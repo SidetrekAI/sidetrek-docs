@@ -1,0 +1,26 @@
+---
+import { MyBreadCrumb } from './MyBreadCrumb'
+import { kebabToTitleCase } from '@/lib/utils'
+
+const currentPath = Astro.url.pathname
+
+const currentPathArr = currentPath.split('/').filter((x) => x !== '')
+
+const breadcrumbItems =
+  currentPathArr.length > 0
+    ? currentPathArr.map((path, index) => {
+        const label = kebabToTitleCase(path)
+        const href = `/${currentPathArr.slice(0, index + 1).join('/')}`
+        
+        // Do not provide href for the current path
+        return href === currentPath ? { label } : { label, href }
+      })
+    : []
+
+const MAX_BREADCRUMB_ITEMS = 4
+const itemsToDisplay = breadcrumbItems.length > MAX_BREADCRUMB_ITEMS ? MAX_BREADCRUMB_ITEMS : breadcrumbItems.length
+---
+
+<div class={itemsToDisplay === 0 ? 'mb-3' : `mb-6`}>
+  <MyBreadCrumb items={breadcrumbItems} itemsToDisplay={itemsToDisplay} />
+</div>

@@ -1,0 +1,130 @@
+---
+import '@/styles/globals.css'
+import '@fontsource/geist-sans/100.css'
+import '@fontsource/geist-sans/200.css'
+import '@fontsource/geist-sans/300.css'
+import '@fontsource/geist-sans/400.css'
+import '@fontsource/geist-sans/500.css'
+import '@fontsource/geist-sans/600.css'
+import '@fontsource/geist-sans/700.css'
+import '@fontsource/geist-sans/800.css'
+import '@fontsource/geist-sans/900.css'
+import Header from '@/components/Header.astro'
+import SideMenu from '@/components/SideMenu'
+import { HEADER_HEIGHT } from '@/lib/constants'
+
+interface Props {
+  title: string
+  description: string
+}
+
+const currentPath = Astro.url.pathname
+
+const { title, description } = Astro.props
+
+export const sideMenuTree = [
+  {
+    label: 'Start Here',
+    tree: [
+      {
+        label: 'Getting Started',
+        href: '/start-here/getting-started',
+      },
+      {
+        label: 'Why Sidetrek?',
+        href: '/start-here/why-sidetrek',
+      },
+      {
+        label: 'Quickstart',
+        href: '/start-here/quickstart',
+      },
+    ],
+  },
+  {
+    label: 'Tutorials',
+    tree: [
+      {
+        label: 'Overview',
+        href: '/tutorials/overview',
+      },
+      {
+        label: 'BI Stack Example 1',
+        href: '/tutorials/bi-stack-1',
+      },
+    ],
+  },
+  {
+    label: 'Basics',
+    tree: [
+      {
+        label: 'Project Structure',
+        href: '/basics/project-structure',
+      },
+    ],
+  },
+  {
+    label: 'Guides',
+    tree: [
+      {
+        label: 'Validation',
+        href: '/guides/validation',
+      },
+      {
+        label: 'Testing',
+        href: '/guides/testing',
+      },
+    ],
+  },
+  {
+    label: 'API',
+    tree: [
+      {
+        label: 'CLI Commands',
+        href: '/api/cli-commands',
+        tree: [
+          {
+            label: 'init',
+            href: '/api/cli-commands/init',
+          },
+          {
+            label: 'start',
+            href: '/api/cli-commands/start',
+          },
+          {
+            label: 'stop',
+            href: '/api/cli-commands/stop',
+          },
+          {
+            label: 'down',
+            href: '/api/cli-commands/down',
+          },
+          {
+            label: 'logs',
+            href: '/api/cli-commands/logs',
+          },
+        ],
+      },
+    ],
+  },
+]
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body class="antialiased">
+    <Header />
+
+    <div class="flex" style={`height: calc(100vh - ${HEADER_HEIGHT}px); margin-top: ${HEADER_HEIGHT}px`}>
+      <div class="hidden md:block"><SideMenu tree={sideMenuTree} currentPath={currentPath} client:load /></div>
+      <slot />
+    </div>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+---
+import { Image } from 'astro:assets'
+import sidetrekLogo from '../images/logos/logo-0.svg'
+import githubIcon from '../images/icons/github.svg?raw'
+import { HEADER_HEIGHT } from '../lib/constants'
+import SideMenuMobile from './SideMenuMobile'
+import { sideMenuTree } from '@/layouts/Layout.astro'
+
+const currentPath = Astro.url.pathname
+---
+
+<header
+  class="fixed top-0 z-50 w-full flex justify-between items-center border-b border-slate-200 bg-white"
+  style={`height: ${HEADER_HEIGHT}px`}
+>
+  <a href="/">
+    <Image src={sidetrekLogo} alt="Sidetrek logo" class="w-36 py-3 px-4" />
+  </a>
+
+  <div class="flex items-center py-3 px-4 space-x-6 md:space-x-12 text-sm">
+    <ul class="flex items-center space-x-6">
+      <li><a href="docs" class="text-slate-500 hover:text-slate-900">Docs</a></li>
+    </ul>
+
+    <div class="flex items-center">
+      <div class="w-5 h-5 flex justify-center items-center">
+        <a href="https://github.com/sidetrekAI" target="_blank">
+          <div class="text-slate-500 hover:text-slate-900">
+            <Fragment set:html={githubIcon} />
+          </div>
+        </a>
+      </div>
+      <div class="block md:hidden -mr-3"><SideMenuMobile tree={sideMenuTree} currentPath={currentPath} client:load /></div>
+    </div>
+  </div>
+</header>
