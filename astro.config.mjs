@@ -8,7 +8,7 @@ import expressiveCode from 'astro-expressive-code'
 // https://astro.build/config
 export default defineConfig({
   redirects: {
-    '/start-here': '/start-here/getting-started'
+    '/start-here': '/start-here/getting-started',
   },
   integrations: [
     react(),
@@ -16,7 +16,7 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
     expressiveCode({
-      themes: ['dark-plus', 'catppuccin-mocha', 'github-dark-default'],
+      themes: ['catppuccin-mocha', 'dark-plus', 'github-dark-default'],
     }),
     mdx(),
   ],
