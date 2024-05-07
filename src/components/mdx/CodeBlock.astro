@@ -1,0 +1,18 @@
+---
+const findAttrValue = (htmlStr: string, attrName: string): string | null => {
+  if (!htmlStr.includes(` ${attrName}="`)) return null
+  return htmlStr.split(` ${attrName}="`)[1].split('"')[0]
+}
+
+const slotHtmlStr = await Astro.slots.render('default')
+console.log('slotHtmlStr', slotHtmlStr)
+const filename = findAttrValue(slotHtmlStr, 'data-astro-code-block-filename')
+console.log('filename', filename)
+---
+
+<div class="bg-[#181827] text-[0.8rem]">
+  {filename && <div class="-my-2">
+    <span class="rounded-full px-1.5 py-0.5 bg-white/30 text-white text-xs">{filename}</span>
+  </div>}
+  <div class="px-4"><slot /></div>
+</div>

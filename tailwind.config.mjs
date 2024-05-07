@@ -70,6 +70,7 @@ export default {
       },
       fontFamily: {
         sans: ['Geist Sans', ...defaultTheme.fontFamily.sans],
+        mono: [...defaultTheme.fontFamily.mono],
       },
     },
   },
