@@ -1,3 +1,5 @@
+@import "mdx.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -73,24 +75,4 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-pre.astro-code {
-  border-radius: 8px;
-  margin-top: 1rem;
-}
-
-pre.astro-code {
-  counter-reset: step;
-  counter-increment: step 0;
-}
-
-.astro-code-line-number:not(:last-child)::before {
-  content: counter(step);
-  counter-increment: step;
-  width: 1rem;
-  margin-right: 1.2rem;
-  display: inline-block;
-  text-align: right;
-  color: rgba(255, 255, 255, 0.4);
 }
