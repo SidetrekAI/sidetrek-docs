@@ -2,14 +2,34 @@ import { defineConfig } from 'astro/config'
 import react from '@astrojs/react'
 import tailwind from '@astrojs/tailwind'
 import mdx from '@astrojs/mdx'
-import {
-  transformerNotationDiff,
-  transformerNotationHighlight,
-  transformerNotationWordHighlight,
-  transformerNotationErrorLevel,
-  transformerMetaHighlight,
-  transformerMetaWordHighlight,
-} from '@shikijs/transformers'
+import rehypePrettyCode from 'rehype-pretty-code'
+import theme from './syntax-theme.json'
+
+const prettyCodeOptions = {
+  theme,
+  onVisitTitle(node) {
+    console.log(node)
+    node.children = [
+      {
+        type: 'element',
+        tagName: 'span',
+        properties: { className: 'title' },
+        children: [{ type: 'text', value: node.children[0].value }],
+      },
+    ]
+  },
+  onVisitHighlightedLine(node) {
+    node?.properties?.className
+      ? node.properties.className.push('highlighted')
+      : (node.properties.className = ['highlighted'])
+  },
+  onVisitHighlightedChars(node) {
+    console.log(node)
+    node?.properties?.className
+      ? node.properties.className.push('highlighted-chars')
+      : (node.properties.className = ['highlighted-chars'])
+  },
+}
 
 // https://astro.build/config
 export default defineConfig({
@@ -24,36 +44,8 @@ export default defineConfig({
     mdx(),
   ],
   markdown: {
-    shikiConfig: {
-      theme: 'catppuccin-mocha',
-      langs: ['python', 'markdown', 'bash'],
-      wrap: false,
-      transformers: [
-        {
-          line(node, line) {
-            // Add line number class to line nodes
-            // USAGE: Add `no_line_numbers` to the meta block in the mdx code fence
-            node.properties['data-line'] = line
-            const metaOptions = this.options.meta ? this.options.meta.__raw.split(' ') : []
-            const hasNoLineNumberOption = metaOptions.includes('no_line_numbers')
-            if (!hasNoLineNumberOption) {
-              this.addClassToHast(node, 'astro-code-line-number')
-            }
-
-            // Add class to code blocks
-            // USAGE: Add `filename=your-filename` to the meta block in the mdx code fence
-            const filenameOpt = metaOptions.find((opt) => opt.startsWith('filename='))
-            const filename = filenameOpt ? filenameOpt.split('=')[1] : null
-            if (filename) {
-              node.properties['data-astro-code-block-filename'] = filename
-            }
-          },
-        },
-        transformerNotationDiff,
-        transformerNotationErrorLevel,
-        transformerMetaHighlight,
-        transformerMetaWordHighlight,
-      ],
-    },
+    syntaxHighlight: false,
+    extendDefaultPlugins: true,
+    rehypePlugins: [[rehypePrettyCode, prettyCodeOptions]],
   },
 })

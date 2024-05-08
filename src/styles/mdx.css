@@ -1,0 +1,61 @@
+figure[data-rehype-pretty-code-figure] {
+  font-size: 0.8rem;
+  margin-top: 1.5rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+figure[data-rehype-pretty-code-figure] > pre > code {
+  display: grid; /*  this is way the line will span whole width of `code` component */
+  padding: 1.5rem 0;
+}
+
+figure[data-rehype-pretty-code-figure] > pre > code span[data-line] {
+  padding: 0 1.5rem;
+}
+
+figure[data-rehype-pretty-code-figure] > pre > code span.highlighted {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/** 
+  *  data-line-numbers will be enabled on markdown with `showLineNumbers` meta string on it
+  */
+figure[data-rehype-pretty-code-figure] > pre > code[data-line-numbers] {
+  counter-reset: line;
+}
+figure[data-rehype-pretty-code-figure] > pre > code[data-line-numbers] > [data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  margin-right: 1.5rem;
+  width: 1rem;
+  text-align: right;
+  color: rgba(255,255,255,0.5);
+}
+figure[data-rehype-pretty-code-figure] > pre > code[data-line-numbers-max-digits='2'] > [data-line]::before {
+  width: 1rem;
+}
+figure[data-rehype-pretty-code-figure] > code[data-line-numbers-max-digits='3'] > [data-line]::before {
+  width: 2rem;
+}
+
+/** 
+  *  title will be enabled on markdown with `title` meta string on it
+  */
+figure[data-rehype-pretty-code-figure] > figcaption {
+  padding: 1rem 1.5rem 0 1.5rem;
+  margin-bottom: -0.5rem;
+  background-color: #181827;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 1);
+}
+
+figure[data-rehype-pretty-code-figure] > figcaption > span.title {
+  padding: 0.1rem 0.5rem;
+  background-color: #4f4ce0;
+  border-radius: 50px;
+}
