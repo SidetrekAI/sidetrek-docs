@@ -3,3 +3,123 @@ title: Quickstart
 description: Create an example project with Sidetrek
 draft: false
 ---
+import H1 from '@/components/H1.astro'
+
+# Quickstart
+
+## Setup A Sidetrek Project
+
+### Download and Install
+
+1. Download and untar the file `sidetrek.x.x.xx-linux-x64.tar.gz`
+2. Run this command to change permission:
+
+```bash
+chmod +x install.sh && ./install.sh
+```
+3. After installing Sidetrek, check the version running `sidetrek --version` and it should print the version number.
+
+### Create A Project
+
+Run the command:
+
+```bash
+sidetrek init
+```
+
+- It will ask `Sidetrek requires Python 3.10-3.11, Poetry, and git CLI installed. Are you ready to continue?` Select `Yes`
+- Then it will ask you to select the Python version- 3.10 and 3.11
+- It will then ask you to enter the project name. Let’s name it `quickstart`
+- Finally, it will ask you to select the data stack. Currently, we only have one data stack available.
+
+After pressing Enter, Sidetrek will start scaffolding your project and setting up Dagster, Meltano, DBT, Trino and Superset.
+
+If project is successfully initialized, you’ll see `You're all set - enjoy building your new data project! 🚀`
+
+### Start the Project
+
+Change working directory to your project directory by running `cd quickstart`
+
+Once you are in the project folder, run the following command:
+
+```bash
+sidetrek start
+```
+
+Please note that you need to have docker, docker compose and docker desktop installed in your system. Also, remember that it will take a while to pull images when you run it for the first time.
+
+Network related issues:
+
+
+>> 💡 If you already have npm installed in your machine, you may get this error: `npm ERR! network In most cases you are behind a proxy or have bad network settings` To fix this, run `npm config rm proxy && npm config rm https-proxy`
+
+
+Port related issues:
+
+
+>> 💡 If you get an error that contains: `bind: address already in use` run `sudo lsof -i :<port-number>` and it will show the `PID` (Process ID). Then you can run `sudo kill <PID>`
+
+
+Every time you want to restart the containers, run `sidetrek down` and then `sidetrek start`
+
+Once, project is started successfully, you can see Dagster GUI at http://0.0.0.0:3000/
+
+In `Code Location` tab, the project name will be visible with an error and that is absolutely normal. The error says:
+
+```bash
+dagster._core.errors.DagsterInvariantViolationError: No repositories, jobs, pipelines, graphs, or asset definitions found in "demo_project".
+```
+
+We need to add jobs, assets, schedules etc. and reload to get rid of the error.
+<br />
+
+## About the Dataset
+
+We’ll work with a dataset consisting of 4 csv files:
+<ul>
+    <li>Orders (orders.csv)</li>
+        <ul>
+        <li>order_id: string</li>
+        <li>ordered_at: timestamp</li>
+        <li>product_id: string</li>
+        <li>product_qty: integer</li>
+        <li>customer_id: string</li>
+        <li>store_id: string</li>
+        </ul>
+
+    <li>Customers (customers.csv)</li>
+        <ul>
+        <li>customer_id: string</li>
+        <li>customer_name: string</li>
+        <li>first_name: string</li>
+        <li>last_name</li>
+        <li>gender: string</li>
+        <li>country: string</li>
+        <li>address: string</li>
+        <li>phone_no: string</li>
+        <li>email: string</li>
+        <li>payment_method: string</li>
+        <li>traffic_source: string</li>
+        <li>customer_age: integer</li>
+        <li>device_type: string</li>
+        </ul>
+    
+    <li>Products (products.csv)</li>
+        <ul>
+        <li>product_id: string</li>
+        <li>product_name: string</li>
+        <li>product_category: string</li>
+        <li>unit_price: float</li>
+        <li>product_description: string</li>
+        </ul>
+    
+    <li>Stores (stores.csv)</li>
+        <ul>
+        <li>store_id: string</li>
+        <li>store_name: string</li>
+        <li>store_city: string</li>
+        <li>store_state: string</li>
+        <li>tax_rate: float</li>
+        </ul>
+</ul>
+<br />
