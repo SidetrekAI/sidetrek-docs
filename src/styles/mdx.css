@@ -1,8 +1,8 @@
 figure[data-rehype-pretty-code-figure] {
   font-size: 0.8rem;
-  margin-top: 1.5rem;
   overflow: hidden;
   border-radius: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 figure[data-rehype-pretty-code-figure] > pre > code {
