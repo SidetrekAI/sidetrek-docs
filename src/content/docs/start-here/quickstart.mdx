@@ -17,6 +17,7 @@ import H1 from '@/components/H1.astro'
 ```bash
 chmod +x install.sh && ./install.sh
 ```
+
 3. After installing Sidetrek, check the version running `sidetrek --version` and it should print the version number.
 
 ### Create A Project
@@ -122,4 +123,521 @@ We’ll work with a dataset consisting of 4 csv files:
         <li>tax_rate: float</li>
         </ul>
 </ul>
+<br />
+## Data Ingestion
+
+- Inside `<project-directory>/meltano/extract/`  add a file `file_def.json`:
+    
+    ```json title="file_def.json"
+    [
+        {
+          "entity": "orders",
+          "path": "../data/orders.csv",
+          "keys": ["order_id"]
+        },
+        {
+            "entity": "customers",
+            "path": "../data/orders.csv",
+            "keys": ["id"]
+        },
+        {
+            "entity": "products",
+            "path": "../data/products.csv",
+            "keys": ["id"]
+        },
+        {
+            "entity": "stores",
+            "path": "../data/stores.csv",
+            "keys": ["id"]
+        }
+      ]
+    ```
+    
+    Entity is the table name, path is the file path and keys can be a list of any columns
+    
+- Inside `<project-directory>/meltano/`, add configurations for an extractor (i.e. tap-csv) and a loader (i.e. target-iceberg) to `meltano.yml`
+    
+    ```yaml title="meltano.yml"
+    plugins:
+      extractors:
+      - name: tap-csv
+        variant: meltanolabs
+        pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+        config:
+          csv_files_definition: extract/file_def.json
+      loaders:
+      - name: target-iceberg
+        namespace: target_iceberg
+        pip_url: git+https://github.com/SidetrekAI/target-iceberg
+        executable: target-iceberg
+        config:
+          add_record_metadata: true
+          aws_access_key_id: $AWS_ACCESS_KEY_ID
+          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+          s3_endpoint: http://localhost:9000
+          s3_bucket: lakehouse
+          iceberg_rest_uri: http://localhost:8181
+          iceberg_catalog_name: icebergcatalog
+          iceberg_catalog_namespace_name: raw
+    ```
+    
+    Notice that we added a custom loader for Iceberg.
+    
+- Go to `<project-directory>/meltano` and on your terminal, run `poetry run meltano lock --update --all` and `poetry run meltano install`
+- Inside `<project-directory>/dagster/<project-name>/` add the following to `__init__.py`:
+    
+    ```python title="__init__.py"
+    from .meltano import run_csv_to_iceberg_meltano_job
+    
+    defs = Definitions(
+        assets=[dbt_project_assets],
+        jobs=[run_csv_to_iceberg_meltano_job],
+        resources={
+            "dbt": DbtCliResource(project_dir=os.fspath(dbt_project_dir)),
+        },
+    )
+    ```
+    
+- Go to http://0.0.0.0:3000/ and after reloading you’ll see `run_csv_to_iceberg_meltano_job` added to the list of jobs. Click on it, go to Launchpad and click on `Launch Run`. The job will be run. If the job is successfully run, you’ll see a new folder `raw` in your lakehouse, where you’ll see the 4 different tables written in iceberg table format.
+    
+>> 💡 Every time you make any change, reload the job on Dagster UI 
+
+## Transformation
+
+### Adding dbt project
+
+We’re going to follow the medallion architecture:
+
+- **Staging:** In this stage, we’ll do some basic transformation and cleaning on the tables in `raw` schema. We’ll take care of null values and data types.
+- **Intermediate:** In this stage, we’ll de-normalize all the tables
+- **Marts:** In this stage, we’ll have our analytics-ready, clean, de-normalized tables which different teams can use.
+
+### Staging Models:
+
+- Inside `dbt/<project-dirname>/models` add a new directory `staging`
+- Inside `staging`, add a properties file called `stg_iceberg.yml` (notice that `stg` represents the stage, and `iceberg` represents the database name) In `stg_iceberg.yml` file, add the following code:
+    
+    ```yaml title="stg_iceberg.yml"
+    version: 2
+    
+    sources:
+      - name: stg_iceberg
+        database: iceberg
+        schema: raw
+        tables:
+          - name: orders
+          - name: customers
+          - name: products
+          - name: stores
+    
+    models:
+    	- name: stg_iceberg__orders
+      - name: stg_iceberg__customers
+      - name: stg_iceberg__products
+      - name: stg_iceberg__stores
+    ```
+    
+- Here’s a little breakdown:
+    - Version: Specifies the version of the model files in the same folder.
+    - Sources: Defines the name of the source, sets the database name, sets the schema name, and lists all the tables in the schema.
+    - Models: Lists all the models we are going to create.
+- Inside `dbt/<projectname>/models/staging/` create the first sql model for staging stage called `stg_iceberg__orders.sql` and put the code in it:
+    
+    ```sql title="stg_iceberg__orders.sql"
+    {{
+      config(
+        file_format='iceberg',
+        on_schema_change='sync_all_columns',
+        materialized='incremental',
+        incremental_strategy='merge',
+        unique_key='order_id',
+        properties={
+          "format": "'PARQUET'",
+          "sorted_by": "ARRAY['order_id']",
+        }
+      )
+    }}
+    
+    with source as (
+      select
+        CAST(order_id AS VARCHAR) AS order_id,
+        CAST(created_at AS TIMESTAMP) AS order_created_at,
+        CAST(qty AS DECIMAL) AS qty,
+        CAST(product_id AS VARCHAR) AS product_id,
+        CAST(customer_id AS VARCHAR) AS customer_id,
+        CAST(store_id AS VARCHAR) AS store_id
+      from {{ source('stg_iceberg', 'orders') }}
+    )
+    
+    select * from source
+    ```
+    
+- Breakdown of the code:
+    - `{{ config() }}` sets the file format as iceberg. If schema is changed, it is set to sync all columns in the table. There are these materializations that we can use in dbt: table, view, incremental, ephemeral, materialized, and view. In our case, we chose incremental. We also chose merge as the strategy so it does not append the previously materialized rows. We also set an unique key, set how we want to sort data in the table.
+    - `with source as ( select column-1, column 2, ... from {{ source('stg_iceberg', 'orders') }})` performs the actual transformation. Notice that we took all the columns and set their datatypes accordingly.
+    - Finally, we select everything from source and create our new table `stg_iceberg__orders`
+- In `dbt_project.yml` add the following:
+    
+    ```yaml title="dbt_project.yml"
+    models:
+      quickstart:
+        staging:
+          +materialized: view
+          +schema: staging
+          +views_enabled: false
+    ```
+    
+
+Similarly, add dbt models for the other tables:
+
+`stg_iceberg__customers.sql`
+
+```sql title="stg_iceberg__customers.sql"
+{{
+  config(
+    file_format='iceberg',
+    on_schema_change='sync_all_columns',
+    materialized='incremental',
+    incremental_strategy='merge',
+    unique_key='id',
+    properties={
+      "format": "'PARQUET'",
+      "partitioning": "ARRAY['traffic_source']",
+      "sorted_by": "ARRAY['id']",
+    }
+  )
+}}
+
+with source as (
+    select
+        CAST(id AS VARCHAR) AS id,
+        CAST(created_at AS TIMESTAMP) AS acc_created_at,
+        CAST(first_name AS VARCHAR) AS first_name,
+        CAST(last_name AS VARCHAR) AS last_name,
+        CAST(gender AS VARCHAR) AS gender,
+        CAST(country AS VARCHAR) AS country,
+        CAST(address AS VARCHAR) AS address,
+        CAST(phone AS VARCHAR) AS phone,
+        CAST(email AS VARCHAR) AS email,
+        CAST(payment_method AS VARCHAR) AS payment_method,
+        CAST(traffic_source AS VARCHAR) AS traffic_source,
+        CAST(referrer AS VARCHAR) AS referrer,
+        CAST(customer_age AS DECIMAL) AS customer_age,
+        CAST(device_type AS VARCHAR) AS device_type
+    from {{ source('stg_iceberg', 'customers') }}
+)
+
+select * from source
+```
+
+`stg_iceberg__products.sql`
+
+```sql title="stg_iceberg__products.sql"
+{{
+  config(
+    file_format='iceberg',
+    on_schema_change='sync_all_columns',
+    materialized='incremental',
+    incremental_strategy='merge',
+    unique_key='id',
+    properties={
+      "format": "'PARQUET'",
+      "partitioning": "ARRAY['category']",
+      "sorted_by": "ARRAY['id']",
+    }
+  )
+}}
+
+with source as (
+    select
+        CAST(id AS VARCHAR) AS id,
+        CAST(name AS VARCHAR) AS name,
+        CAST(category AS VARCHAR) AS category,
+        CAST(price AS DECIMAL(10,2)) AS price,
+        CAST(description AS VARCHAR) AS description,
+        CAST(unit_shipping_cost AS DECIMAL(4, 2)) AS unit_shipping_cost
+    from {{ source('stg_iceberg', 'products') }}
+)
+
+select * from source
+```
+
+`stg_iceberg__stores.sql`
+
+```sql title="stg_iceberg__stores.sql"
+{{
+  config(
+    file_format='iceberg',
+    on_schema_change='sync_all_columns',
+    materialized='incremental',
+    incremental_strategy='merge',
+    unique_key='id',
+    properties={
+      "format": "'PARQUET'",
+      "partitioning": "ARRAY['state']",
+      "sorted_by": "ARRAY['id']",
+    }
+  )
+}}
+
+with source as (
+    select
+        CAST(id AS VARCHAR) AS id,
+        CAST(name AS VARCHAR) AS name,
+        CAST(city AS VARCHAR) AS city,
+        CAST(state AS VARCHAR) AS state,
+        CAST(tax_rate AS DECIMAL(10, 8)) AS tax_rate
+    from {{ source('stg_iceberg', 'stores') }}
+)
+
+select * from source
+```
+### Intermediate Models:
+
+- Just like staging, inside `dbt/<projectname>/models` add a new directory `intermediate`
+- Add the following files:
+    - `int_iceberg.yml`:
+        
+        ```yaml title="int_iceberg.yml"
+        version: 2
+        
+        sources:
+          - name: int_iceberg
+            database: iceberg
+            schema: project_staging
+            tables:
+              - name: stg_iceberg__orders
+              - name: stg_iceberg__customers
+              - name: stg_iceberg__products
+              - name: stg_iceberg__stores
+        
+        models:
+          - name: int_iceberg__denormalized_orders
+        ```
+        
+    - `int_iceberg__denormalized_orders.sql`:
+        
+        ```sql title="int_iceberg__denormalized_orders.sql"
+        {{
+        config(
+            file_format='iceberg',
+            materialized='incremental',
+            on_schema_change='sync_all_columns',
+            unique_key='order_id',
+            incremental_strategy='merge',
+            properties={
+            "format": "'PARQUET'",
+            "sorted_by": "ARRAY['order_id']",
+            "partitioning": "ARRAY['device_type']",
+            }
+        )
+        }}
+
+        with denormalized_data as (
+        select
+            o.order_id,
+            o.order_created_at,
+            o.qty,
+            o.product_id,
+            o.customer_id,
+            o.store_id,
+            c.acc_created_at,
+            c.first_name,
+            c.last_name,
+            --  Concatenated columns
+            CONCAT(c.first_name, ' ', c.last_name) as full_name,
+            c.gender,
+            c.country,
+            c.address,
+            c.phone,
+            c.email,
+            c.payment_method,
+            c.traffic_source,
+            c.referrer,
+            c.customer_age,
+            c.device_type,
+            p.name as product_name,
+            p.category as product_category,
+            (p.price/100) as product_price,
+            p.description as product_description,
+            p.unit_shipping_cost,
+            s.name as store_name,
+            s.city as store_city,
+            s.state as store_state,
+            s.tax_rate,
+            -- Calculated columns
+            (p.price/100) * o.qty as total_product_price,
+            ((p.price/100) * o.qty) + p.unit_shipping_cost as total_price_with_shipping,
+            (((p.price/100) * o.qty) + p.unit_shipping_cost) * (1 + s.tax_rate) as total_price_with_tax
+        from {{ ref('stg_iceberg__orders') }} o
+        left join {{ ref('stg_iceberg__customers') }} c
+            on o.customer_id = c.id
+        left join {{ ref('stg_iceberg__products') }} p
+            on o.product_id = p.id
+        left join {{ ref('stg_iceberg__stores') }} s
+            on o.store_id = s.id
+        )
+
+        select *
+        from denormalized_data
+        
+        ```
+        
+- In `dbt_project.yml` add this to models:
+    
+    ```yaml title="dbt_project.yml"
+    intermediate:
+          +materialized: view
+          +schema: intermediate
+          +views_enabled: false
+    ```
+    
+- Test if the intermediate models are found on dagster Global Asset Lineage and materialize them. You should see a de-normalized table in `project_intermediate` schema.
+
+### Marts Models:
+
+- Just like staging and intermediate, inside `dbt/<projectname>/models` add a new directory `marts`
+- Add the following files:
+    - `marts_iceberg.yml`:
+        
+        ```yaml title="marts_iceberg.yml"
+        version: 2
+        
+        sources:
+          - name: marts_iceberg
+            database: iceberg
+            schema: project_intermediate
+            tables:
+              - name: int_iceberg__denormalized_orders
+        
+        models:
+          - name: marts_iceberg__general
+          - name: marts_iceberg__marketing
+          - name: marts_iceberg__payment
+        ```
+        
+        Notice how we are creating 4 different models from the table from `project_intermediate` schema for 4 different departments.
+        
+    - `marts_iceberg__general.sql`:
+        
+        ```sql title="marts_iceberg__general.sql"
+        {{
+          config(
+            file_format='iceberg',
+            on_schema_change='sync_all_columns',
+            materialized='incremental',
+            unique_key='order_id',
+            incremental_strategy='merge',
+            properties={
+              "format": "'PARQUET'",
+              "partitioning": "ARRAY['traffic_source']"
+            }
+          )
+        }}
+        
+        with final as (
+          select * from {{ ref('int_iceberg__denormalized_orders') }}
+        )
+        
+        select *
+        from final
+        ```
+        
+    - `marts_iceberg__marketing.sql`:
+        
+        ```sql title="marts_iceberg__marketing.sql"
+        {{
+          config(
+            file_format='iceberg',
+            on_schema_change='sync_all_columns',
+            materialized='incremental',
+            unique_key='order_id',
+            incremental_strategy='merge',
+            properties={
+              "format": "'PARQUET'",
+              "partitioning": "ARRAY['traffic_source']"
+            }
+          )
+        }}
+        
+        with final as (
+          select
+            order_id,
+            order_created_at,
+            qty,
+            product_id,
+            customer_id,
+            store_id,
+            traffic_source,
+            referrer,
+            product_name,
+            product_category,
+            product_description,
+            unit_shipping_cost,
+            store_name,
+            store_city,
+            store_state,
+            tax_rate,
+            total_price_with_shipping,
+            total_price_with_tax,
+            product_price,
+            total_product_price
+          from {{ ref('int_iceberg__denormalized_orders') }}
+        )
+        
+        select *
+        from final
+        
+        ```
+        
+    - `marts_iceberg__payment.sql`:
+        
+        ```sql title="marts_iceberg__payment.sql"
+        {{
+          config(
+            file_format='iceberg',
+            on_schema_change='sync_all_columns',
+            materialized='incremental',
+            unique_key='order_id',
+            incremental_strategy='merge',
+            properties={
+              "format": "'PARQUET'",
+              "partitioning": "ARRAY['payment_method']"
+            }
+          )
+        }}
+        
+        with final as (
+          select
+            order_id,
+            order_created_at,
+            product_id,
+            qty,
+            unit_shipping_cost,
+            tax_rate,
+            total_price_with_shipping,
+            total_price_with_tax,
+            product_price,
+            total_product_price,
+            payment_method
+          from {{ ref('int_iceberg__denormalized_orders') }}
+        )
+        
+        select *
+        from final
+        ```
+        
+- In `dbt_project.yml` add this to models:
+    
+    ```yaml title="dbt_project.yml"
+    marts:
+          +materialized: view
+          +schema: marts
+          +views_enabled: false
+    ```
+    
+- Test if the marts models are found on dagster Global Asset Lineage and materialize them. You should see 4 analytics-ready tables in `project_marts` schema.
+
+<br />
+## Data Visualization
 <br />
