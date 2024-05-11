@@ -1,17 +1,25 @@
+p code, li code {
+  font-size: 0.85rem;
+  color: rgb(15 23 42);
+  border-radius: 0.2rem;
+  padding: 0.1rem 0.25rem;
+  background-color: #eeeef5;
+}
+
 figure[data-rehype-pretty-code-figure] {
   font-size: 0.8rem;
   overflow: hidden;
   border-radius: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 figure[data-rehype-pretty-code-figure] > pre > code {
   display: grid; /*  this is way the line will span whole width of `code` component */
-  padding: 1.5rem 0;
+  padding: 1rem 0;
 }
 
 figure[data-rehype-pretty-code-figure] > pre > code span[data-line] {
-  padding: 0 1.5rem;
+  padding: 0 1rem;
 }
 
 figure[data-rehype-pretty-code-figure] > pre > code span.highlighted {
