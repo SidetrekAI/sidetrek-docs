@@ -3,7 +3,7 @@ p code, li code {
   color: rgb(15 23 42);
   border-radius: 0.2rem;
   padding: 0.1rem 0.25rem;
-  background-color: #eeeef5;
+  background-color: #ebecf6;
 }
 
 figure[data-rehype-pretty-code-figure] {
