@@ -419,22 +419,22 @@ select * from source
         
         ```sql title="int_iceberg__denormalized_orders.sql"
         {{
-          config(
+        config(
             file_format='iceberg',
             materialized='incremental',
             on_schema_change='sync_all_columns',
             unique_key='order_id',
             incremental_strategy='merge',
             properties={
-              "format": "'PARQUET'",
-              "sorted_by": "ARRAY['order_id']",
-              "partitioning": "ARRAY['device_type']",
+            "format": "'PARQUET'",
+            "sorted_by": "ARRAY['order_id']",
+            "partitioning": "ARRAY['device_type']",
             }
-          )
+        )
         }}
-        
+
         with denormalized_data as (
-          select
+        select
             o.order_id,
             o.order_created_at,
             o.qty,
@@ -444,6 +444,8 @@ select * from source
             c.acc_created_at,
             c.first_name,
             c.last_name,
+            --  Concatenated columns
+            CONCAT(c.first_name, ' ', c.last_name) as full_name,
             c.gender,
             c.country,
             c.address,
@@ -467,15 +469,15 @@ select * from source
             (p.price/100) * o.qty as total_product_price,
             ((p.price/100) * o.qty) + p.unit_shipping_cost as total_price_with_shipping,
             (((p.price/100) * o.qty) + p.unit_shipping_cost) * (1 + s.tax_rate) as total_price_with_tax
-          from {{ ref('stg_iceberg__orders') }} o
-          left join {{ ref('stg_iceberg__customers') }} c
+        from {{ ref('stg_iceberg__orders') }} o
+        left join {{ ref('stg_iceberg__customers') }} c
             on o.customer_id = c.id
-          left join {{ ref('stg_iceberg__products') }} p
+        left join {{ ref('stg_iceberg__products') }} p
             on o.product_id = p.id
-          left join {{ ref('stg_iceberg__stores') }} s
+        left join {{ ref('stg_iceberg__stores') }} s
             on o.store_id = s.id
         )
-        
+
         select *
         from denormalized_data
         
