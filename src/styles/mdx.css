@@ -1,4 +1,4 @@
-p code, li code {
+:not(pre) > code {
   font-size: 0.85rem;
   color: rgb(15 23 42);
   border-radius: 0.2rem;
