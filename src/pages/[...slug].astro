@@ -6,6 +6,9 @@ import H1 from '@/components/H1.astro'
 import H2 from '@/components/H2.astro'
 import H3 from '@/components/H3.astro'
 import P from '@/components/mdx/P.astro'
+import UL from '@/components/mdx/UL.astro'
+import OL from '@/components/mdx/OL.astro'
+import LI from '@/components/mdx/LI.astro'
 
 export async function getStaticPaths() {
   const docsPages = await getCollection('docs', ({ data }) => {
@@ -31,6 +34,6 @@ const { title, description } = page.data
 
 <Layout title={title} description={description}>
   <Main>
-    <Content class="content" components={{ h1: H1, h2: H2, h3: H3, p: P }} />
+    <Content class="content" components={{ h1: H1, h2: H2, h3: H3, p: P, ul: UL, ol: OL, li: LI }} />
   </Main>
 </Layout>
