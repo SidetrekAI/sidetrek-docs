@@ -114,9 +114,11 @@ export const sideMenuTree = [
   <body class="antialiased">
     <Header />
 
-    <div class="flex" style={`height: calc(100vh - ${HEADER_HEIGHT}px); margin-top: ${HEADER_HEIGHT}px`}>
-      <div class="hidden md:block"><SideMenu tree={sideMenuTree} currentPath={currentPath} client:load /></div>
-      <slot />
+    <div class="container mx-auto" style={`height: calc(100vh - ${HEADER_HEIGHT}px); margin-top: ${HEADER_HEIGHT}px`}>
+      <div class="flex">
+        <div class="hidden md:block"><SideMenu tree={sideMenuTree} currentPath={currentPath} client:load /></div>
+        <slot />
+      </div>
     </div>
   </body>
 </html>
