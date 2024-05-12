@@ -5,6 +5,7 @@ import githubIcon from '../images/icons/github.svg?raw'
 import { HEADER_HEIGHT } from '../lib/constants'
 import SideMenuMobile from './SideMenuMobile'
 import { sideMenuTree } from '@/layouts/Layout.astro'
+import { SearchBar } from './SearchBar'
 
 const currentPath = Astro.url.pathname
 ---
@@ -18,6 +19,8 @@ const currentPath = Astro.url.pathname
   </a>
 
   <div class="flex items-center py-3 px-4 space-x-6 md:space-x-12 text-sm">
+    <SearchBar items={[]} client:load />
+
     <ul class="flex items-center space-x-6">
       <li><a href="docs" class="text-slate-500 hover:text-slate-900">Docs</a></li>
     </ul>
@@ -30,7 +33,9 @@ const currentPath = Astro.url.pathname
           </div>
         </a>
       </div>
-      <div class="block md:hidden -mr-3"><SideMenuMobile tree={sideMenuTree} currentPath={currentPath} client:load /></div>
+      <div class="block md:hidden -mr-3">
+        <SideMenuMobile tree={sideMenuTree} currentPath={currentPath} client:load />
+      </div>
     </div>
   </div>
 </header>
