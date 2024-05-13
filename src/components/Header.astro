@@ -30,7 +30,26 @@ const currentPath = Astro.url.pathname
           </div>
         </a>
       </div>
-      <div class="block md:hidden -mr-3"><SideMenuMobile tree={sideMenuTree} currentPath={currentPath} client:load /></div>
+      <div class="block md:hidden -mr-3">
+        <SideMenuMobile tree={sideMenuTree} currentPath={currentPath} client:load />
+      </div>
     </div>
   </div>
 </header>
+
+<script>
+  // Smooth scroll to anchor links
+  function smoothScroll(target: string) {
+    const element = document.getElementById(target.replace('#', ''))
+    if (element) {
+      window.scrollTo({
+        top: element.offsetTop - 60,
+        behavior: 'smooth',
+      })
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    const hash = window.location.hash
+    smoothScroll(hash)
+  })
+</script>

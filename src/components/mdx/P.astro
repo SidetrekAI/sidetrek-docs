@@ -1,1 +1,5 @@
-<p class="mb-6"><slot /></p>
+---
+const props = Astro.props
+---
+
+<p class="mb-6" {...props}><slot /></p>

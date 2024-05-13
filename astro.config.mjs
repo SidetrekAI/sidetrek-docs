@@ -2,13 +2,14 @@ import { defineConfig } from 'astro/config'
 import react from '@astrojs/react'
 import tailwind from '@astrojs/tailwind'
 import mdx from '@astrojs/mdx'
-import rehypePrettyCode from 'rehype-pretty-code'
 import theme from './syntax-theme.json'
+import rehypePrettyCode from 'rehype-pretty-code'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+import attachHeadingSlugs from './src/lib/rehype-plugins/attach-heading-slugs'
 
 const prettyCodeOptions = {
   theme,
   onVisitTitle(node) {
-    console.log(node)
     node.children = [
       {
         type: 'element',
@@ -24,7 +25,6 @@ const prettyCodeOptions = {
       : (node.properties.className = ['highlighted'])
   },
   onVisitHighlightedChars(node) {
-    console.log(node)
     node?.properties?.className
       ? node.properties.className.push('highlighted-chars')
       : (node.properties.className = ['highlighted-chars'])
@@ -45,7 +45,7 @@ export default defineConfig({
   ],
   markdown: {
     syntaxHighlight: false,
-    extendDefaultPlugins: true,
-    rehypePlugins: [[rehypePrettyCode, prettyCodeOptions]],
+    extendDefaultPlugins: false,
+    rehypePlugins: [attachHeadingSlugs, rehypeAutolinkHeadings, [rehypePrettyCode, prettyCodeOptions]],
   },
 })
