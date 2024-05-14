@@ -1,1 +1,5 @@
-<h1 class="text-3xl font-semibold tracking-tight text-slate-900 mb-6"><slot /></h1>
+---
+const props = Astro.props
+---
+
+<h1 class="text-3xl font-semibold text-slate-900 mb-6" {...props}><slot /></h1>
