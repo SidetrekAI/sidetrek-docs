@@ -1,8 +1,7 @@
 import path from 'node:path'
 import fs from 'node:fs/promises'
 import * as R from 'ramda'
-import { $ } from 'bun'
-import { Glob } from 'bun'
+import { $, Glob } from 'bun'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
@@ -26,46 +25,65 @@ const collectionName = 'Docs'
 
 // Only creates it if it doesn't exist yet
 const createWeaviateCollection = async (collectionName: string) => {
+  const collectionExists = await dbClient.collections.exists(collectionName)
+  console.log('collection exists?', collectionExists)
+
   // Add a new collection if it doesn't exist
-  if (!(await dbClient.collections.exists(collectionName))) {
+  if (!collectionExists) {
     const schema = {
       name: collectionName,
-      // @ts-ignore
-      vectorizer: weaviate.configure.vectorizer.text2VecOpenAI({
-        model: 'text-embedding-3-small',
-        dimensions: 1536,
-      }),
-      // vectorizer: [
-      //   // @ts-ignore
-      //   weaviate.configure.namedVectorizer('openai_te3_sm', {
+      properties: [
+        {
+          name: 'pathname',
+          dataType: 'text' as const,
+          description: 'Doc pathname' as const,
+        },
+        {
+          name: 'content',
+          dataType: 'text' as const,
+          description: 'Section content' as const,
+        },
+        {
+          name: 'headingId',
+          dataType: 'text' as const,
+          description: 'Heading ID of the section' as const,
+        },
+        {
+          name: 'heading',
+          dataType: 'text' as const,
+          description: 'Heading text of the section' as const,
+        },
+        {
+          name: 'excerpt',
+          dataType: 'text' as const,
+          description: 'Except text for the section' as const,
+        },
+      ],
+      vectorizers: [
+        weaviate.configure.vectorizer.text2VecOpenAI('default', {
+          model: 'text-embedding-3-small',
+          dimensions: 1536,
+        }),
+      ],
+      // vectorizers: [
+      //   weaviate.configure.vectorizer('openai_te3_sm', {
       //     properties: ['openai_te3_sm'],
-      //     // @ts-ignore
       //     vectorizerConfig: weaviate.configure.vectorizer.text2VecOpenAI({
       //       model: 'text-embedding-3-small',
       //       dimensions: 1536,
-      //     }),
-      //   }),
-      //   // @ts-ignore
-      //   weaviate.configure.namedVectorizer('openai_te3_lg_1024', {
-      //     properties: ['openai_te3_lg_1024'],
-      //     // @ts-ignore
-      //     vectorizerConfig: weaviate.configure.vectorizer.text2VecOpenAI({
-      //       model: 'text-embedding-3-large',
-      //       dimensions: 1024,
       //     }),
       //   }),
       // ],
       generative: weaviate.configure.generative.openAI(),
     }
 
-    // @ts-ignore
     const newCollection = await dbClient.collections.create(schema)
     console.log('Added a new class ', newCollection['name'])
   }
 }
 
 const getPathnameFromFilepath = (filepath: string): string => {
-  return filepath.replace('src/content/docs', '')
+  return filepath.replace('src/content/docs', '').split('.md')[0]
 }
 
 const getAllDocFilepaths = async (): Promise<string[]> => {
@@ -89,11 +107,25 @@ const getChangedDocFilepaths = async (): Promise<string[]> => {
   return changedDocFilepaths
 }
 
+const extractTextFromMdast = (node: any): string[] => {
+  if (node.type === 'text') {
+    return [node.value]
+  }
+
+  if (Array.isArray(node.children)) {
+    return node.children.flatMap(extractTextFromMdast)
+  }
+
+  return []
+}
+
 interface DbObject {
   id?: string
   pathname: string
   content: string
-  headingId: string | null
+  headingId: string
+  heading: string
+  excerpt: string
 }
 
 export const buildDbObjectsFromMdx = async (mdxFilepath: string): Promise<DbObject[]> => {
@@ -119,11 +151,30 @@ export const buildDbObjectsFromMdx = async (mdxFilepath: string): Promise<DbObje
     return toMarkdown({ type: 'root', children: section }, { extensions: [mdxToMarkdown()] })
   })
 
+  const headingTexts = headingIndexes.map((headingIndex) => {
+    const heading = children[headingIndex]
+    return heading.children.find((child: any) => child.type === 'text').value
+  })
+
+  const excerpts = sectionsMdast.map((section) => {
+    const excerptLen = 300
+    const sectionTexts = section
+      .flatMap((sectionNode) => {
+        // Filter out heading text
+        if (sectionNode.type === 'heading') {
+          return []
+        }
+
+        return extractTextFromMdast(sectionNode)
+      })
+      .filter((text) => text.length > 0)
+    const sectionText = sectionTexts.length > 0 ? sectionTexts.join(' ').slice(0, excerptLen) : ''
+    return sectionText
+  })
+
   // Create heading slugs (including handling duplicates)
   const headingSlugsState: string[] = []
-  const headingSlugs = headingIndexes.map((headingIndex) => {
-    const heading = children[headingIndex]
-    const headingText = heading.children.find((child: any) => child.type === 'text').value
+  const headingSlugs = headingTexts.map((headingText) => {
     const headingSlug = slugify(headingText)
     const duplicateOccurence = headingSlugsState.filter((_slug) => _slug === headingSlug).length
 
@@ -137,6 +188,8 @@ export const buildDbObjectsFromMdx = async (mdxFilepath: string): Promise<DbObje
       pathname,
       content: sectionMdx,
       headingId: headingSlugs[i],
+      heading: headingTexts[i],
+      excerpt: excerpts[i],
     }
   })
 }
@@ -192,11 +245,13 @@ const main = async () => {
 
     // Delete all objects in changed doc files first
     await docsCollection.data.deleteMany(docsCollection.filter.byProperty('pathname').like(pathname))
+    console.log(`Deleted all objects for ${pathname}`)
 
     const dbObjects = await buildDbObjectsFromMdx(filepath)
 
     if (dbObjects.length !== 0) {
       await docsCollection.data.insertMany(dbObjects)
+      console.log(`Inserted ${dbObjects.length} new objects for ${pathname}`)
     }
   }
 
@@ -204,15 +259,19 @@ const main = async () => {
   dbClient.close()
 }
 
-// await main()
+await main()
 
-const queryTest = async () => {
-  const docsCollection = await dbClient.collections.get(collectionName)
+// const queryTest = async () => {
+//   const docsCollection = await dbClient.collections.get(collectionName)
 
-  const result = await docsCollection.query.nearText(['quick start'], {
-    returnProperties: ['headingId'],
-    limit: 5,
-  })
-  console.log('Query result:', result)
-}
-await queryTest()
+//   const result = await docsCollection.query.nearText(['quick start'], {
+//     returnProperties: ['headingId'],
+//     limit: 5,
+//   })
+//   console.log('Query result:', result)
+
+//   // Close the db connection
+//   dbClient.close()
+// }
+
+// await queryTest()

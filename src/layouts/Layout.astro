@@ -1,6 +1,8 @@
 ---
 import '@/styles/globals.css'
 import '@fontsource/geist-sans'
+import { ViewTransitions } from "astro:transitions"
+import { fade } from 'astro:transitions'
 import Header from '@/components/Header.astro'
 import SideMenu from '@/components/SideMenu'
 import { HEADER_HEIGHT } from '@/lib/constants'
@@ -110,11 +112,12 @@ export const sideMenuTree = [
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <ViewTransitions />
   </head>
   <body class="antialiased">
     <Header />
 
-    <div class="container mx-auto" style={`height: calc(100vh - ${HEADER_HEIGHT}px); margin-top: ${HEADER_HEIGHT}px`}>
+    <div class="container mx-auto" style={`height: calc(100vh - ${HEADER_HEIGHT}px); margin-top: ${HEADER_HEIGHT}px`} transition:animate={fade({ duration: '0.1s' })}>
       <div class="flex">
         <div class="hidden md:block"><SideMenu tree={sideMenuTree} currentPath={currentPath} client:load /></div>
         <slot />
