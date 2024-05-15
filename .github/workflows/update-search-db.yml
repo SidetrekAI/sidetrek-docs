@@ -1,6 +1,8 @@
-name: update-search-db
+name: Update search DB
 on: 
   pull_request:
+    branches:
+      - main
     types:
       - closed
 jobs:
