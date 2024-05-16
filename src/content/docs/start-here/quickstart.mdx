@@ -66,12 +66,7 @@ Every time you want to restart the containers, run `sidetrek down` and then `sid
 
 Once, project is started successfully, you can see Dagster GUI at http://0.0.0.0:3000/
 
-<Image
-  src="/dagster-ui.png"
-  alt="dagsterui"
-  width="100%"
-  height="100%"
-/>
+![dagsterui](../../../assets/dagster-ui.png)
 
 ## About the Dataset
 
@@ -212,30 +207,15 @@ Inside `<example-project>/dagster/<example-project>/` add the following to `__in
     
 Go to http://0.0.0.0:3000/ and after reloading you’ll see run_csv_to_iceberg_meltano_job added to the list of jobs. 
 
-<Image
-  src="/meltano-job.png"
-  alt="meltanojob"
-  width="100%"
-  height="100%"
-/>
+![meltanojob](../../../assets/meltano-job.png)
 
 Click on the job, go to the tab Launchpad and click on Launch Run. The job will be run. 
 
-<Image
-  src="/meltano-job-launch.png"
-  alt="meltanojoblaunch"
-  width="100%"
-  height="100%"
-/>
+![meltanojobrun](../../../assets/meltano-job-launch.png)
 
 If the job is successfully run, you’ll see a new folder raw in your lakehouse, where you’ll see the 4 different tables written in iceberg table format.
 
-<Image
-  src="/minio-raw.png"
-  alt="rawtables"
-  width="100%"
-  height="100%"
-/>
+![minio-raw](../../../assets/minio-raw.png)
 
 >> 💡 Every time you make any change, reload the job on Dagster UI 
 
@@ -433,12 +413,7 @@ select * from source
 ```
 Test if the staging models are found on dagster Global Asset Lineage.
 
-<Image
-src="/staging-assets.png"
-alt="stagingassets"
-width="100%"
-height="100%"
-/>
+![stagingassets](../../../assets/staging-assets.png)
 
 If the models are successfully materialized, you should see 4 table in project_staging schema.
 
@@ -448,6 +423,7 @@ alt="miniostaging"
 width="100%"
 height="100%"
 />
+![miniostaging](../../../assets/minio-staging.png)
 
 ### Intermediate Models:
 
