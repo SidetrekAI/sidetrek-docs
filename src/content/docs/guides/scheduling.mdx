@@ -8,8 +8,14 @@ import { Image } from 'astro:assets';
 # Scheduling
 - In `dagster/<example-project>/<example-project>/__init__.py` add the following code:
     
-    ```python title="dagster/<example-project>/<example-project>/__init__.py" {3-10,15} showLineNumbers
-    from dagster_dbt import build_schedule_from_dbt_selection
+    ```python title="dagster/<example-project>/<example-project>/__init__.py" {9-16,21} showLineNumbers
+    import os
+
+    from dagster import Definitions
+    from dagster_dbt import DbtCliResource
+
+    from .dbt_assets import dbt_project_assets, dbt_project_dir
+    from .meltano import run_csv_to_iceberg_meltano_job
     
     schedules = [
         build_schedule_from_dbt_selection(

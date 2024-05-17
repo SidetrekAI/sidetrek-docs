@@ -45,7 +45,7 @@ class TestDbtAssets(unittest.TestCase):
     # Connect to Trino
     conn = dbapi.connect(
         host="localhost",
-        port=8081,
+        port=8080,
         user="trino",
         catalog="iceberg",
         schema="project_intermediate"
@@ -80,7 +80,7 @@ def test_int_iceberg__denormalized_orders_columns(self):
   # Connect to Trino
   conn = dbapi.connect(
     host="localhost",
-    port=8081,
+    port=8080,
     user="trino",
     catalog="iceberg",
     schema="project_intermediate"
