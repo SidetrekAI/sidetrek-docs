@@ -3,12 +3,19 @@ title: Scheduling
 description: Scheduling tasks in Sidetrek
 draft: false
 ---
+import { Image } from 'astro:assets';
 
 # Scheduling
-- In `dagster/<project_dirname>/<project-name>/__init__.py` add the following code:
+- In `dagster/<example-project>/<example-project>/__init__.py` add the following code:
     
-    ```python title="__init__.py" {3-10,15} showLineNumbers
-    from dagster_dbt import build_schedule_from_dbt_selection
+    ```python title="dagster/<example-project>/<example-project>/__init__.py" {9-16,21} showLineNumbers
+    import os
+
+    from dagster import Definitions
+    from dagster_dbt import DbtCliResource
+
+    from .dbt_assets import dbt_project_assets, dbt_project_dir
+    from .meltano import run_csv_to_iceberg_meltano_job
     
     schedules = [
         build_schedule_from_dbt_selection(
@@ -40,6 +47,8 @@ draft: false
     
     So, this schedule will trigger the **`materialize_dbt_models`** job at midnight (00:00) every day.
     
-- To enable the schedule, reload definitions on dagster UI, go to `http://localhost:3000/locations/<project-name>/schedules` and turn on the toggle button under `Running`
-<br />
+- To enable the schedule, reload definitions on dagster UI, go to `http://localhost:3000/locations/<example-project>/schedules` and turn on the toggle button under `Running`
+
+![Schedule](../../../assets/schedule.png)
+
 <br />

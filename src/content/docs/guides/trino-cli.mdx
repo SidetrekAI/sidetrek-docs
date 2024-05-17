@@ -1,0 +1,63 @@
+---
+title: Trino CLI
+description: How to query data in Trino
+draft: false
+---
+
+## Trino CLI
+
+You can use Trino CLI to query your Iceberg tables. In your console, run the following:
+
+```bash
+docker exec -it trino trino
+```
+
+When you see `trino>`, it means you are inside Trino CLI.
+
+Run the following SQL query to check all the catalogs you have:
+
+```bash
+show catalogs;
+```
+
+You’ll see the names of the catalogs in Trino:
+
+```bash
+ Catalog 
+---------
+ iceberg 
+ system  
+(2 rows)
+
+Query 20240515_235950_00029_ky8ah, FINISHED, 1 node
+Splits: 11 total, 11 done (100.00%)
+0.17 [0 rows, 0B] [0 rows/s, 0B/s]
+```
+
+Similarly, you can check all the schemas inside `iceberg` catalog by running this:
+
+```bash
+show schemas in iceberg;
+```
+
+You’ll see the names of all existing schemas.
+
+Let’s query the number of rows in the table `int_iceberg__denormalized_orders` in the schema `project_intermediate` in the catalog `iceberg`. Run the following:
+
+```bash
+select count(*) from iceberg.project_intermediate.int_iceberg__denormalized_orders;
+```
+
+You’ll see the output:
+
+```bash
+ _col0  
+---------
+ 1000000 
+(1 row)
+
+Query 20240516_000541_00003_ky8ah, FINISHED, 1 node
+Splits: 26 total, 26 done (100.00%)
+0.28 [1000K rows, 720KB] [3.57M rows/s, 2.51MB/s]
+```
+<br />
