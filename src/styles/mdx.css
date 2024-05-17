@@ -40,7 +40,7 @@ figure[data-rehype-pretty-code-figure] > pre > code[data-line-numbers] > [data-l
   margin-right: 1.5rem;
   width: 1rem;
   text-align: right;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
 }
 figure[data-rehype-pretty-code-figure] > pre > code[data-line-numbers-max-digits='2'] > [data-line]::before {
   width: 1rem;
@@ -50,7 +50,7 @@ figure[data-rehype-pretty-code-figure] > code[data-line-numbers-max-digits='3'] 
 }
 
 /** 
-  *  title will be enabled on markdown with `title` meta string on it
+  *  Title will be enabled on markdown with `title` meta string on it
   */
 figure[data-rehype-pretty-code-figure] > figcaption {
   padding: 1rem 1rem 0.5rem 1rem;
@@ -66,4 +66,13 @@ figure[data-rehype-pretty-code-figure] > figcaption > span.title {
   padding: 0.1rem 0.5rem;
   background-color: #4f4ce0;
   border-radius: 50px;
+}
+
+/**
+  * Heading anchor
+  */
+a.heading-anchor {
+  display: block;
+  padding-top: 70px;
+  margin-top: -70px;
 }
