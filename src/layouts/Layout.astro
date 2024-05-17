@@ -120,7 +120,7 @@ export const sideMenuTree = [
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
@@ -145,22 +145,23 @@ export const sideMenuTree = [
         <slot />
       </div>
     </div>
+
+    <script>
+      // Smooth scroll to hash value on page load
+      function smoothScroll(targetId: string) {
+        const element = document.getElementById(targetId)
+        if (element) {
+          window.scrollTo({
+            top: element.offsetTop - 20,
+            behavior: 'smooth',
+          })
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const hash = window.location.hash
+        smoothScroll(`#${hash}`)
+      })
+    </script>
   </body>
 </html>
-
-<script>
-  // Smooth scroll to anchor links
-  function smoothScroll(target: string) {
-    const element = document.getElementById(target.replace('#', ''))
-    if (element) {
-      window.scrollTo({
-        top: element.offsetTop - 60,
-        behavior: 'smooth',
-      })
-    }
-  }
-  document.addEventListener('DOMContentLoaded', function () {
-    const hash = window.location.hash
-    smoothScroll(hash)
-  })
-</script>

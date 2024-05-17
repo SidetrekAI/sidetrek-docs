@@ -1,26 +1,19 @@
-import { visit } from 'unist-util-visit'
+import type { RehypePlugin } from '@astrojs/markdown-remark'
+import { visit, type VisitorResult } from 'unist-util-visit'
+import { heading as isHeading } from 'hast-util-heading'
+import type { ElementContent, Text } from 'hast'
 import slugify from '@sindresorhus/slugify'
-import { head } from 'ramda'
 
-function transformer(ast: any) {
-  visit(ast, 'heading', visitor)
+export const attachHeadingSlugsPlugin: RehypePlugin = () => {
+  return (tree) => {
+    visit(tree, (node) => {
+      if (!isHeading(node)) return
 
-  function visitor(node: any, index?: number, parent?: Node) {
-    const textNodeValue = node.children.find((child: any) => child.type === 'text')?.value
-    const slug = slugify(textNodeValue)
+      const headingTextNode = node.children.find((child: ElementContent) => child.type === 'text') as Text
+      const headingTextNodeValue = headingTextNode?.value
+      const slug = slugify(headingTextNodeValue)
 
-    return {
-      ...node,
-      data: {
-        ...node.data,
-        id: slug,
-      },
-    }
+      node.data = { ...node.data, id: slug }
+    })
   }
 }
-
-function plugin() {
-  return transformer
-}
-
-export default plugin
