@@ -34,11 +34,11 @@ const { title, description } = page.data
 ---
 
 <Layout title={title} description={description}>
-  <div class="flex min-w-0 w-full">
+  <div class="md:flex min-w-0 w-full">
     <Main>
       <Content class="content" components={{ h1: H1, h2: H2, h3: H3, p: P, ul: UL, ol: OL, li: LI }} />
     </Main>
 
-    <SecondarySideMenu />
+    <SecondarySideMenu page={page.body} client:load />
   </div>
 </Layout>
