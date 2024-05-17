@@ -94,11 +94,13 @@ interface SideMenuProps {
 
 export default function SideMenu({ tree, currentPath }: SideMenuProps) {
   return (
-    <nav
-      className="shrink-0 w-[280px] border-r border-slate-200 pl-4 pr-4 py-6 text-sm text-slate-600 overflow-auto"
-      style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}
-    >
-      {TreeComponent({ tree, currentPath })}
-    </nav>
+    <div className="relative w-[280px] shrink-0">
+      <nav
+        className="fixed border-r border-slate-200 pl-4 pr-4 py-6 text-sm text-slate-600 overflow-auto"
+        style={{ top: `${HEADER_HEIGHT}px`, width: 'inherit', height: `calc(100vh - ${HEADER_HEIGHT}px)` }}
+      >
+        {TreeComponent({ tree, currentPath })}
+      </nav>
+    </div>
   )
 }

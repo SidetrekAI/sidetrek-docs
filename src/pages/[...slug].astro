@@ -31,6 +31,7 @@ export async function getStaticPaths() {
 const { page } = Astro.props
 const { Content } = await page.render()
 const { title, description } = page.data
+const pathname = Astro.url.pathname
 ---
 
 <Layout title={title} description={description}>
@@ -39,6 +40,6 @@ const { title, description } = page.data
       <Content class="content" components={{ h1: H1, h2: H2, h3: H3, p: P, ul: UL, ol: OL, li: LI }} />
     </Main>
 
-    <SecondarySideMenu />
+    <SecondarySideMenu page={page.body} client:load />
   </div>
 </Layout>

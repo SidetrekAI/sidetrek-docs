@@ -27,7 +27,6 @@ interface SearchBarProps {
 export function SearchBar({ inputPlaceholder = 'Search the docs...' }: SearchBarProps) {
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<any[]>([])
-  console.log('items', items)
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {

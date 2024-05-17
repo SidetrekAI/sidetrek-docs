@@ -32,6 +32,11 @@
     "cmdk": "^1.0.0",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.378.0",
+    "mdast-util-from-markdown": "^2.0.0",
+    "mdast-util-mdx": "^3.0.0",
+    "mdast-util-to-markdown": "^2.1.0",
+    "mdast-util-toc": "^7.0.1",
+    "micromark-extension-mdxjs": "^3.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.51.4",
@@ -44,7 +49,7 @@
     "typescript": "^5.4.5",
     "unist-util-visit": "^5.0.0",
     "usehooks-ts": "^3.1.0",
-    "vaul": "^0.9.0",
+    "vaul": "^0.9.1",
     "weaviate-client": "3.0.0-rc.1"
   },
   "devDependencies": {
@@ -53,10 +58,6 @@
     "@types/lodash.debounce": "^4.0.9",
     "@types/ramda": "^0.30.0",
     "bun": "^1.1.8",
-    "mdast-util-from-markdown": "^2.0.0",
-    "mdast-util-mdx": "^3.0.0",
-    "mdast-util-to-markdown": "^2.1.0",
-    "micromark-extension-mdxjs": "^3.0.0",
     "ramda": "^0.30.0",
     "shiki": "^1.4.0"
   }

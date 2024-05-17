@@ -139,7 +139,9 @@ export const sideMenuTree = [
       transition:animate={fade({ duration: '0.1s' })}
     >
       <div class="flex">
-        <div class="hidden md:block"><SideMenu tree={sideMenuTree} currentPath={currentPath} client:load /></div>
+        <div class="sticky hidden md:block" style={{ top: `${HEADER_HEIGHT}px` }}>
+          <SideMenu tree={sideMenuTree} currentPath={currentPath} client:load />
+        </div>
         <slot />
       </div>
     </div>
