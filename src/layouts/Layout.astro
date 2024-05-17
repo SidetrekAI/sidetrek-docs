@@ -134,12 +134,12 @@ export const sideMenuTree = [
     <Header />
 
     <div
-      class="container mx-auto"
-      style={`height: calc(100vh - ${HEADER_HEIGHT}px); margin-top: ${HEADER_HEIGHT}px`}
+      class="relative container mx-auto"
+      style={`height: calc(100vh - ${HEADER_HEIGHT}px);`}
       transition:animate={fade({ duration: '0.1s' })}
     >
       <div class="flex">
-        <div class="sticky hidden md:block" style={{ top: `${HEADER_HEIGHT}px` }}>
+        <div class="hidden md:block">
           <SideMenu tree={sideMenuTree} currentPath={currentPath} client:load />
         </div>
         <slot />
@@ -147,3 +147,20 @@ export const sideMenuTree = [
     </div>
   </body>
 </html>
+
+<script>
+  // Smooth scroll to anchor links
+  function smoothScroll(target: string) {
+    const element = document.getElementById(target.replace('#', ''))
+    if (element) {
+      window.scrollTo({
+        top: element.offsetTop - 60,
+        behavior: 'smooth',
+      })
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    const hash = window.location.hash
+    smoothScroll(hash)
+  })
+</script>

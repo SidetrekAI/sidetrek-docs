@@ -1,62 +1,50 @@
-import { lazy, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import * as R from 'ramda'
 import { HEADER_HEIGHT } from '@/lib/constants'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { toc } from 'mdast-util-toc'
+import { toHast } from 'mdast-util-to-hast'
+import { toHtml } from 'hast-util-to-html'
 
 interface SecondarySideMenuProps {
   page: string
 }
 
 export default function SecondarySideMenu({ page }: SecondarySideMenuProps) {
-  const [tocTree, setTocTree] = useState<any>(null)
+  const [tocHtml, setTocHtml] = useState<any>(null)
   useEffect(() => {
     const fn = async () => {
       const mdastTree = fromMarkdown(page, { extensions: [mdxjs()], mdastExtensions: [mdxFromMarkdown()] })
-      const _tocTree = toc(mdastTree)
-      // console.log('_tocTree', _tocTree)
+
+      // Filter out the first heading
+      const mdastTreePruned = R.reject((node: any) => node.type === 'heading' && node.depth === 1, mdastTree.children)
+
+      const _tocTree = toc({ type: 'root', children: mdastTreePruned })
+
       const mdx = toMarkdown(
         { type: 'root', children: _tocTree?.map?.children as any },
         { extensions: [mdxToMarkdown()] }
       )
-      console.log('mdx', mdx)
-      const tocMdast = fromMarkdown(mdx, { extensions: [mdxjs()], mdastExtensions: [mdxFromMarkdown()] })
-      console.log('tocMdast', tocMdast)
-      // const tocTreeTextNodes = extractTextFromTocTree(_tocTree.map)
-      // console.log('tocTreeTextNodes', tocTreeTextNodes)
+      const mdast = fromMarkdown(mdx, { extensions: [mdxjs()], mdastExtensions: [mdxFromMarkdown()] })
+      const hast = toHast(mdast)
+      const html = toHtml(hast)
+      setTocHtml(html)
     }
     fn()
   }, [])
 
   return (
-    <div className="relative w-[240px] shrink-0">
+    <div className="toc relative w-[240px] shrink-0">
       <nav
-        className="fixed hidden xl:block h-fit pl-4 pr-4 py-6 text-sm text-slate-600 border-b border-slate-200 overflow-auto"
+        className="fixed hidden xl:block h-fit pl-4 pr-4 py-4 text-sm text-slate-600 border-b border-slate-200 overflow-auto"
         style={{ top: `${HEADER_HEIGHT}px`, width: 'inherit' }}
       >
-        PLACEHOLDER
+        <div className="font-semibold text-slate-900 mt-2 mb-4">On this page</div>
+        <div dangerouslySetInnerHTML={{ __html: tocHtml }} />
       </nav>
     </div>
   )
-}
-
-function extractTextFromTocTree(node: any, level: number = 0): Array<{ value: string; children?: any[] }> {
-  if (node.type === 'text') {
-    return [{ value: node.value }]
-  }
-
-  if (Array.isArray(node.children)) {
-    return node.children.flatMap((child: any) => {
-      const childResult = extractTextFromTocTree(child, level + 1)
-      if (childResult.length > 0) {
-        return [{ value: node.value, level, children: childResult }]
-      } else {
-        return []
-      }
-    })
-  }
-
-  return []
 }

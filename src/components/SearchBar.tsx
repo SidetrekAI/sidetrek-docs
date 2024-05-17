@@ -76,19 +76,37 @@ export function SearchBar({ inputPlaceholder = 'Search the docs...' }: SearchBar
 
   return (
     <>
-      <div
-        className="w-[240px] h-8 flex items-center bg-slate-100 rounded-md px-2 py-1 text-sm text-slate-400 cursor-pointer"
-        onClick={(e) => {
-          e.preventDefault()
-          setOpen((open) => !open)
-        }}
-      >
-        <div className="grow flex items-center space-x-1">
-          <Search size={20} />
-          <span>{inputPlaceholder}</span>
-        </div>
-        <div>⌘K</div>
+      {/* Mobile */}
+      <div className="block md:hidden">
+        <button
+          className="p-2 text-slate-500 hover:text-slate-700"
+          onClick={(e) => {
+            e.preventDefault()
+            setOpen((open) => !open)
+          }}
+        >
+          <Search size={24} />
+        </button>
       </div>
+      {/* end: Mobile */}
+
+      {/* Desktop */}
+      <div className="hidden md:block">
+        <div
+          className="w-[240px] h-8 flex items-center bg-slate-100 rounded-md px-2 py-1 text-sm text-slate-400 cursor-pointer"
+          onClick={(e) => {
+            e.preventDefault()
+            setOpen((open) => !open)
+          }}
+        >
+          <div className="grow flex items-center space-x-1">
+            <Search size={16} />
+            <span>{inputPlaceholder}</span>
+          </div>
+          <div>⌘K</div>
+        </div>
+      </div>
+      {/* end: Desktop */}
 
       <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
         <Form {...form}>
@@ -111,7 +129,7 @@ export function SearchBar({ inputPlaceholder = 'Search the docs...' }: SearchBar
                         }}
                         placeholder={inputPlaceholder}
                       />
-                      
+
                       {isLoading && (
                         <div className="p-2 flex items-center space-x-1 pb-3 ml-2 text-sm text-slate-400">
                           <LoaderCircle size={14} className="animate-spin" />

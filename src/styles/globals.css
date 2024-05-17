@@ -1,4 +1,5 @@
 @import "mdx.css";
+@import "toc.css";
 
 @tailwind base;
 @tailwind components;
