@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { ChevronRight } from 'lucide-react'
 import type { Tree } from '@/lib/types'
-import { HEADER_HEIGHT } from '@/lib/constants'
+import { FOOTER_HEIGHT, HEADER_HEIGHT } from '@/lib/constants'
 import { useMediaQuery } from 'usehooks-ts'
+import { ScrollArea, ScrollBar } from './ui/scroll-area'
 
 const TREE_LEFT_PADDING = 16
 
@@ -19,7 +20,10 @@ function SideMenuItem({ item, level, isActive }: SideMenuItemProps) {
       className={`w-full mb-3 hover:text-slate-900 transition-color cursor-pointer ${
         level > 0 && 'hover:border-l-2 hover:border-pink-400'
       } ${isActive && 'text-slate-900 font-medium border-l-2 border-pink-400'}`}
-      style={{ paddingLeft: `${TREE_LEFT_PADDING}px`, marginLeft: `-${TREE_LEFT_PADDING + 1.5}px` }}
+      style={{
+        paddingLeft: `${isActive ? TREE_LEFT_PADDING - 2 : TREE_LEFT_PADDING}px`,
+        marginLeft: `-${TREE_LEFT_PADDING + 1.5}px`,
+      }}
     >
       {item.tree ? <div>{item.label}</div> : <a href={item.href}>{item.label}</a>}
     </li>
@@ -94,13 +98,15 @@ interface SideMenuProps {
 
 export default function SideMenu({ tree, currentPath }: SideMenuProps) {
   return (
-    <div className="relative w-[280px] shrink-0">
-      <nav
-        className="fixed border-r border-slate-200 pl-4 pr-4 py-6 text-sm text-slate-600 overflow-auto"
-        style={{ top: `${HEADER_HEIGHT}px`, width: 'inherit', height: `calc(100vh - ${HEADER_HEIGHT}px)` }}
+    <div className="relative w-[300px]">
+      <aside
+        className="fixed w-full shrink-0 text-sm text-slate-600"
+        style={{ top: `${HEADER_HEIGHT}px`, width: 'inherit', height: `calc(100vh - ${HEADER_HEIGHT + FOOTER_HEIGHT}px)` }}
       >
-        {TreeComponent({ tree, currentPath })}
-      </nav>
+        <ScrollArea className="h-full pl-4 pr-6 py-6">
+          {TreeComponent({ tree, currentPath })}
+        </ScrollArea>
+      </aside>
     </div>
   )
 }

@@ -1,0 +1,32 @@
+---
+title: Install Sidetrek
+description: Install Sidetrek
+draft: false
+---
+import SubH1 from '@/components/SubH1.astro'
+import { Button } from '@/components/ui/button'
+import BashCode from '@/components/BashCode'
+import DownloadSidetrekTabs from '@/components/docs/DownloadSidetrekTabs'
+
+# Download & install Sidetrek
+
+<SubH1>Follow the steps below to download and install Sidetrek CLI.</SubH1>
+
+## Download and install for your OS
+
+To download and install Sidetrek, select your Operating System and then run the shown command in your terminal. Please note that Sidetrek currently does not officially support Windows.
+
+<DownloadSidetrekTabs client:load />
+
+## Verify installation
+
+To verify that Sidetrek has been installed correctly, run the following command in your terminal.
+
+<BashCode code="sidetrek --version\nv0.1.26" clipboardCopy="sidetrek --version" client:load />
+
+## Next steps
+
+OK, you should now be able to run `sidetrek` command anywhere in your terminal. Next, we will create a new data project using Sidetrek CLI.
+
+<Button><a href="/get-started/step-2-initialize-your-project">Let's create a new data project</a></Button>
+```

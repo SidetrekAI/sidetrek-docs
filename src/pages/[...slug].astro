@@ -9,6 +9,7 @@ import P from '@/components/mdx/P.astro'
 import UL from '@/components/mdx/UL.astro'
 import OL from '@/components/mdx/OL.astro'
 import LI from '@/components/mdx/LI.astro'
+import Underline from '@/components/mdx/Underline.astro'
 import SecondarySideMenu from '@/components/SecondarySideMenu'
 
 export async function getStaticPaths() {
@@ -31,12 +32,13 @@ export async function getStaticPaths() {
 const { page } = Astro.props
 const { Content } = await page.render()
 const { title, description } = page.data
+const pathname = Astro.url.pathname
 ---
 
 <Layout title={title} description={description}>
-  <div class="md:flex min-w-0 w-full">
+  <div class="md:flex min-w-0 w-full h-full">
     <Main>
-      <Content class="content" components={{ h1: H1, h2: H2, h3: H3, p: P, ul: UL, ol: OL, li: LI }} />
+      <Content class="content" components={{ h1: H1, h2: H2, h3: H3, p: P, ul: UL, ol: OL, li: LI, em: Underline }} />
     </Main>
 
     <SecondarySideMenu page={page.body} client:load />

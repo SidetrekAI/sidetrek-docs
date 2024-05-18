@@ -14,6 +14,8 @@ import { fade } from 'astro:transitions'
 import Header from '@/components/Header.astro'
 import SideMenu from '@/components/SideMenu'
 import { HEADER_HEIGHT } from '@/lib/constants'
+import Footer from '@/components/Footer.astro'
+import type { Tree } from '@/lib/types'
 
 interface Props {
   title: string
@@ -24,7 +26,32 @@ const currentPath = Astro.url.pathname
 
 const { title, description } = Astro.props
 
-export const sideMenuTree = [
+export const sideMenuTree: Tree[] = [
+  {
+    label: 'Get Started',
+    tree: [
+      {
+        label: 'Overview',
+        href: '/get-started/overview',
+      },
+      {
+        label: 'Step 1 - Install Sidetrek',
+        href: '/get-started/step-1-install-sidetrek',
+      },
+      {
+        label: 'Step 2 - Initialize Your Project',
+        href: '/get-started/step-2-initialize-your-project',
+      },
+      {
+        label: 'Step 3 - Run Your Project',
+        href: '/get-started/step-3-run-your-project',
+      },
+      {
+        label: 'Next Steps',
+        href: '/get-started/next-steps',
+      },
+    ],
+  },
   {
     label: 'Start Here',
     tree: [
@@ -138,8 +165,8 @@ export const sideMenuTree = [
     <Header />
 
     <div
-      class="relative container mx-auto"
-      style={`height: calc(100vh - ${HEADER_HEIGHT}px);`}
+      class="container mx-auto h-max"
+      style={`min-height: calc(100vh - ${HEADER_HEIGHT}px);`}
       transition:animate={fade({ duration: '0.1s' })}
     >
       <div class="flex">
@@ -149,6 +176,8 @@ export const sideMenuTree = [
         <slot />
       </div>
     </div>
+
+    <Footer />
 
     <script>
       // Smooth scroll to hash value on page load

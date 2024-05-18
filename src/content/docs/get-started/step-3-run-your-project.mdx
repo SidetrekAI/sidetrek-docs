@@ -1,0 +1,42 @@
+---
+title: Run Your Project
+description: Run Your Project
+draft: false
+---
+import SubH1 from '@/components/SubH1.astro'
+import { Button } from '@/components/ui/button'
+import BashCode from '@/components/BashCode'
+
+# Run your data project
+
+<SubH1>Let's use Sidetrek CLI to run your newly created data project.</SubH1>
+
+## Run your project
+
+You can run the following command to run the end-to-end data pipeline you've just created.
+
+<BashCode code="sidetrek start" client:load />
+
+Underneath, all this command is doing is running three separate commands:
+1. `dagster dev` to start the Dagster server - this runs the user code (Dagster, Meltano, and DBT).
+2. `docker-compose up` inside the project root to run Minio, Iceberg, and Trino.
+3. `docker-compose up` inside superset directory to run Superset.
+
+The step 1 is basically all your user code. The step 2 runs all other core services for your data pipeline. 
+
+The step 3 runs Superset separately because it's not part of the core data pipeline. This way you can easily swap it out for another solution. 
+
+For more details, please refer to the [Project Structure](/basics/project-structure) documentation.
+
+### STEPS HERE...
+
+## What's happening underneath
+
+EXPLAIN WHAT'S HAPPENING HERE...
+
+## Next steps
+
+Now you should have a new data project initialized. You'll see that a new directory has been created with the name of your project and all the tools have been installed.
+
+<Button><a href="/get-started/step-3-run-your-project">Let's run your project</a></Button>
+```
