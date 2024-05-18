@@ -25,7 +25,7 @@ export default function BashCode({ code, clipboardCopy }: BashCodeProps) {
 
   return (
     <ScrollArea className="relative whitespace-nowrap w-full bg-[#181827] px-4 py-4 mb-6 rounded text-[0.85rem] text-white font-mono leading-5">
-      <div className="overflow-hidden" style={{ width: `calc(100% + 48px)` }}>
+      <div className="pr-12">
         {lines.map((line, i) => (
           <div key={i}>
             {i === 0 ? (

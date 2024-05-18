@@ -37,9 +37,9 @@ export default function SecondarySideMenu({ page }: SecondarySideMenuProps) {
   }, [])
 
   return (
-    <aside className="toc relative w-[280px] shrink-0">
+    <aside className="hidden xl:block toc relative w-[280px] shrink-0">
       <div
-        className="fixed hidden xl:block h-fit pl-4 pr-4 py-4 text-sm text-slate-600 border-b border-slate-200 overflow-auto"
+        className="fixed h-fit pl-4 pr-4 py-4 text-sm text-slate-600 border-b border-slate-200 overflow-auto"
         style={{ top: `${HEADER_HEIGHT}px`, width: 'inherit' }}
       >
         <div className="font-semibold text-slate-900 mt-2 mb-4 uppercase">On this page</div>
