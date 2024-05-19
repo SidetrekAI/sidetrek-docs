@@ -1,11 +1,12 @@
 ---
 import { Image } from 'astro:assets'
-import sidetrekLogo from '../images/logos/logo-0.svg'
-import githubIcon from '../images/icons/github.svg?raw'
-import { HEADER_HEIGHT } from '../lib/constants'
-import SideMenuMobile from './SideMenuMobile'
+import sidetrekLogo from '@/images/logos/logo-0.svg'
+import githubIcon from '@/images/icons/github.svg?raw'
+import { HEADER_HEIGHT } from '@/lib/constants'
+import SideMenuMobile from '@/components/SideMenuMobile'
 import { sideMenuTree } from '@/layouts/Layout.astro'
-import { SearchBar } from './SearchBar'
+import { SearchBar } from '@/components/SearchBar'
+import { ModeToggle } from '@/components/ModeToggle'
 
 const currentPath = Astro.url.pathname
 ---
@@ -34,6 +35,9 @@ const currentPath = Astro.url.pathname
             </div>
           </a>
         </div>
+
+        <!-- <ModeToggle client:load /> -->
+
         <div class="block md:hidden -mr-3">
           <SideMenuMobile tree={sideMenuTree} currentPath={currentPath} client:load />
         </div>

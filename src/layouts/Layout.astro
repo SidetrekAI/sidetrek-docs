@@ -14,6 +14,8 @@ import { fade } from 'astro:transitions'
 import Header from '@/components/Header.astro'
 import SideMenu from '@/components/SideMenu'
 import { HEADER_HEIGHT } from '@/lib/constants'
+import Footer from '@/components/Footer.astro'
+import type { Tree } from '@/lib/types'
 
 interface Props {
   title: string
@@ -24,21 +26,25 @@ const currentPath = Astro.url.pathname
 
 const { title, description } = Astro.props
 
-export const sideMenuTree = [
+export const sideMenuTree: Tree[] = [
   {
-    label: 'Start Here',
+    label: 'Get Started',
     tree: [
       {
-        label: 'Getting Started',
-        href: '/start-here/getting-started',
+        label: 'Overview',
+        href: '/get-started/overview',
       },
       {
-        label: 'Why Sidetrek?',
-        href: '/start-here/why-sidetrek',
+        label: 'Step 1 - Install Sidetrek',
+        href: '/get-started/step-1-install-sidetrek',
       },
       {
-        label: 'Quickstart',
-        href: '/start-here/quickstart',
+        label: 'Step 2 - Initialize Your Project',
+        href: '/get-started/step-2-initialize-your-project',
+      },
+      {
+        label: 'Step 3 - Run Your Project',
+        href: '/get-started/step-3-run-your-project',
       },
     ],
   },
@@ -50,17 +56,17 @@ export const sideMenuTree = [
         href: '/tutorials/overview',
       },
       {
-        label: 'BI Stack Example 1',
-        href: '/tutorials/bi-stack-1',
+        label: 'BI Stack Example (Iceberg)',
+        href: '/tutorials/bi-stack-iceberg',
       },
     ],
   },
   {
-    label: 'Basics',
+    label: 'Concepts',
     tree: [
       {
         label: 'Project Structure',
-        href: '/basics/project-structure',
+        href: '/concepts/project-structure',
       },
     ],
   },
@@ -109,14 +115,37 @@ export const sideMenuTree = [
             href: '/api/cli-commands/logs',
           },
           {
-            label: 'version',
-            href: '/api/cli-commands/version',
-          },
-          {
-            label: 'help',
-            href: '/api/cli-commands/help',
+            label: 'run',
+            href: '/api/cli-commands/run',
+            tree: [
+              {
+                label: 'meltano *',
+                href: '/api/cli-commands/run/meltano',
+              },
+              {
+                label: 'trino shell',
+                href: '/api/cli-commands/run/trino',
+              }
+            ]
           },
         ],
+      },
+    ],
+  },
+  {
+    label: 'Start Here',
+    tree: [
+      {
+        label: 'Getting Started',
+        href: '/start-here/getting-started',
+      },
+      {
+        label: 'Why Sidetrek?',
+        href: '/start-here/why-sidetrek',
+      },
+      {
+        label: 'Quickstart',
+        href: '/start-here/quickstart',
       },
     ],
   },
@@ -138,8 +167,8 @@ export const sideMenuTree = [
     <Header />
 
     <div
-      class="relative container mx-auto"
-      style={`height: calc(100vh - ${HEADER_HEIGHT}px);`}
+      class="container mx-auto h-max"
+      style={`min-height: calc(100vh - ${HEADER_HEIGHT}px);`}
       transition:animate={fade({ duration: '0.1s' })}
     >
       <div class="flex">
@@ -149,6 +178,8 @@ export const sideMenuTree = [
         <slot />
       </div>
     </div>
+
+    <Footer />
 
     <script>
       // Smooth scroll to hash value on page load
@@ -166,6 +197,24 @@ export const sideMenuTree = [
         const hash = window.location.hash
         smoothScroll(`#${hash}`)
       })
+
+      // Light/dark theme toggle
+      const getThemePreference = () => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme')
+        }
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      }
+      const isDark = getThemePreference() === 'dark'
+      document.documentElement.classList[isDark ? 'add' : 'remove']('dark')
+
+      if (typeof localStorage !== 'undefined') {
+        const observer = new MutationObserver(() => {
+          const isDark = document.documentElement.classList.contains('dark')
+          localStorage.setItem('theme', isDark ? 'dark' : 'light')
+        })
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+      }
     </script>
   </body>
 </html>
