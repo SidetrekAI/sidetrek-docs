@@ -85,7 +85,7 @@ export function SearchBar({ inputPlaceholder = 'Search the docs...' }: SearchBar
             setOpen((open) => !open)
           }}
         >
-          <Search size={24} />
+          <Search size={20} />
         </button>
       </div>
       {/* end: Mobile */}

@@ -11,23 +11,47 @@ import BashCode from '@/components/BashCode'
 
 <SubH1>Let's use Sidetrek CLI to initialize your new data project.</SubH1>
 
-## Initialize your project
+## Initialize Your Project
 
-Run the following command to start a new data project.
+Run the following command to start a new data project. You don't need to create an empty directory for the project - Sidetrek will create one for you.
 
 <BashCode code="sidetrek init" client:load />
 
 It'll walk you through a series of questions to help you set up your new data project.
 
-### STEPS HERE...
+Please note that currently we only have one data stack available - **Dagster-Iceberg-Trino stack** (with optional DBT and Meltano additions).
 
-## What's happening underneath
+If everything went as planned, you should see the message "You're all set - enjoy building your new data project! 🚀". There should be a new directory with the name of your project. 
 
-EXPLAIN WHAT'S HAPPENING HERE...
+### What's Happening Underneath?
 
-## Next steps
+`sidetrek init` command does a few things under the hood:
+- It creates a new Poetry project.
+- Inside the new project, it `pip install`s all required libraries for Dagster, Meltano, DBT, and the necessary connections between them.
+- In the project root, it creates a docker-compose file with all the core services: Minio, Iceberg (i.e. Iceberg REST catalog and Postgres backing the catalog), and Trino.
+- It creates a new directory for Superset and clones the latest version.
 
-Now you should have a new data project initialized. You'll see that a new directory has been created with the name of your project and all the tools have been installed.
+
+Here's the project structure you should see after running `sidetrek init`:
+
+```plaintext
+your_project
+├── .sidetrek
+├── .venv
+├── superset
+├── trino
+└── your_project
+    ├── dagster
+    ├── data
+    ├── dbt
+    └── meltano
+```
+
+For more details about the project structure, please refer to the [Project Structure](/concepts/project-structure) documentation.
+
+## Next Steps
+
+Now you should have a new data project initialized. It's time to run the project and see it in action!
 
 <Button><a href="/get-started/step-3-run-your-project">Let's run your project</a></Button>
 ```

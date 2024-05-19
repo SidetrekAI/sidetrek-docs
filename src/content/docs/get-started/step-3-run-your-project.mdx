@@ -6,37 +6,61 @@ draft: false
 import SubH1 from '@/components/SubH1.astro'
 import { Button } from '@/components/ui/button'
 import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
 
-# Run your data project
+# Run Your Data Project
 
 <SubH1>Let's use Sidetrek CLI to run your newly created data project.</SubH1>
 
-## Run your project
+## Run Your Project
 
-You can run the following command to run the end-to-end data pipeline you've just created.
+Run the following command to start the end-to-end data pipeline you've just created.
 
 <BashCode code="sidetrek start" client:load />
 
+If you're running this command for the first time, it will take a few minutes to download all the necessary Docker images. Superset in particular is quite heavy and can take a while to start. Please be patient!
+
+There are two places you can check the status of your services:
+
+1. **Dagster server** - you'll immediately see the logs in the terminal once you run `sidetrek start`.
+2. **Docker Desktop** - you can check the status of all the other services in the Docker Desktop app.
+
+Once everything is running, you can access the Dagster dashboard at [http://localhost:3000](http://localhost:3000) and the Superset dashboard at [http://localhost:8088](http://localhost:8088).
+
+### What's Happening Underneath?
+
 Underneath, all this command is doing is running three separate commands:
 1. `dagster dev` to start the Dagster server - this runs the user code (Dagster, Meltano, and DBT).
-2. `docker-compose up` inside the project root to run Minio, Iceberg, and Trino.
-3. `docker-compose up` inside superset directory to run Superset.
+2. `docker-compose up -d` in the project root to run Minio, Iceberg, and Trino in the background.
+3. `docker-compose up -d` inside superset directory to run Superset in the background.
 
-The step 1 is basically all your user code. The step 2 runs all other core services for your data pipeline. 
+The step 1 runs all your user code. The step 2 runs all other core services for your data pipeline. 
 
-The step 3 runs Superset separately because it's not part of the core data pipeline. This way you can easily swap it out for another solution. 
+The step 3 runs Superset separately because it's not part of the core data pipeline. This way you can easily swap it out for another data visualization solution. 
 
-For more details, please refer to the [Project Structure](/basics/project-structure) documentation.
+{/* For more details, please refer to the [Project Structure](/concepts/project-structure) documentation. */}
 
-### STEPS HERE...
+### Common Issues
 
-## What's happening underneath
+**Port collisions**
 
-EXPLAIN WHAT'S HAPPENING HERE...
+Because Sidetrek runs multiple services covering multiple ports, you could get the `bind: address already in use` error if you're already using one of these ports.
 
-## Next steps
+If you encounter this error, you'll have to first free the occupied port to proceed. Run `sudo lsof -i :<port-number>` to retrieve the PID for the process that's occupying the port and then run `sudo kill <PID>` to free up that port.
 
-Now you should have a new data project initialized. You'll see that a new directory has been created with the name of your project and all the tools have been installed.
+## Question or Problems?
 
-<Button><a href="/get-started/step-3-run-your-project">Let's run your project</a></Button>
+If you have any questions or problems, please don't hesitate to reach out to us on [Slack](https://join.slack.com/t/sidetrek/shared_invite/zt-1z1z1z1z-1z1z1z1z) or on [GitHub](https://https://github.com/SidetrekAI/sidetrek-cli).
+
+We'll do our best to help!
+
+## Next Steps
+
+Awesome job! You've successfully created and run your first data project.
+
+You can now start using this data pipeline to work with your own data or explore the example project we've included.
+
+If you're interested in exploring the example project, let's move on to the tutorial.
+
+<Button><a href="/tutorials/bi-stack-example-1">Check out the tutorial</a></Button>
 ```
