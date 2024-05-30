@@ -1,0 +1,124 @@
+---
+title: Meltano Using CLI
+description: Learn how to use CLI to directly manage your Meltano project.
+draft: false
+---
+# Meltano Using CLI
+
+If you want to use meltano directly using CLI, instead of dagster UI, you can do so, by running:
+
+```bash
+cd <example-project>/<example-project>/meltano
+poetry run meltano --version
+```
+
+It will show you the version of meltano installed.
+
+## Installing Plugins
+
+You can install a plugin running this command:
+
+```bash
+poetry run meltano add <plugin-type> <plugin-name> 
+# For example:
+poetry run meltano add extractor tap-gitlab
+poetry run meltano add loader target-postgres
+```
+
+If multiple variants of a discoverable plugin are available, you can choose a specific (non-default) variant using the `--variant` option on `meltano add`:
+
+```bash
+poetry run meltano add <type> <name> --variant <variant>
+*# For example:*
+poetry run meltano add loader target-postgres --variant=transferwise
+```
+
+## Installing Custom Plugins
+
+Custom plugins for packages can be added to your project using the `--custom`:
+
+```bash
+poetry run meltano add --custom <type> <name>
+
+# For example:
+poetry run meltano add --custom loader target-iceberg
+```
+
+Add value for `namespace` , `pip_url`, etc.
+
+## Configuring Plugins
+
+To set the configuration to the newly installed plugin, run this:
+
+```bash
+poetry run meltano config <name> set <setting> <value>
+# For example:
+poetry run meltano config target-postgres set password my_password
+```
+
+You can use `--interactive` flag to set the configuration settings using CLI:
+
+```bash
+poetry run meltano config <name> set --interactive
+```
+
+Running this will show you a list of all configurations.
+
+However, you can also, add configuration to `meltano.yml` file:
+
+```bash
+...
+plugins:
+  extractors:
+    - name: tap-csv
+      variant: meltanolabs
+      pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+      config:
+        csv_files_definition: extract/example_csv_files_def.json
+  loaders:
+  ...
+```
+
+You need to install the changes, using `meltano install <plugin-type> <plugin-name>` 
+
+If you change any configuration in the `meltano.yml` file, such as `pip-url` you can run `meltano install --clean <plugin-type> <plugin-name>`
+
+## Explicit inheritance
+
+If you want to use the same plugin with different configuration, you can do so using explicit inheritance. 
+
+```bash
+poetry run meltano add <type> <name> --inherit-from <discoverable-name>
+# Or equivalently:
+poetry run meltano add <type> <discoverable-name> --as <name>
+# For example:
+poetry run meltano add extractor tap-postgres--billing --inherit-from tap-postgres
+poetry run meltano add extractor tap-postgres --as tap-postgres--billing
+```
+
+The corresponding inheriting plugin definition in your `meltano.yml` project file  will use `inherit_from`:
+
+```bash
+...
+plugins:
+  extractors:
+  - name: tap-postgres--billing
+    inherit_from: tap-postgres
+    variant: transferwise
+    pip_url: pipelinewise-tap-postgres
+...
+```
+
+## Updating plugins
+
+You can update a plugin in your project using the `--update` option. Updating a plugin will re-add it to your project - that is:
+
+- Update the plugin lock file the same as `meltano lock --update` would
+- Update the plugin entry in the `meltano.yml`, without overwriting any user-defined config or extras
+
+```bash
+poetry run meltano add --update <type> <name>
+
+# For example:
+poetry run meltano add --update extractor tap-gitlab
+```
