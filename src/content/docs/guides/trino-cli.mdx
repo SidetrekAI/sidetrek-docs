@@ -60,4 +60,16 @@ Query 20240516_000541_00003_ky8ah, FINISHED, 1 node
 Splits: 26 total, 26 done (100.00%)
 0.28 [1000K rows, 720KB] [3.57M rows/s, 2.51MB/s]
 ```
-<br />
+You don’t need to call a table using `catalog.schema.table` structure, if you `use` the `schema` by running something like this:
+
+```bash
+use iceberg.project_marts;
+```
+
+Instead of `trino>` you’ll see `trino:schema_name>` on the terminal. Then you can simply run:
+
+```bash
+select count(*) from marts_iceberg__general;
+```
+
+and it will show the number of rows in that table.

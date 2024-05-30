@@ -1,0 +1,32 @@
+---
+title: Apache Iceberg Structure
+description: Learn about the structure of Apache Iceberg tables.
+draft: false
+---
+
+# Understanding Apache Iceberg Table Format Structure
+
+Apache Iceberg is a high-performance table format for large-scale analytics datasets. It brings SQL tables to big data file formats such as Apache Parquet, Avro, and ORC. Iceberg tables are designed to work with distributed data processing engines like Apache Spark, Trino, and Hive. The table format supports rich schema evolution, partitioning, and efficient data management. Here's an overview of the structure of Iceberg tables:
+
+## Key Components of an Iceberg Table
+
+1. **Catalog**:
+    - **Description**: A logical namespace for organizing tables. It is typically implemented using Hive Metastore, AWS Glue, or other catalog services.
+    - **Role**: Manages multiple databases (namespaces) and provides the location of metadata and data files.
+2. **Namespace** (or Database):
+    - **Description**: A higher-level grouping of tables, similar to a schema in relational databases.
+    - **Role**: Organizes tables within a catalog, allowing for logical separation of different datasets.
+3. **Table**:
+    - **Description**: The main structure containing the data. Each table has metadata, schema, and data files.
+    - **Role**: Stores the actual data and metadata needed for querying and managing the data.
+    
+    Inside Table, there are Metadata files and the actual data files:
+    
+    - **Metadata**:
+        - **Metadata File**: Contains information about the schema, partitioning, snapshots, and file locations. It provides a manifest of all the data files and their versions.
+        - **Snapshot**: Represents the state of a table at a given point in time. Each snapshot includes metadata about the files that constitute the table's data at that moment.
+        - **Manifest List**: A list of manifest files that were created during a snapshot. It is essentially a collection of pointers to manifest files.
+        - **Manifest File**: Lists the data files and their respective metadata, such as file paths, partition information, and statistics. Each manifest file corresponds to a subset of the table's data files.
+    - **Data Files**:
+        - **Parquet/Avro/ORC Files**: The actual data is stored in these files, which are organized based on the table's schema and partitioning strategy.
+        - **Partitioning**: Iceberg supports complex partitioning schemes that allow efficient data pruning and querying. Partitions are defined in the table's schema and used to organize data files within the table.
