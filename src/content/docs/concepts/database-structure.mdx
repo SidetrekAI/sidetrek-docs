@@ -1,0 +1,80 @@
+---
+title: Database Structures
+description: Learn about the structure of various databases.
+draft: false
+---
+# Comparison of Database Structures
+
+This table provides a quick reference to the structural terminology and hierarchy for different database systems.
+
+| Database | Top Level | Middle Level | Bottom Level |
+| --- | --- | --- | --- |
+| PostgreSQL | Database | Schema | Table |
+| MySQL | Database | - | Table |
+| Trino | Catalog | Schema | Table |
+| Iceberg | Catalog | Namespace | Table |
+| MongoDB | Database | Collection | Document |
+| Oracle | Database | Schema | Table |
+| SQL Server | Database | Schema | Table |
+| Cassandra | Keyspace | - | Table |
+| Redis | Database | - | Key-Value |
+| S3 | Bucket | - | Object |
+| DuckDB | Database | Schema | Table |
+
+## How to Access Trino Database
+You can use Trino CLI to access Trino database. Here is an example of how to access Trino CLI:
+
+```bash
+docker exec -it trino trino
+```
+You'll see `trino>` at the beginning of the line on your console. You can run SQL queries here.
+```bash
+trino> show catalogs;
+```
+It will show all the available catalogs in Trino. Run this command to see all the available schemas under a catalog.
+```bash
+trino> show schemas from catalog_name;
+```
+It will show all the schemas under the catalog. You can also run SQL queries to show the tables in the schema.
+```bash
+trino> use catalog_name.schema_name;
+trino> show tables;
+```
+It will show all the tables in the schema. You can run SQL queries to see the data in the tables.
+```bash
+trino> select * from table_name;
+```
+It will show all the data in the table.
+
+## How to Access PostgreSQL Database
+There are two main ways to access data in PostgreSQL:
+
+1. **Using psql:** This is the command-line interface for PostgreSQL. You can use psql to connect to a database, run SQL queries to retrieve data, and even update or delete data.
+
+2. **Using a graphical user interface (GUI) tool:** There are several GUI tools available for PostgreSQL, such as pgAdmin. These tools allow you to manage your databases and run SQL queries in a more user-friendly way.
+
+You can access the PostgreSQL database from inside a container using the following command:
+```bash
+docker exec -it postgres-container psql -U postgres
+```
+You'll see `postgres=#` at the beginning of the line on your console. You can run SQL queries here.
+```bash
+postgres=# \l
+```
+It will show all the available databases in PostgreSQL. You can always press `q` to come back to the original psql cli. Run this command to connect to a database.
+```bash
+postgres=# \c database_name
+```
+Run this command to see all the available schemas under a database.
+```bash
+database_name=# \dn
+```
+It will show all the schemas under the database. You can also run SQL queries to show the tables in the schema.
+```bash
+postgres=# \dt schema_name.*
+```
+It will show all the tables in the schema. You can run SQL queries to see the data in the tables.
+```bash
+postgres=# SELECT * FROM schema_name.table_name;
+```
+It will show all the data in the table.

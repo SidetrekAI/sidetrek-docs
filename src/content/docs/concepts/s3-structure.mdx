@@ -1,0 +1,53 @@
+---
+title: S3 File Structure
+description: Learn about S3 file structure and how to organize your files in S3.
+draft: false
+---
+# Understanding S3 File Structure
+
+Amazon S3 (Simple Storage Service) is a scalable object storage service designed for storing and retrieving any amount of data at any time. It uses a simple and flexible structure that allows users to store and organize their data efficiently. The structure of S3 is straightforward, focusing on buckets, objects, and keys. MinIO is an open-source, high-performance, distributed object storage system designed to be compatible with Amazon S3's API. This compatibility allows MinIO to serve as an alternative to S3 for on-premises or private cloud environments. The structure of MinIO mirrors that of S3, providing a familiar setup for users who are already acquainted with Amazon S3.
+
+## Key Components of S3
+
+1. **Bucket**:
+    - **Description**: The top-level container for storing objects in S3. Each bucket must have a globally unique name and is created in a specific AWS region.
+    - **Role**: Acts as a namespace for objects and organizes them within the S3 service.
+2. **Object**:
+    - **Description**: The fundamental entity stored in a bucket, consisting of the data itself and metadata.
+    - **Role**: Represents the actual data stored in S3. Objects are identified within a bucket by a unique key.
+3. **Key**:
+    - **Description**: The unique identifier for an object within a bucket. It is essentially the "name" of the object.
+    - **Role**: Used to retrieve and manage objects. Keys can include slashes (**`/`**) to simulate a hierarchical directory structure, though S3 uses a flat namespace.
+4. **Metadata**:
+    - **Description**: Information about the object, such as its size, type, and other properties. Metadata can be system-defined (e.g., creation date, last modified date) or user-defined (custom metadata).
+    - **Role**: Provides additional context and information about the object, useful for managing and retrieving the data.
+
+### Example Structure of S3
+
+Let's consider a scenario where we have a bucket named `lakehouse` containing several objects:
+
+- **Bucket**: `lakehouse`
+    - **Object**: `/raw/orders/data/00000-0-2cd2668b-2b7a-4dac-8a1e-af3f02fa2495.parquet`
+        - **Key**: `/raw/orders/data/00000-0-2cd2668b-2b7a-4dac-8a1e-af3f02fa2495.parquet`
+        - **Metadata**: `{ "Name": "00000-0-2cd2668b-2b7a-4dac-8a1e-af3f02fa2495.parquet", "Date": "2024-05-26 17:35:45 UTC", “Size”: “189 KiB”, “ETag”: “edd2116fab95a1381e9ad50fb03c012a-1”, “Type”: “file” }`
+
+You can check the metadata of a file stored in Minio using MinIO Client (mc):
+
+```bash
+docker exec -it mc bash
+mc stat minio/<lakehouse-name>/<catalog-name>/<namespace>/data/<key-name>
+# For example
+mc stat minio/lakehouse/raw/orders/data/00000-0-2cd2668b-2b7a-4dac-8a1e-af3f02fa2495.parquet
+```
+
+You should see the metadata:
+
+```bash
+Name      : 00000-0-2cd2668b-2b7a-4dac-8a1e-af3f02fa2495.parquet
+Date      : 2024-05-26 17:35:45 UTC 
+Size      : 189 KiB 
+ETag      : edd2116fab95a1381e9ad50fb03c012a-1 
+Type      : file 
+Metadata  :
+  Content-Type: application/octet-stream 
+```
