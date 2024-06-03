@@ -3,6 +3,8 @@ title: DBT Using CLI
 description: Learn how to use CLI to directly manage your DBT project.
 draft: false
 ---
+import BashCode from '@/components/BashCode'
+
 # DBT Using CLI
 
 If you want to use DBT directly using CLI, instead of the Dagster UI, you can do so, by running:
@@ -15,10 +17,8 @@ poetry run dbt --version
 ### Running All Models
 
 You can directly run DBT models using CLI:
+<BashCode code="poetry run dbt run" client:load />
 
-```bash
-poetry run dbt run
-```
 ### Running A Specific Model
 
 To run a specific model or a list of models, you can use the `--select` flag:

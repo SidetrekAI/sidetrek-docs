@@ -66,7 +66,7 @@ Running this will show you a list of all configurations.
 
 However, you can also, add configuration to `meltano.yml` file:
 
-```bash
+```yaml title="example-project>/meltano/meltano.yml"
 ...
 plugins:
   extractors:
@@ -98,7 +98,7 @@ poetry run meltano add extractor tap-postgres --as tap-postgres--billing
 
 The corresponding inheriting plugin definition in your `meltano.yml` project file  will use `inherit_from`:
 
-```bash
+```yaml title="example-project>/meltano/meltano.yml"
 ...
 plugins:
   extractors:
