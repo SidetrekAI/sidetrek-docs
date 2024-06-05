@@ -3,10 +3,12 @@ title: SQL Code Generated from DBT Models
 description: How to check SQL code generated from DBT models.
 draft: false
 ---
-If you want to check the SQL code generated from your DBT models, you can do so by running the following command:
+import BashCode from '@/components/BashCode'
 
-```bash
-cd <example-project>/<example-project>/dbt/<example-project>
-poetry run dbt compile
-```
+If you want to check the SQL code generated from your DBT models, you can do so by running the following commands:
+
+<BashCode code="cd <example-project>/<example-project>/dbt/<example-project>" client:load />
+<BashCode code="poetry run dbt compile" client:load />
+
+
 `dbt compile` generates executable SQL from source model, test, and analysis files. You can find these compiled SQL files in the `target/` directory of your dbt project.
