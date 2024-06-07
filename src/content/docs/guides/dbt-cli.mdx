@@ -3,43 +3,37 @@ title: DBT Using CLI
 description: Learn how to use CLI to directly manage your DBT project.
 draft: false
 ---
+import BashCode from '@/components/BashCode'
+
 # DBT Using CLI
 
 If you want to use DBT directly using CLI, instead of the Dagster UI, you can do so, by running:
 
-```bash
-cd <example-project>/<example-project>/dbt/<example-project>
-poetry run dbt --version
-```
+<BashCode code="cd <example-project>/<example-project>/dbt/<example-project>" client:load />
+<BashCode code="poetry run dbt --version" client:load />
 
 ### Running All Models
 
 You can directly run DBT models using CLI:
+<BashCode code="poetry run dbt run" client:load />
 
-```bash
-poetry run dbt run
-```
 ### Running A Specific Model
 
 To run a specific model or a list of models, you can use the `--select` flag:
 
-```bash
-poetry run dbt run --select <model-name>
-# For example:
-poetry run dbt run --select marts_iceberg__general
-```
+<BashCode code="poetry run dbt run --select <model-name>" client:load />
+For example:
+<BashCode code="poetry run dbt run --select marts_iceberg__general" client:load />
+
 ### Running A Set of Models
 
 If you want to run a set of models with names starting with `stg_iceberg__`, such as, `stg_iceberg__products`, `stg_iceberg__orders`, etc., you can use the `--select` flag with `+`:
 
-```bash
-poetry run dbt run --select +stg_iceberg__
-```
+<BashCode code="poetry run dbt run --select +stg_iceberg__>" client:load />
+
 ### Excluding A Model or A List of Models
 You can also exclude a specific model or a list of models using the `--exclude` flag:
 
-```bash
-poetry run dbt run --exclude <model-name>
-# For example:
-poetry run dbt run --exclude int_iceberg__denormalized_orders
-```
+<BashCode code="poetry run dbt run --exclude <model-name>" client:load />
+For example:
+<BashCode code="poetry run dbt run --exclude int_iceberg__denormalized_orders" client:load />

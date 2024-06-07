@@ -3,26 +3,25 @@ title: Trino CLI
 description: How to query data in Trino
 draft: false
 ---
+import BashCode from '@/components/BashCode'
 
 ## Trino CLI
 
 You can use Trino CLI to query your Iceberg tables. In your console, run the following:
 
-```bash
-docker exec -it trino trino
-```
+<BashCode code="docker exec -it trino trino" client:load />
+
 
 When you see `trino>`, it means you are inside Trino CLI.
 
 Run the following SQL query to check all the catalogs you have:
 
-```bash
-show catalogs;
-```
+<BashCode code="show catalogs;" client:load />
+
 
 You’ll see the names of the catalogs in Trino:
 
-```bash
+```plaintext
  Catalog 
 ---------
  iceberg 
@@ -36,21 +35,18 @@ Splits: 11 total, 11 done (100.00%)
 
 Similarly, you can check all the schemas inside `iceberg` catalog by running this:
 
-```bash
-show schemas in iceberg;
-```
+<BashCode code="show schemas in iceberg;" client:load />
 
 You’ll see the names of all existing schemas.
 
 Let’s query the number of rows in the table `int_iceberg__denormalized_orders` in the schema `project_intermediate` in the catalog `iceberg`. Run the following:
 
-```bash
-select count(*) from iceberg.project_intermediate.int_iceberg__denormalized_orders;
-```
+<BashCode code="select count(*) from iceberg.project_intermediate.int_iceberg__denormalized_orders;" client:load />
+
 
 You’ll see the output:
 
-```bash
+```plaintext
  _col0  
 ---------
  1000000 
@@ -62,14 +58,11 @@ Splits: 26 total, 26 done (100.00%)
 ```
 You don’t need to call a table using `catalog.schema.table` structure, if you `use` the `schema` by running something like this:
 
-```bash
-use iceberg.project_marts;
-```
+<BashCode code="use iceberg.project_marts;" client:load />
+
 
 Instead of `trino>` you’ll see `trino:schema_name>` on the terminal. Then you can simply run:
 
-```bash
-select count(*) from marts_iceberg__general;
-```
+<BashCode code="select count(*) from marts_iceberg__general;" client:load />
 
 and it will show the number of rows in that table.
