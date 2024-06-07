@@ -6,7 +6,7 @@ draft: false
 # Sidetrek Project Structure
 The project is organized into several directories and files, each serving a specific purpose. Below is an overview of the structure:
 
-```bash
+```plaintext
 demo_project
 ├── .env
 ├── .gitignore
@@ -54,42 +54,50 @@ Contains the source code and configuration files for Apache Superset, a data exp
 
 Configuration files for Trino (formerly PrestoSQL), a distributed SQL query engine.
 
+### Why is Trino and Superset Outside the Project Folder?
+
+Trino and Superset are not included within the second project folder because they are deployed as separate services rather than being part of the user code. These tools are independently managed and deployed, ensuring that any changes made to the user code do not affect their deployment. This separation allows for independent updates and maintenance of Trino and Superset without impacting the core project, thereby facilitating a more modular and manageable deployment architecture.
+
 ### dagster Directory
 
 Contains Dagster-related configurations and code.
 
-```bash
-dagster
+```plaintext
+demo_project
+...
 └── demo_project
-    ├── .env
-    ├── .gitignore
-    ├── .logs_queue
-    ├── .nux
-    ├── .telemetry
-    │   └── id.yaml
-    ├── README.md
-    ├── demo_project
-    │   ├── __init__.py
-    │   ├── __pycache__
-    │   ├── assets.py
-    │   ├── dbt_assets.py
-    │   └── meltano.py
-    ├── demo_project_tests
-    │   ├── __init__.py
-    │   └── test_assets.py
-    ├── history
-    │   ├── runs
-    │   └── runs.db
-    ├── logs
-    │   └── event.log
-    ├── pyproject.toml
-    ├── schedules
-    │   └── schedules.db
-    ├── setup.cfg
-    ├── setup.py
-    └── storage
-        ├── 8407b3f3-504d-4a32-91c2-b447a485dc5c
-        └── abe21850-81be-4de9-932a-017194e6ff35
+    ...
+    └── dagster
+        └── demo_project
+            ├── .env
+            ├── .gitignore
+            ├── .logs_queue
+            ├── .nux
+            ├── .telemetry
+            │   └── id.yaml
+            ├── README.md
+            ├── demo_project
+            │   ├── __init__.py
+            │   ├── __pycache__
+            │   ├── assets.py
+            │   ├── dbt_assets.py
+            │   └── meltano.py
+            ├── demo_project_tests
+            │   ├── __init__.py
+            │   └── test_assets.py
+            ├── history
+            │   ├── runs
+            │   └── runs.db
+            ├── logs
+            │   └── event.log
+            ├── pyproject.toml
+            ├── schedules
+            │   └── schedules.db
+            ├── setup.cfg
+            ├── setup.py
+            └── storage
+                ├── 8407b3f3-504d-4a32-91c2-b447a485dc5c
+                └── abe21850-81be-4de9-932a-017194e6ff35
 ```
 
 - **.env**: Environment variables specific to Dagster.
@@ -116,13 +124,17 @@ dagster
 
 Contains data files for the project.
 
-```bash
-data
-└── example
-    ├── customers.csv
-    ├── orders.csv
-    ├── products.csv
-    └── stores.csv
+```plaintext
+demo_project
+...
+└── demo_project
+    ...
+    └── data
+        └── example
+            ├── customers.csv
+            ├── orders.csv
+            ├── products.csv
+            └── stores.csv
 ```
 
 - **example/**: Example data files.
@@ -132,45 +144,49 @@ data
 
 Contains DBT (Data Build Tool) configurations and project files.
 
-```bash
-dbt
-├── demo_project
-│   ├── .gitignore
-│   ├── .user.yml
-│   ├── README.md
-│   ├── analyses
-│   │   └── .gitkeep
-│   ├── dbt_packages
-│   ├── dbt_project.yml
-│   ├── logs
-│   │   └── dbt.log
-│   ├── macros
-│   │   └── .gitkeep
-│   ├── models
-│   │   ├── intermediate
-│   │   ├── marts
-│   │   └── staging
-│   ├── profiles.yml
-│   ├── seeds
-│   │   └── .gitkeep
-│   ├── snapshots
-│   │   └── .gitkeep
-│   ├── target
-│   │   ├── compiled
-│   │   ├── dbt.log
-│   │   ├── dbt_project_assets-8407b3f-90ffd3b
-│   │   ├── graph.gpickle
-│   │   ├── graph_summary.json
-│   │   ├── manifest.json
-│   │   ├── partial_parse.msgpack
-│   │   ├── perf_info.json
-│   │   ├── run
-│   │   ├── run_results.json
-│   │   └── semantic_manifest.json
-│   └── tests
-│       └── .gitkeep
-└── logs
-    └── dbt.log
+```plaintext
+demo_project
+...
+└── demo_project
+    ...
+    └── dbt
+        ├── demo_project
+        │   ├── .gitignore
+        │   ├── .user.yml
+        │   ├── README.md
+        │   ├── analyses
+        │   │   └── .gitkeep
+        │   ├── dbt_packages
+        │   ├── dbt_project.yml
+        │   ├── logs
+        │   │   └── dbt.log
+        │   ├── macros
+        │   │   └── .gitkeep
+        │   ├── models
+        │   │   ├── intermediate
+        │   │   ├── marts
+        │   │   └── staging
+        │   ├── profiles.yml
+        │   ├── seeds
+        │   │   └── .gitkeep
+        │   ├── snapshots
+        │   │   └── .gitkeep
+        │   ├── target
+        │   │   ├── compiled
+        │   │   ├── dbt.log
+        │   │   ├── dbt_project_assets-8407b3f-90ffd3b
+        │   │   ├── graph.gpickle
+        │   │   ├── graph_summary.json
+        │   │   ├── manifest.json
+        │   │   ├── partial_parse.msgpack
+        │   │   ├── perf_info.json
+        │   │   ├── run
+        │   │   ├── run_results.json
+        │   │   └── semantic_manifest.json
+        │   └── tests
+        │       └── .gitkeep
+        └── logs
+            └── dbt.log
 ```
 
 - **demo_project/**: Core DBT project files.
@@ -196,46 +212,49 @@ dbt
 
 Contains Meltano project files and configurations.
 
-```bash
-meltano
-├── .env
-├── .gitignore
-├── .meltano
-│   ├── analytics.json
-│   ├── cache
-│   │   └── discovery.yml
-│   ├── extractors
-│   │   └── tap-csv
-│   ├── loaders
-│   │   └── target-iceberg
-│   ├── logs
-│   │   ├── elt
-│   │   └── pip
-│   ├── meltano.db
-│   └── run
-│       ├── bin
-│       └── meltano.yml.lock
-├── README.md
-├── analyze
-│   └── .gitkeep
-├── extract
-│   ├── .gitkeep
-│   └── example_csv_files_def.json
-├── load
-│   └── .gitkeep
-├── meltano.yml
-├── notebook
-│   └── .gitkeep
-├── orchestrate
-│   └── .gitkeep
-├── output
-│   └── .gitignore
-├── plugins
-│   └── extractors
-│       └── tap-csv--meltanolabs.lock
-├── requirements.txt
-└── transform
-    └── .gitkeep
+```plaintext
+...
+└── demo_project
+    ...
+    └── meltano
+        ├── .env
+        ├── .gitignore
+        ├── .meltano
+        │   ├── analytics.json
+        │   ├── cache
+        │   │   └── discovery.yml
+        │   ├── extractors
+        │   │   └── tap-csv
+        │   ├── loaders
+        │   │   └── target-iceberg
+        │   ├── logs
+        │   │   ├── elt
+        │   │   └── pip
+        │   ├── meltano.db
+        │   └── run
+        │       ├── bin
+        │       └── meltano.yml.lock
+        ├── README.md
+        ├── analyze
+        │   └── .gitkeep
+        ├── extract
+        │   ├── .gitkeep
+        │   └── example_csv_files_def.json
+        ├── load
+        │   └── .gitkeep
+        ├── meltano.yml
+        ├── notebook
+        │   └── .gitkeep
+        ├── orchestrate
+        │   └── .gitkeep
+        ├── output
+        │   └── .gitignore
+        ├── plugins
+        │   └── extractors
+        │       └── tap-csv--meltanolabs.lock
+        ├── requirements.txt
+        └── transform
+            └── .gitkeep
 ```
 
 - **.env, .gitignore**: Environment variables and Git ignore file for Meltano.
@@ -250,7 +269,3 @@ meltano
     - **extractors/**: Contains extractor plugins.
 - **requirements.txt**: Python dependencies for Meltano.
 - **transform/**: Directory for transformation files (contains a placeholder `.gitkeep`).
-
-### Why is Trino and Superset Outside the Project Folder?
-
-Trino and Superset are not included within the second project folder because they are deployed as separate services rather than being part of the user code. These tools are independently managed and deployed, ensuring that any changes made to the user code do not affect their deployment. This separation allows for independent updates and maintenance of Trino and Superset without impacting the core project, thereby facilitating a more modular and manageable deployment architecture.
