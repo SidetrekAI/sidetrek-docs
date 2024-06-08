@@ -10,10 +10,244 @@ import MyAlert from '@/components/MyAlert'
 
 # Explore the Example Project
 
-<SubH1>Let's take a look at the example project installed during the project initialization.</SubH1>
+<SubH1>Let's take a look at the example project.</SubH1>
 
-## Example Project
+If you opted in to adding the example project during `sidetrek init`, you should now have a fully functional data pipeline that you can explore.
 
+Let's take a look at each part of this example project to see what's going on.
+
+## The Dataset
+
+We've included a simple dataset with four tables: `orders`, `customers`, `products`, and `stores`. This emulates the typical e-commerce data.
+
+Each table has its own csv file in the `/your_project/data` directory.
+
+<div className="grid grid-cols-1 md:grid-cols-2 md:gap-8">
+<div className="col-span-1">
+#### Orders Table
+
+<div className="max-w-[320px]">
+| Field | Type |
+| --- | --- |
+| order_id | string |
+| ordered_at | timestamp |
+| product_id | string |
+| product_qty | integer |
+| customer_id | string |
+| store_id | string |
+</div>
+</div>
+
+<div className="col-span-1">
+#### Customers Table
+
+<div className="max-w-[320px]">
+| Field | Type |
+| --- | --- |
+| customer_id | string |
+| customer_name | string |
+| first_name | string |
+| last_name | string |
+| gender | string |
+| country | string |
+| address | string |
+| phone_no | string |
+| email | string |
+| payment_method | string |
+| traffic_source | string |
+| customer_age | integer |
+| device_type | string |
+</div>
+</div>
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 md:gap-8">
+<div className="col-span-1">
+#### Products Table
+
+<div className="max-w-[320px]">
+| Field | Type |
+| --- | --- |
+| product_id | string |
+| product_name | string |
+| product_category | string |
+| unit_price | float |
+| product_description | string |
+</div>
+</div>
+
+<div className="col-span-1">
+#### Stores Table
+
+<div className="max-w-[320px]">
+| Field | Type |
+| --- | --- |
+| store_id | string |
+| store_name | string |
+| store_city | string |
+| store_state | string |
+| tax_rate | float |
+</div>
+</div>
+</div>
+
+## Data Ingestion
+
+Data ingestion is handled by Meltano. Meltano is a managed connector that already has a number of pre-built connectors to popular data sources and targets. Essentially, it handles the EL ("Extract, Load") part of the ELT process.
+
+Just as a quick reminder, here's where Meltano is in the project structure:
+
+```plaintext {10}
+your_project
+├── .sidetrek
+├── .venv
+├── superset
+├── trino
+└── your_project
+    ├── dagster
+    ├── data
+    ├── dbt
+    └── meltano
+```
+
+### Meltano extractor and loader
+
+To use Meltano to ingest data, you need to set up two things: 1) extractor (or "tap") and 2) loader ("target").
+
+In our example project, our data is stored in CSV files and we want to load that data into Iceberg tables, so we're using the `tap-csv` extractor and `target-iceberg` loader.
+
+Note that currently, there are no official Meltano target for Iceberg, so we've created a custom target. This is also open-source, so feel free to check out the source code [here](https://github.com/SidetrekAI/target-iceberg).
+
+#### Adding the Extractor
+
+If you opted in to adding the example project during `sidetrek init`, Sidetrek has already added and configured the extractor for you. 
+
+<MyAlert variant="info" title="In the example project, extractor and loader are already set up for you." description="We've already added and configured the Meltano extractor and loader for you in the example project."/>
+
+If you want to add more extractors for your own data project later, you can do so by running a command like this:
+
+<BashCode code="meltano add extractor tap-csv" />
+
+Replace `tap-csv` with the name of the extractor you want to add. See the [Meltano documentation](https://meltano.com/docs/) for more information on how to work with Meltano.
+
+Once the extractor is installed, it needs to be configured. We've already done this for you in the example project. You can see it in meltano.yml file in the /meltano directory.
+
+```yaml title="meltano/meltano.yml" showLineNumbers
+...
+plugins:
+  extractors:
+    - name: tap-csv
+      ...
+      config:
+        csv_files_definition: extract/example_csv_files_def.json
+```
+
+`csv_files_definition` field lets Meltano know where to find the CSV files. If you look at that file, you'll see something like this:
+  
+```json title="meltano/extract/example_csv_files_def.json" showLineNumbers
+[
+  { "entity": "orders", "path": "../data/example/orders.csv", "keys": ["id"] },
+  { "entity": "customers", "path": "../data/example/customers.csv", "keys": ["id"] },
+  { "entity": "products", "path": "../data/example/products.csv", "keys": ["id"] },
+  { "entity": "stores", "path": "../data/example/stores.csv", "keys": ["id"] }
+]
+```
+
+It basically tells Meltano where to find the CSV files and what the primary keys are for each table.
+
+#### Adding the Loader
+
+Once the extractor is set up, it's time to add the loader. This is where you tell Meltano where to load the data to.
+
+In the example project, we're loading the data into Iceberg tables. We've already added and configured the loader for you in the example project, but if you want to add your own later, you can do it like this:
+
+<BashCode code="meltano add --custom loader target-iceberg" />
+
+Note that you typically don't need the `--custom` flag if you're using one of the existing Meltano loaders.
+
+Configuring the loader is similar to configuring the extractor. You can find the configuration in the meltano.yml file in the /meltano directory.
+
+```yaml title="meltano/meltano.yml" showLineNumbers
+...
+plugins:
+  ...
+  loaders:
+    - name: target-iceberg
+      namespace: target_iceberg
+      pip_url: git+https://github.com/SidetrekAI/target-iceberg@bugfix/fields
+      executable: target-iceberg
+      config:
+        add_record_metadata: true
+        aws_access_key_id: $AWS_ACCESS_KEY_ID
+        aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+        s3_endpoint: http://localhost:9000
+        s3_bucket: lakehouse
+        iceberg_rest_uri: http://localhost:8181
+        iceberg_catalog_name: icebergcatalog
+        iceberg_catalog_namespace_name: raw
+```
+
+It requires AWS credentials, S3 endpoint (this is Minio endpoint in our case since we're using Minio as S3 replacement for our development environment), and Iceberg related configurations.
+
+Iceberg is a table format that sits on top of a physical storage layer like S3. So when you load data into Iceberg tables, the actual data is stored as files in S3 and Iceberg specifies how those files are organized into tables we're familiar with. 
+
+In essence, Iceberg makes object storage like S3 work like a relational database or data warehouse.
+
+This is why this loader requires AWS credentials and Minio endpoint, not just Iceberg configurations.
+
+To learn more about how Iceberg works, check out the [Iceberg documentation](https://iceberg.apache.org/).
+
+### Running Meltano ingestion
+
+Now that we have meltano extractor and loader installed and configured, we can run the ingestion.
+
+You can run it manually by running the following command:
+
+<BashCode code="sidetrek run meltano run tap-csv target-iceberg" />
+
+`sidetrek run` here is simply a wrapper around `meltano run *` command. It runs the meltano CLI inside the project virtual env and also sets the cwd to meltano directory.
+
+It's identical to running:
+
+<BashCode code="cd your_project/meltano && poetry run meltano run tap-csv target-iceberg" />
+
+### Running Meltano ingestion as part of the Dagster pipeline
+
+We saw how we can trigger the ingestion manually with the CLI, but often we want to run the ingestion inside the orchestrator (Dagster). For example, we might want to schedule the ingestion to run daily.
+
+If you check out the example project, you'll see that we've already added a job to run the meltano ingestion in the Dagster pipeline.
+
+```python title="your_project/dagster/your_project/__init__.py" {7, 11}
+import os
+ 
+from dagster import Definitions
+from dagster_dbt import DbtCliResource
+ 
+from .dbt_assets import dbt_project_assets, dbt_project_dir
+from .meltano import run_csv_to_iceberg_meltano_job
+ 
+defs = Definitions(
+    assets=[dbt_project_assets],
+    jobs=[run_csv_to_iceberg_meltano_job],
+    resources={
+        "dbt": DbtCliResource(project_dir=os.fspath(dbt_project_dir)),
+    },
+)
+```
+
+If you follow the code to `run_csv_to_iceberg_meltano_job` function above, you'll see that we've added a Dagster job to run meltano.
+
+```python title="your_project/dagster/your_project/meltano.py" {7, 11}
+...
+
+@job(resource_defs={"meltano": meltano_resource}, config=default_config)
+def run_csv_to_iceberg_meltano_job():
+    tap_done = meltano_run_op("tap-csv target-iceberg")()
+```
+
+As you can see here, all we're doing is really just running meltano CLI inside a Dagster job.
+
+In the example project, this is all we've done, but for your own data pipeline, you can easily add scheduling on top of this job to run it daily or hourly.
 
 ## Next Steps
 

@@ -20,5 +20,125 @@ We've included a simple dataset with four tables: `orders`, `customers`, `produc
 
 Each table has its own csv file in the `/your_project/data` directory.
 
-<Button><a href="/get-started/step-1-install-sidetrek">Let's get started!</a></Button>
+<div className="grid grid-cols-1 md:grid-cols-2 md:gap-8">
+<div className="col-span-1">
+#### Orders Table
 
+<div className="max-w-[320px]">
+| Field | Type |
+| --- | --- |
+| order_id | string |
+| ordered_at | timestamp |
+| product_id | string |
+| product_qty | integer |
+| customer_id | string |
+| store_id | string |
+</div>
+</div>
+
+<div className="col-span-1">
+#### Customers Table
+
+<div className="max-w-[320px]">
+| Field | Type |
+| --- | --- |
+| customer_id | string |
+| customer_name | string |
+| first_name | string |
+| last_name | string |
+| gender | string |
+| country | string |
+| address | string |
+| phone_no | string |
+| email | string |
+| payment_method | string |
+| traffic_source | string |
+| customer_age | integer |
+| device_type | string |
+</div>
+</div>
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 md:gap-8">
+<div className="col-span-1">
+#### Products Table
+
+<div className="max-w-[320px]">
+| Field | Type |
+| --- | --- |
+| product_id | string |
+| product_name | string |
+| product_category | string |
+| unit_price | float |
+| product_description | string |
+</div>
+</div>
+
+<div className="col-span-1">
+#### Stores Table
+
+<div className="max-w-[320px]">
+| Field | Type |
+| --- | --- |
+| store_id | string |
+| store_name | string |
+| store_city | string |
+| store_state | string |
+| tax_rate | float |
+</div>
+</div>
+</div>
+
+## Data Ingestion
+
+Data ingestion is handled by Meltano. Meltano is a managed connector that already has a number of pre-built connectors to popular data sources and targets. Essentially, it handles the EL ("Extract, Load") part of the ELT process.
+
+Just as a quick reminder, here's where Meltano is in the project structure:
+
+```plaintext {10}
+your_project
+├── .sidetrek
+├── .venv
+├── superset
+├── trino
+└── your_project
+    ├── dagster
+    ├── data
+    ├── dbt
+    └── meltano
+```
+
+### Meltano extractor and loader
+
+To use Meltano to ingest data, you need to set up two things: 1) extractor (or "tap") and 2) loader ("target").
+
+In our example project, our data is stored in CSV files and we want to load that data into Iceberg tables, so we're using the `tap-csv` extractor and `target-iceberg` loader.
+
+Note that currently, there are no official Meltano target for Iceberg, so we've created a custom target. This is also open-source, so feel free to check out the source code [here](https://github.com/SidetrekAI/target-iceberg).
+
+#### Add the Extractor
+
+<BashCode code="meltano add extractor tap-csv" />
+
+Configure the extractor by updating the meltano.yml file in the /meltano directory like this:
+
+```yaml title="meltano/your_project/__init__.py" showLineNumbers
+...
+plugins:
+  extractors:
+    - name: tap-csv
+      ...
+      config:
+        csv_files_definition: extract/csv_files_def.json
+```
+
+
+
+
+## Next Steps
+
+Congrats! You've successfully set up a data pipeline from scratch with Sidetrek.
+
+This should give you a pretty good start on how to build your own data pipeline.
+
+If you have any questions or feedback, feel free to reach out to us on our [Slack channel](https://join.slack.com/t/sidetrek-community/shared_invite/zt-2jt7qd46b-FmqAl3WSU~2uWtAFTXjj7A).
