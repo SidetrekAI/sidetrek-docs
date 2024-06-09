@@ -15,7 +15,7 @@ models:
   - name: int_iceberg__denormalized_orders
     columns:
       - name: order_id
-        tests:
+        data_tests:
           - not_null
 ```
 
@@ -26,7 +26,7 @@ models:
   - name: int_iceberg__denormalized_orders
     columns:
       - name: customer_id
-        tests:
+        data_tests:
           - unique
 ```
 
