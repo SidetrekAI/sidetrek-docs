@@ -93,9 +93,9 @@ Each table has its own csv file in the `/your_project/data` directory.
 
 ## Data Ingestion
 
-Data ingestion is handled by Meltano. Meltano is a managed connector that already has a number of pre-built connectors to popular data sources and targets. Essentially, it handles the EL ("Extract, Load") part of the ELT process.
+Data ingestion is handled by Meltano. Meltano is a managed connector with hundreds of pre-built connectors to popular data sources and targets. Essentially, it handles the EL ("Extract, Load") part of the ELT process.
 
-Just as a quick reminder, here's where Meltano is in the project structure:
+As a quick reminder, here's where Meltano fits into the project structure:
 
 ```plaintext {10}
 your_project
@@ -112,17 +112,19 @@ your_project
 
 ### Meltano Extractor and Loader
 
-To use Meltano to ingest data, you need to set up two things: 1) extractor (or "tap") and 2) loader ("target").
+To use Meltano to ingest data, you need to set up two things: 1) an extractor ("tap") and 2) a loader ("target").
 
-In our example project, our data is stored in CSV files and we want to load that data into Iceberg tables, so we're using the `tap-csv` extractor and `target-iceberg` loader.
+<MyAlert variant="info" title="Taps and Targets?" description='Meltano follows the Singer protocol for their extractors and loaders. In the Singer protocol, extractors are called "taps" and loaders are called "targets".' />
 
-Note that currently, there are no official Meltano target for Iceberg, so we've created a custom target. This is also open-source, so feel free to check out the source code [here](https://github.com/SidetrekAI/target-iceberg).
+In our example project, our data is stored in CSV files and we want to load that data into Iceberg tables, so we're using the tap-csv extractor and target-iceberg loader.
+
+Note that currently, there is no official Meltano target for Iceberg, so we've created a custom target. This is also open-source, so feel free to check out the source code [here](https://github.com/SidetrekAI/target-iceberg).
 
 #### Adding the Extractor
 
-If you opted in to adding the example project during `sidetrek init`, Sidetrek has already added and configured the extractor for you. 
+If you opted to add the example project during `sidetrek init`, Sidetrek has already added and configured the extractor for you. 
 
-<MyAlert variant="info" title="In the example project, extractor and loader are already set up for you." description="We've already added and configured the Meltano extractor and loader for you in the example project."/>
+<MyAlert variant="info" title="In the example project, extractor and loader are already set up for you." description="We've already added and configured the Meltano extractor and loader for you in the example project." />
 
 If you want to add more extractors for your own data project later, you can do so by running a command like this:
 
@@ -187,25 +189,25 @@ plugins:
         iceberg_catalog_namespace_name: raw
 ```
 
-It requires AWS credentials, S3 endpoint (this is Minio endpoint in our case since we're using Minio as S3 replacement for our development environment), and Iceberg related configurations.
+It requires AWS credentials, an S3 endpoint (which is a Minio endpoint in our case since we're using Minio as an S3 replacement for our development environment), and Iceberg-related configurations.
 
-Iceberg is a table format that sits on top of a physical storage layer like S3. So when you load data into Iceberg tables, the actual data is stored as files in S3 and Iceberg specifies how those files are organized into tables we're familiar with. 
+Iceberg is a table format that sits on top of a physical storage layer like S3. When you load data into Iceberg tables, the actual data is stored as files in S3, and Iceberg specifies how those files are organized into tables we're familiar with.
 
 In essence, Iceberg makes object storage like S3 work like a relational database or data warehouse.
 
-This is why this loader requires AWS credentials and Minio endpoint, not just Iceberg configurations.
+This is why this loader requires AWS credentials and a Minio endpoint, not just Iceberg configurations.
 
 To learn more about how Iceberg works, check out the [Iceberg documentation](https://iceberg.apache.org/).
 
 ### Running Meltano Ingestion
 
-Now that we have meltano extractor and loader installed and configured, we can run the ingestion.
+Now that we have the Meltano extractor and loader installed and configured, we can run the ingestion.
 
-You can run it manually by running the following command:
+You can run it manually by executing the following command:
 
 <BashCode code="sidetrek run meltano run tap-csv target-iceberg" />
 
-`sidetrek run` here is simply a wrapper around `meltano run *` command. It runs the meltano CLI inside the project virtual env and also sets the cwd to /meltano directory.
+`sidetrek run` here is a simple convenience wrapper around `meltano run *` command. It runs the meltano CLI inside the project virtual env and also sets the cwd to /meltano directory.
 
 It's identical to running:
 
@@ -215,7 +217,7 @@ It's identical to running:
 
 We saw how we can trigger the ingestion manually with the CLI, but often we want to run the ingestion inside the orchestrator (Dagster). For example, we might want to schedule the ingestion to run daily.
 
-If you check out the example project, you'll see that we've already added a job to run the meltano ingestion in the Dagster pipeline.
+In the example project, we've already added a job to run the Meltano ingestion in the Dagster pipeline.
 
 ```python title="your_project/dagster/your_project/your_project/__init__.py" {7, 11}
 import os
@@ -245,25 +247,27 @@ def run_csv_to_iceberg_meltano_job():
     tap_done = meltano_run_op("tap-csv target-iceberg")()
 ```
 
-As you can see here, all we're doing is really just running meltano CLI inside a Dagster job.
+As you can see here, this is simply running the Meltano CLI inside a Dagster job.
 
 In the example project, this is all we've done, but for your own data pipeline, you can easily add scheduling on top of this job to run it daily or hourly.
 
-Finally, let's run the meltano ingestion job inside Dagster.
+Finally, let's run the Meltano ingestion job inside Dagster.
 
-1. Go to the Dagster dashboard at http://localhost:3000.
-2. Click on the `run_csv_to_iceberg_meltano_job` job.
-3. Go to the tab "Launchpad" and click "Launch Run".
+1. Go to the Dagster dashboard at http://localhost:3000 and click on the `run_csv_to_iceberg_meltano_job` job
 
-![meltano-job-on-dagster](../../../assets/doc-img/1.png)
-![meltano-job-launch](../../../assets/doc-img/2.png)
-![meltano-job-run-success](../../../assets/doc-img/3.png)
+![meltano-job-on-dagster](@/assets/docs/step-4-explore-example/1a.jpg)
+
+2. Go to the tab "Launchpad" and click "Launch Run".
+
+![meltano-job-launch](@/assets/docs/step-4-explore-example/1b.jpg)
 
 You'll see the job starts running. It might take a couple of minutes to finish the ~100k rows of data we're using in our example project.
 
-If the job is run successfully, you'll see the 4 different tables written inside Minio's /raw prefix (which maps to `raw` Trino schema). 
+![meltano-job-run-success](@/assets/docs/step-4-explore-example/1c.jpg)
 
-![raw-schema-on-minio](../../../assets/doc-img/4.png)
+If the job is run successfully, you'll see the 4 different tables written inside Minio's `raw` prefix (which maps to `raw` Trino schema). 
+
+![raw-schema-on-minio](@/assets/docs/step-4-explore-example/4.jpg)
 
 You can also inspect the actual Iceberg tables from inside the Trino shell.
 
@@ -273,31 +277,37 @@ Once you're in the Trino shell, first you need to switch to the `iceberg` catalo
 
 <BashCode code="use iceberg.raw;" />
 
+<MyAlert variant="info" title="Trino catalog/schema hierarchy" description="Trino catalog here is `iceberg` and the schema is `raw`." />
+
 Then list out the tables in that schema.
 
 <BashCode code="show tables;" />
 
-<MyAlert variant="info" title="Trino catalog/schema hierarchy" description="Trino catalog here is `iceberg` and the schema is `raw`." />
-
-![tables-in-trino-cli](../../../assets/doc-img/5.png)
+```plaintext
+     Table     
+---------------
+ orders    
+ customers 
+ products
+ stores  
+(4 rows)
+```
 
 To view the data inside the table, you can run something like:
 
 <BashCode code="select * from orders;" />
 
-![data-in-trino-cli](../../../assets/doc-img/6.png)
-
 ## Data Transformation
 
-Now that we have the data in the Iceberg tables, we can start the transformation process to turn the raw data into more useful form for analytics.
+Now that we have the data in the Iceberg tables, we can start the transformation process to turn the raw data into a more useful form for analytics.
 
-We briefly showed you how we used our query engine Trino to query the data in the Iceberg tables.
+Above, we briefly showed you how we used our query engine Trino to query the data in the Iceberg tables.
 
-Using the trino shell directly is great for data exploration and ad hoc queries, but it's not suitable for production. For that, we connect dbt to trino via dbt-trino adapter so we can run our transformations inside Dagster (our orchestrator).
+Using the Trino shell directly is great for data exploration and ad hoc queries, but it's not suitable for an automated pipeline. For that, we connect dbt to Trino via the dbt-trino adapter so we can run our transformations inside Dagster (our orchestrator).
 
-Now, let's see how we can set up dbt and trino to work together.
+Now, let's see how we can set up dbt and Trino to work together.
 
-Here's a quick reminder of where dbt and trino are in the project structure:
+Here's a quick reminder of where dbt and Trino are in the project structure.
 
 ```plaintext {5, 9}
 your_project
@@ -314,11 +324,13 @@ your_project
 
 ### DBT + Trino
 
-DBT is a SQL data transformation tool that follows software engineering best practices. But it cannot actually execute the SQL queries itself. This is where Trino comes in. Trino is a query engine that can take our DBT SQL queries and execute them.
+DBT is a SQL data transformation tool that follows software engineering best practices.
 
-DBT provides a Trino adapter (i.e. `dbt-trino`) that allows us to run our DBT transformations on Trino. Here's how it's set up in our example project:
+It makes it easy to write complex SQL queries, but it cannot execute those SQL queries itself. This is where Trino comes in. Trino is a query engine that can execute our DBT SQL queries.
 
-In `dbt/your_project/profiles.yml`, you'll see the Trino profile.
+DBT provides a Trino adapter (`dbt-trino`) that allows us to run our DBT transformations on Trino easily.
+
+This Trino connection is configured in "dbt/your_project/profiles.yml":
 
 ```yaml title="dbt/your_project/profiles.yml"
 trino:
@@ -336,7 +348,10 @@ trino:
       session_properties:
         query_max_run_time: 5d
 ```
-In `dbt/your_project/dbt_project.yml`, you'll see the project configuration.
+
+<MyAlert variant='info' title='Notice the `schema` of `project`' description='DBT creates schema names based on the `models` section of "dbt_project.yml". For better control, we add `schema` in the root "profile.yml" which adds `project_` prefix to all schema names in this DBT project.' />
+
+In "dbt/your_project/dbt_project.yml", you'll see the project configuration.
 
 ```yaml title="dbt/your_project/dbt_project.yml" {3}
 name: demo_project_32
@@ -344,7 +359,10 @@ version: 1.0.0
 profile: trino
 ...
 ```
-In the same file, you'll see how during starting, we create the schema `Raw` in the following lines:
+
+There's one more step required. We need to create the `raw` schema in Trino before we can run the DBT transformations.
+
+We do this by adding the `on-run-start` hook inside "dbt/your_project/dbt_project.yml".
   
 ```yaml title="dbt/your_project/dbt_project.yml" {3-4}
 ...
@@ -353,11 +371,19 @@ on-run-start:
   - CREATE SCHEMA IF NOT EXISTS {{ schema }}
 ```
 
+Where does this `raw` schema come from? 
+
+If you recall, it's the Trino schema where we loaded the data from Meltano. Recall this command we ran inside Trino shell:
+
+<BashCode code="use iceberg.raw;" />
+
+We previously set up the loader to load the data into the `raw` schema in the `iceberg` catalog.
+
 ### Trino + Iceberg
 
 Trino is a query engine (or "compute engine" to be more general). 
 
-But query engines need to know where the data is stored. If you want to dig up gold (i.e. our data), you need both the shovel (the compute engine, which is Trino) and the gold deposit (the storage, which is Iceberg + Minio). 
+But query engines need to know where the data is stored. If you want to dig up gold (our data), you need both the shovel (the compute engine, which is Trino) and the gold deposit (the storage, which is Iceberg + Minio). 
 
 In our case, the data is stored in Iceberg tables in Minio so we need to connect Trino with Iceberg somehow.
 
@@ -365,29 +391,29 @@ We've already set this up for you - if you look at the `trino` directory in the 
 
 To learn more about this, see the [Trino Iceberg connector documentation](https://trino.io/docs/current/connector/iceberg.html).
 
-### Staging, Intermediate, Marts
+### Staging, Intermediate, and Marts
 
-OK, now we've set up all the tools required to write our transformation queries in DBT. 
+OK, now we've set up all the tools required to write our transformation queries in DBT.
 
-We can start writing SQL queries in DBT now, but instead, let's take a look at a helpful organization pattern: Staging, Intermediate, Marts pattern.
+We can start writing SQL queries in DBT now, but instead, let's take a look at a helpful organizational pattern: Staging, Intermediate, and Marts.
 
-This is a common pattern in data warehousing where you have three layers of transformations, progressively taking the raw data into more business conformed form suitable for analaytics.
+This is a common pattern in data warehousing where you have three layers of transformations, progressively turning raw data into a more business-conformed form suitable for analytics.
 
-This pattern not only makes our SQL code more modular and maintainable, but also makes it easier to collaborate with others. With a common design pattern like this, everyone knows what to expect.
+This pattern not only makes our SQL code more modular and maintainable but also makes it easier to collaborate with others. With a common design pattern like this, everyone knows exactly what to expect.
 
-- **Staging**: This is where we create atomic tables from the raw data. You can think of each of these tables as the most basic unit of data - an atomic building block we'll later compose together to build more complex SQL queries.
-- **Intermediate**: This is where we compose together a bunch of atomic tables from the staging stage to create more complex tables. You can also think of this step as an intermediate stage in between the modular tables in the staging stage and the final, business conformed tables in the marts stage.
-- **Marts**: This is where you have the final, business conformed data ready for analytics. Each mart is typically designed to be consumed by a specific function in the business - finance team, marketing team, etc. 
+- **Staging**: This is where we create atomic tables from the raw data. You can think of each of these tables as the most basic unit of data — an atomic building block we'll later compose together to build more complex SQL queries. This makes our SQL code more modular.
+- **Intermediate**: This is where we compose a bunch of atomic tables from the staging stage to create more complex tables. You can think of this stage as an intermediate step between the modular tables in the staging stage and the final, business-conformed tables in the marts stage.
+- **Marts**: This is where you have the final, business-conformed data ready for analytics. Each mart is typically designed to be consumed by a specific function in the business, such as the finance team, marketing team, etc.
 
 For more details, we highly recommend you check out DBT's excellent [Best Practices Guide](https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview).
 
-Here's how we set up each stage in our example project.
+OK, now let's take a look at how we set up each stage in our example project.
 
 ### Staging
 
-In `dbt/your_project/models` directory, you'll see the `staging` directory. 
+In "dbt/your_project/models" directory, you'll see the staging directory. 
 
-Inside, you'll find stg_iceberg.yml where we specify the data sources for the staging tables as well as define the staging tables (or "models" in DBT terms) themselves.
+Inside, you'll find "stg_iceberg.yml" where we specify the data sources for the staging tables as well as define the staging tables (or "models" in DBT terms) themselves.
 
 ```yaml title="dbt/your_project/models/staging/stg_iceberg.yml"
 version: 2
@@ -411,13 +437,15 @@ models:
 
 Notice how we've specified in DBT that the data `sources` are in the `iceberg` database and the `raw` schema. This is because we've set up Trino to connect to Iceberg tables in the `raw` schema.
 
+In other words, `database` here maps to Trino `catalog`.
+
 Staging tables are then defined under `models`.
 
-<MyAlert variant="info" title="DBT file naming convention matters!" description="Note that we prefix all models with `stg` here. This denotes the stage. Then after a single underscore, there's `iceberg` which denotes the storage where the data lives. Finally we add the table name at the end after double underscores." />
+<MyAlert variant="info" title="DBT file naming convention matters!" description="Note that we prefix all models with `stg` here. This denotes the stage. Then after a single underscore, there's `iceberg` which denotes the storage where the data lives. Finally we add the table name at the end after double underscores. A common naming convention like this makes it much easier to collaborate with others." />
 
 #### Example DBT Model in Staging
 
-We won't go through each table, but here's an example of a DBT model `stg_iceberg__orders`.
+We won't go through each table, but here's an example of a DBT model "stg_iceberg__orders".
 
 ```sql title="dbt/your_project/models/staging/stg_iceberg__orders.sql"
 {{
@@ -448,15 +476,15 @@ with source as (
 select * from source
 ```
 
-You'll probably recognize the SQL queries here. The part you might not be familiar with is the `config` block at the top.
+I'm sure you recognize the SQL queries here. The part you might not be familiar with is the `config` block at the top.
 
-This is actually a Jinja template that DBT uses to augment regular SQL code. In this case, we're telling DBT how to materialize this model.
+This is actually a Jinja template that DBT uses to augment SQL code. In this case, we're telling DBT how to materialize this model.
 
-When we run DBT, it will take this code and create a valid SQL query that can actually be executed by Trino.
+When we run DBT build, it will take this code and create a valid SQL query that can be executed by Trino.
 
-#### Adding Staging Model Configuration to dbt_project.yml
+#### Adding Staging Model Configuration to "dbt_project.yml"
 
-Finally, we need to add a bit of configuration. We do this in the `dbt_project.yml` file in the /dbt directory.
+Finally, we need to add a bit of extra configuration. We do this in the "dbt_project.yml" file in the /dbt directory.
 
 ```yaml title="dbt/your_project/dbt_project.yml" {4-7} showLineNumbers
 ...
@@ -471,9 +499,9 @@ models:
 
 ### Intermediate
 
-Similar to the staging stage, we have the intermediate stage in the `dbt/your_project/models/intermediate` directory.
+Similar to the staging stage, we have the intermediate stage in the "dbt/your_project/models/intermediate" directory.
 
-As with staging, you'll notice we specify the sources and models in the `int_iceberg.yml` file.
+As with staging, you'll notice we specify the sources and models in the "int_iceberg.yml" file.
 
 ```yaml title="dbt/your_project/models/intermediate/int_iceberg.yml"
 version: 2
@@ -492,7 +520,7 @@ models:
   - name: int_iceberg__denormalized_orders
 ```
 
-Then we add the model SQL file `int_iceberg__denormalized_orders.sql`.
+Then we add the model SQL file "int_iceberg__denormalized_orders.sql".
 
 ```sql title="dbt/your_project/models/intermediate/int_iceberg__denormalized_orders.sql"
 {{
@@ -578,7 +606,7 @@ models:
 
 ### Marts
 
-Same deal with marts. We have the `dbt/your_project/models/marts` directory where we specify the sources and models in the `mart_iceberg.yml` file.
+Same deal with marts. We have the "dbt/your_project/models/marts" directory where we specify the sources and models in the "mart_iceberg.yml" file.
 
 ```yaml title="dbt/your_project/models/marts/marts_iceberg.yml"
 version: 2
@@ -600,7 +628,7 @@ models:
 
 Then we add the model SQL files. We'll skip an example here, but you get the idea.
 
-Finally, we add the configuration for the marts stage in dbt/dbt_project.yml.
+Finally, we add the configuration for the marts stage in "dbt/dbt_project.yml".
 
 ```yaml title="dbt/your_project/dbt_project.yml" {12-15} showLineNumbers
 ...
@@ -625,11 +653,11 @@ models:
 
 Now that we have the DBT transformations set up, let's see how we can run them in Dagster.
 
-Dagster has a deep DBT integration. It can infer the dependencies between all your DBT models and run them in the correct order. The visualization of this graph is very helpful as well.
+Dagster has a deep DBT integration. It can infer the dependencies between all your DBT models and run them in the correct order. The visualization of this graph is also very helpful.
 
-![dbt-assets-dagster](../../../assets/doc-img/7.png)
+![dbt-assets-dagster](@/assets/docs/step-4-explore-example/7a.jpg)
 
-We add all DBT assets into Dagster in dagster/your_project/your_project/dbt_assets.py.
+We add all DBT assets into Dagster in "dagster/your_project/your_project/dbt_assets.py".
 
 ```python title="your_project/dagster/your_project/your_project/__init__.py"
 ...
@@ -638,9 +666,9 @@ def dbt_project_assets(context: AssetExecutionContext, dbt: DbtCliResource):
     yield from dbt.cli(["build"], context=context).stream()
 ```
 
-In the code above, we're using dagster_dbt package that Dagster team has created to build DBT assets and then import them as Dagster assets.
+In the code above, we're using the `dagster_dbt` package, which the Dagster team created to build DBT assets and then import them as Dagster assets.
 
-Once we've done that, we can add the DBT assets to the Dagster definitions in dagster/your_project/your_project/__init__.py.
+Once we've done that, we can add the DBT assets to the Dagster definitions in "dagster/your_project/your_project/__init__.py".
 
 ```python title="your_project/dagster/your_project/your_project/__init__.py" {4, 6, 10, 12-14}
 import os
@@ -660,17 +688,20 @@ defs = Definitions(
 )
 ```
 
-Now we can see if DBT assets are added correctly in Dagster by looking at the Global Asset Lineage in the Dagster dashboard (http://localhost:3000).
+Now you should be able to see all DBT assets in Global Asset Lineage section of the Dagster dashboard.
 
-![dbt-assets-lineage-dagster](../../../assets/doc-img/8.png)
+1. Click on the "Assets" in the top menu.
+2. Click on "View global asset lineage" at the top right.
 
-Finally, we can click "materialize" in the same page to execute the DBT transformations (i.e. Trino does that for us). Of course, in a production environment, you might want to schedule them instead of manually triggering them.
+![dbt-assets-lineage-dagster](@/assets/docs/step-4-explore-example/8a.jpg)
 
-![dbt-assets-materialization](../../../assets/doc-img/9.png)
+In the global asset lineage view, click "Materialize all" to execute the DBT transformations (underneath, Trino is executing these DBT queries). Of course, in a production environment, you might want to schedule them instead of manually triggering them.
 
-If the materialization was successful, you should see 3 analytics-ready tables in project_marts schema in minio.
+![dbt-assets-lineage-dagster](@/assets/docs/step-4-explore-example/8b.jpg)
 
-![marts-tables-minio](../../../assets/doc-img/10.png)
+If the materialization was successful, you should see 3 analytics-ready tables in `project_marts` prefix in minio.
+
+![marts-tables-minio](@/assets/docs/step-4-explore-example/10.jpg)
 
 ## Data Visualization
 
@@ -724,19 +755,19 @@ Once you're in:
 
 Now that we've connected Superset to Trino, let's add an example dashboard.
 
-1. First download the example dashboard we created for you [here](../../../assets/demo_dashboard.zip)
+1. First download the example dashboard we created for you [here](@/assets/docs/superset/demo_dashboard.zip)
 2. Go to the "Dashboards" tab and click on the Import Dashboard icon at the top-right corner, select the downloaded file, and click "Import".
 
-![superset-import](../../../assets/doc-img/11.png)
-![superset-import-module](../../../assets/doc-img/12.png)
+![superset-import](@/assets/docs/step-4-explore-example/11.png)
+![superset-import-module](@/assets/docs/step-4-explore-example/12.png)
 
 Find the example dashboard you just added in the list of dashboards and click on it to view it.
 
-![superset-dashboard-list](../../../assets/doc-img/13.png)
+![superset-dashboard-list](@/assets/docs/step-4-explore-example/13.png)
 
 That's it! You should now see a bunch of charts we created for you based on the example dataset.
 
-![superset-dashboard-view](../../../assets/doc-img/14.png)
+![superset-dashboard-view](@/assets/docs/step-4-explore-example/14.png)
 
 ## Next Steps
 

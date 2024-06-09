@@ -20,6 +20,7 @@ import TBODY from '@/components/mdx/TBODY.astro'
 import TH from '@/components/mdx/TH.astro'
 import TR from '@/components/mdx/TR.astro'
 import TD from '@/components/mdx/TD.astro'
+import IMG from '@/components/mdx/IMG.astro'
 
 export async function getStaticPaths() {
   const docsPages = await getCollection('docs', ({ data }) => {
@@ -67,6 +68,7 @@ const pathname = Astro.url.pathname
           th: TH,
           tr: TR,
           td: TD,
+          img: IMG,
         }}
       />
     </Main>
