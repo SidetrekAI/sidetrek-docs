@@ -5,6 +5,7 @@ import Main from '@/components/Main.astro'
 import H1 from '@/components/H1.astro'
 import H2 from '@/components/H2.astro'
 import H3 from '@/components/H3.astro'
+import H4 from '@/components/H4.astro'
 import P from '@/components/mdx/P.astro'
 import UL from '@/components/mdx/UL.astro'
 import OL from '@/components/mdx/OL.astro'
@@ -12,6 +13,13 @@ import LI from '@/components/mdx/LI.astro'
 import EM from '@/components/mdx/EM.astro'
 import A from '@/components/mdx/A.astro'
 import SecondarySideMenu from '@/components/SecondarySideMenu'
+import TABLE from '@/components/mdx/TABLE.astro'
+import THEAD from '@/components/mdx/THEAD.astro'
+import TFOOT from '@/components/mdx/TFOOT.astro'
+import TBODY from '@/components/mdx/TBODY.astro'
+import TH from '@/components/mdx/TH.astro'
+import TR from '@/components/mdx/TR.astro'
+import TD from '@/components/mdx/TD.astro'
 
 export async function getStaticPaths() {
   const docsPages = await getCollection('docs', ({ data }) => {
@@ -39,7 +47,28 @@ const pathname = Astro.url.pathname
 <Layout title={title} description={description}>
   <div class="md:flex min-w-0 w-full h-full">
     <Main>
-      <Content class="content" components={{ h1: H1, h2: H2, h3: H3, p: P, ul: UL, ol: OL, li: LI, em: EM, a: A }} />
+      <Content
+        class="content"
+        components={{
+          h1: H1,
+          h2: H2,
+          h3: H3,
+          h4: H4,
+          p: P,
+          ul: UL,
+          ol: OL,
+          li: LI,
+          em: EM,
+          a: A,
+          table: TABLE,
+          thead: THEAD,
+          tfoot: TFOOT,
+          tbody: TBODY,
+          th: TH,
+          tr: TR,
+          td: TD,
+        }}
+      />
     </Main>
 
     <SecondarySideMenu page={page.body} client:load />

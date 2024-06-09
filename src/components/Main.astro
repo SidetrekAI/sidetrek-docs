@@ -3,7 +3,10 @@ import PageBreadCrumb from './PageBreadCrumb.astro'
 import { HEADER_HEIGHT } from '@/lib/constants'
 ---
 
-<main class="md:px-8 pt-6 pb-12 text-slate-700 min-w-0 w-full max-w-[880px] mx-auto" style={{ minHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
+<main
+  class="md:px-8 pt-6 pb-12 text-slate-700 min-w-0 w-full max-w-[880px] mx-auto"
+  style={{ minHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}
+>
   <PageBreadCrumb />
 
   <slot />

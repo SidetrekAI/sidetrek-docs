@@ -42,7 +42,8 @@ const prettyCodeOptions = {
 // https://astro.build/config
 export default defineConfig({
   redirects: {
-    '/start-here': '/start-here/getting-started',
+    '/': '/get-started/overview',
+    '/get-started': '/get-started/overview',
   },
   output: 'hybrid',
   integrations: [
