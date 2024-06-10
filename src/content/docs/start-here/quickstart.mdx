@@ -725,48 +725,48 @@ Create a dashboard by going to http://localhost:8088/dashboard/list/ and clickin
     - Type: Line Chart
     - Columns: `order_created_at` and `COUNT(order_id)`
     - Description: The number of orders over time to visualize trends in order volume
-    ![orders-over-time](../../../assets/orders-over-time.png)
+    ![orders-over-time](../../../assets/chart/1.jpg)
 - **Total Revenue by Category:**
     - Type: Bar Chart
     - Columns: `product_category` and `SUM(total_product_price)`
     - Description: The total sales for each product category to identify the top-selling categories.
-    ![categories-viz](../../../assets/categories-viz.png)
+    ![categories-viz](../../../assets/chart/2.jpg)
 - **Customer Distribution by Country**
     - Type: World Map
     - Columns: `country` [full name] and `COUNT_DISTINCT(customer_id)`
     - Description: The distribution of customers by country to understand the geographic spread of your customer base.
-    ![customer-distribution](../../../assets/customer-distribution-map.png)
+    ![customer-distribution](../../../assets/chart/3.jpg)
 - **Average Order Value Over Time:**
     - Type: Line Chart
     - Columns: `order_created_at` and `AVG(total_price_with_shipping)`
     - Description: The average order value over time to track changes in purchasing behavior.
-    ![order-value](../../../assets/order-value.png)
+    ![order-value](../../../assets/chart/4.jpg)
 - **Customer Acquisition by Traffic Source:**
     - Type: Pie Chart
     - Columns: `traffic_source` and `COUNT(customer_id)`
     - Description: How customers are finding your store by visualizing the number of customers acquired from different traffic sources.
-    ![traffic-sources](../../../assets/traffic-sources.png)
+    ![traffic-sources](../../../assets/chart/5.jpg)
 - **Average Customer Age by Gender:**
     - Type: Bar Chart
     - Columns: `gender` and `AVG(customer_age)`
     - Description: The customer ages by gender to understand the demographics of your customer base.
-    ![supersetchart](../../../assets/age-gender.png)
+    ![supersetchart](../../../assets/chart/6.jpg)
 - **Top 10 Highest Revenue Generating Referrers:**
     - Type: Table
     - Columns: `referrer` and `SUM(total_product_price)`
     - Description: The top 10 referrer with the highest total sales generated
-    ![supersetchart](../../../assets/top-10-referrers.png)
+    ![supersetchart](../../../assets/chart/7.jpg)
 - **Payment Received by Payment Method:**
     - Type: Pie Chart
     - Columns: `payment_method` and `SUM(total_price_with_tax)`
     - Description: The total amount of payment received through payment methods
-    ![payment-methods](../../../assets/payment-methods.png)
+    ![payment-methods](../../../assets/chart/8.jpg)
 - **Big Numbers:**
     - No. of Countries
     - No. of Customers
     - No. of Orders
     - Sales Generated
-    ![supersetchart](../../../assets/big-numbers.png)
+    ![supersetchart](../../../assets/chart/9.jpg)
 
 ### Exporting/Importing Dashboards
 
