@@ -73,6 +73,8 @@ const pathname = Astro.url.pathname
       />
     </Main>
 
-    <SecondarySideMenu page={page.body} client:load />
+    <div class="hidden xl:block">
+      <SecondarySideMenu page={page.body} client:load />
+    </div>
   </div>
 </Layout>

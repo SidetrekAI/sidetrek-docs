@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import * as R from 'ramda'
-import { HEADER_HEIGHT } from '@/lib/constants'
+import { FOOTER_HEIGHT, HEADER_HEIGHT } from '@/lib/constants'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
@@ -8,6 +8,7 @@ import { mdxjs } from 'micromark-extension-mdxjs'
 import { toc } from 'mdast-util-toc'
 import { toHast } from 'mdast-util-to-hast'
 import { toHtml } from 'hast-util-to-html'
+import { ScrollArea } from './ui/scroll-area'
 
 interface SecondarySideMenuProps {
   page: string
@@ -37,14 +38,18 @@ export default function SecondarySideMenu({ page }: SecondarySideMenuProps) {
   }, [])
 
   return (
-    <aside className="hidden xl:block toc relative w-[280px] shrink-0">
-      <div
-        className="fixed h-fit pl-4 pr-4 py-4 text-sm text-slate-600 border-b border-slate-200 overflow-auto"
-        style={{ top: `${HEADER_HEIGHT}px`, width: 'inherit' }}
+    <div className="toc relative w-[280px] shrink-0">
+      <aside
+        className="fixed w-full h-fit text-sm text-slate-600 overflow-auto"
+        style={{ top: `${HEADER_HEIGHT}px`, width: 'inherit', height: `calc(100vh - ${HEADER_HEIGHT + FOOTER_HEIGHT}px)` }}
       >
-        <div className="font-semibold text-slate-900 mt-2 mb-4 uppercase">On this page</div>
-        <div dangerouslySetInnerHTML={{ __html: tocHtml }} />
-      </div>
-    </aside>
+        <ScrollArea className="h-full pl-4 pr-4 pt-4">
+          <div>
+            <div className="font-semibold text-slate-900 mt-2 mb-4 uppercase">On this page</div>
+            <div dangerouslySetInnerHTML={{ __html: tocHtml }} />
+          </div>
+        </ScrollArea>
+      </aside>
+    </div>
   )
 }
