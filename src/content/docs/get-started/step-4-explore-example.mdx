@@ -213,7 +213,16 @@ Then list out the tables in that schema.
 
 To view the data inside the table, you can run something like:
 
-<BashCode code="select * from orders;" />
+<BashCode code="select count(*) from orders;" />
+
+This will show you the number of rows in the `orders` table.
+
+```plaintext
+  _col0  
+--------
+ 100000 
+(1 row)
+```
 
 ### Running Meltano Ingestion Manually
 
