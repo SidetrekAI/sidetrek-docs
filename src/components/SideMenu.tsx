@@ -103,7 +103,7 @@ export default function SideMenu({ tree, currentPath }: SideMenuProps) {
         className="fixed w-full shrink-0 text-sm text-slate-600"
         style={{ top: `${HEADER_HEIGHT}px`, width: 'inherit', height: `calc(100vh - ${HEADER_HEIGHT + FOOTER_HEIGHT}px)` }}
       >
-        <ScrollArea className="h-full pl-4 pr-6 py-6">
+        <ScrollArea className="h-full pl-4 pr-6 pt-6">
           {TreeComponent({ tree, currentPath })}
         </ScrollArea>
       </aside>
