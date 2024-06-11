@@ -139,7 +139,7 @@ We've already added and configured the extractor for you in the example project,
 
 To install an extractor, you can run a command like this:
 
-<BashCode code="meltano add extractor tap-csv" />
+<BashCode code="meltano add extractor tap-csv" client:load />
 
 Replace `tap-csv` with the name of the extractor you want to add. See the [Meltano documentation](https://meltano.com/docs/) for more information on how to work with Meltano.
 
@@ -174,7 +174,7 @@ Once the extractor is set up, it's time to add the loader. This is where you tel
 
 In the example project, we're loading the data into Iceberg tables. We've already added and configured the loader for you in the example project, but if you want to add your own later, you can do it like this:
 
-<BashCode code="meltano add --custom loader target-iceberg" />
+<BashCode code="meltano add --custom loader target-iceberg" client:load />
 
 Note that you typically don't need the `--custom` flag if you're using one of the existing Meltano loaders.
 
@@ -216,13 +216,13 @@ Now that we have the Meltano extractor and loader installed and configured, we c
 
 You can run it manually by executing the following command:
 
-<BashCode code="sidetrek run meltano run tap-csv target-iceberg" />
+<BashCode code="sidetrek run meltano run tap-csv target-iceberg" client:load />
 
 `sidetrek run` here is a simple convenience wrapper around `meltano run *` command. It runs the meltano CLI inside the project virtual env and also sets the cwd to /meltano directory.
 
 It's identical to running:
 
-<BashCode code="cd your_project/meltano && poetry run meltano run tap-csv target-iceberg" />
+<BashCode code="cd your_project/meltano && poetry run meltano run tap-csv target-iceberg" client:load />
 
 ### Running Meltano Ingestion Inside the Dagster Pipeline
 
@@ -284,17 +284,17 @@ If the job is run successfully, you'll see the 4 different tables written inside
 
 Once the data is inserted to the Iceberg tables, you can inspect them from inside the Trino shell.
 
-<BashCode code="sidetrek run trino shell" />
+<BashCode code="sidetrek run trino shell" client:load />
 
 Once you're in the Trino shell, first you need to switch to the `iceberg` catalog and `raw` schema. This basically tells Trino we're using the `raw` schema inside the Iceberg data store.
 
-<BashCode code="use iceberg.raw;" />
+<BashCode code="use iceberg.raw;" client:load />
 
 <MyAlert variant="info" title="Trino catalog?" description='Trino has a concept called "catalogs" (also called "connectors"). Each catalog is a data storage system that Trino can query. For example, Iceberg catalog or Snowflake catalog.' />
 
 Then list out the tables in that schema.
 
-<BashCode code="show tables;" />
+<BashCode code="show tables;" client:load />
 
 ```plaintext
      Table     
@@ -308,7 +308,16 @@ Then list out the tables in that schema.
 
 To view the data inside the table, you can run something like:
 
-<BashCode code="select * from orders;" />
+<BashCode code="select count(*) from orders;" client:load />
+
+This will show you the number of rows in the `orders` table.
+
+```plaintext
+  _col0  
+--------
+ 100000 
+(1 row)
+```
 
 ## Data Transformation
 
@@ -386,7 +395,7 @@ on-run-start:
 
 If you recall, it's the Trino schema where we loaded the data from Meltano. Recall this command we ran inside Trino shell:
 
-<BashCode code="use iceberg.raw;" />
+<BashCode code="use iceberg.raw;" client:load />
 
 We previously set up the loader to load the data into the `raw` schema in the `iceberg` catalog.
 
