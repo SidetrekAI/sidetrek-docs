@@ -1,0 +1,20 @@
+---
+title: init
+description: init command reference for the Sidetrek CLI.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# init
+
+The `init` command initializes a new Sidetrek project in the current directory by performing the following steps:
+
+* Creates a new Poetry project: Initializes a new Python project using Poetry, a dependency management tool.
+
+* Installs required libraries: Pip installs all necessary libraries for Dagster, Meltano, DBT, and establishes connections between them within the project environment.
+
+* Generates docker-compose file: Creates a docker-compose.yml file in the project root, configuring core services such as Minio, Iceberg (with Iceberg REST catalog and PostgreSQL backend), and Trino.
+
+* Sets up Superset: Creates a directory for Superset and clones the latest version, enabling seamless integration for data visualization needs.
+

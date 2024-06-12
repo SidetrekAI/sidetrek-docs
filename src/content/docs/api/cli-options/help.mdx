@@ -1,0 +1,39 @@
+---
+title: --help or -h
+description: --help or -h reference for the Sidetrek CLI.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# --help or -h
+
+The `-h` or `--help` option provides help and displays information about the available commands and options in Sidetrek. This is particularly useful when you need a quick reference or are unfamiliar with certain commands.
+
+### Usage
+<BashCode code="sidetrek -h" client:load />
+
+or
+
+<BashCode code="sidetrek --help" client:load />
+
+When you run the above command, it outputs the following help information:
+
+```plaintext
+Usage: sidetrek [options] [command]
+
+🦄 Sidetrek is the fastest way
+to build a modern data stack.
+
+Options:
+  --version                Show version
+  -h, --help               display help for command
+
+Commands:
+  init [options]           Initialize your project
+  start [options]          Start the development services
+  stop                     Stop the development services
+  down                     Tear down the development services
+  logs [options] [string]  View logs
+  run                      Run tool commands
+```
