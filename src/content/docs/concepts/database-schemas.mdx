@@ -1,0 +1,93 @@
+---
+title: Database Structures
+description: Learn about the structure of various databases.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# Comparison of Database/Schema Terminologies
+
+Every database system has its own terminology and hierarchy to organize data. 
+
+Because there are many types of databases, it can be confusing to understand the structure of each one and how they compare.
+
+<MyAlert variant="info" title="Not all of these are databases" description="Some of the databases listed below are not technically databases at all. Trino, for example, is a query engine, not a database. But we'll include them here because understanding these terminologies are important for data querying." />
+
+This table provides a quick reference to the terminology and hierarchy for different database systems.
+
+| Database | Top Level | Middle Level | Bottom Level |
+| --- | --- | --- | --- |
+| PostgreSQL | Database | Schema | Table |
+| MySQL | Database | - | Table |
+| Trino | Catalog | Schema | Table |
+| Iceberg | Catalog | Namespace | Table |
+| MongoDB | Database | Collection | Document |
+| Oracle | Database | Schema | Table |
+| SQL Server | Database | Schema | Table |
+| Cassandra | Keyspace | - | Table |
+| Redis | Database | - | Key-Value |
+| S3 | Bucket | - | Object |
+| DuckDB | Database | Schema | Table |
+
+## Example 1 - Querying Postgres
+
+Since most data engineers are familiar with SQL databases, let's take Postgres as an example.
+
+There are many ways to access a Postgres database, but for simplicity, we'll use the `psql` command line tool.
+
+You can access the Postgres database from inside a container using the following command:
+
+<BashCode code="docker exec -it postgres-container psql -U postgres" client:load />
+
+You'll see `postgres=#` at the beginning of the line on your console. You can run Postgres queries here.
+
+Let's see what databases are available in our Postgres instance.
+
+<BashCode code="postgres=# \l" client:load />
+
+It will show all the available databases in PostgreSQL. You can always press `q` to come back to the original psql cli. Run this command to connect to a database.
+
+<BashCode code="postgres=# \c db_name" client:load />
+
+Run this command to see all the available schemas under a database.
+
+<BashCode code="db_name=# \dn" client:load />
+
+It will show all the schemas under the database. You can also run SQL queries to show the tables in the schema.
+
+<BashCode code="postgres=# \dt schema_name.*" client:load />
+
+It will show all the tables in the schema. You can run SQL queries to see the data in the tables.
+
+<BashCode code="postgres=# select * from schema_name.table_name;" client:load />
+
+It will show all the data in the table.
+
+## Example 2 - Querying using Trino
+
+As a second example, let's see how to query data in Trino.
+
+You can use Trino CLI to access Trino database.
+
+<BashCode code="sidetrek run trino shell" client:load />
+
+You'll see `trino>` at the beginning of the line on your console.
+
+To access the Iceberg table `orders` in the `raw` schema, you can first switch to the `raw` schema in `iceberg` catalog:
+
+<BashCode code="trino> use iceberg.raw;" client:load />
+
+Now you can run this command to see all the tables in the schema.
+
+<BashCode code="trino:raw> show tables;" client:load />
+
+```plaintext
+   Table   
+-----------
+ customers 
+ orders    
+ products  
+ stores    
+(4 rows)
+```
