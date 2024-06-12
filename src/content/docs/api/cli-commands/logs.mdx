@@ -1,0 +1,20 @@
+---
+title: logs
+description: logs command reference for the Sidetrek CLI.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# logs
+
+The sidetrek logs command allows viewing logs for specific services:
+
+<BashCode code="sidetrek logs [options] [string]" client:load />
+
+Select a service when prompted to view its logs. For example, to view Trino logs:
+
+```plaintext
+Which service would you like to view the logs for?
+> trino
+```

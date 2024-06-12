@@ -1,0 +1,15 @@
+---
+title: start
+description: start command reference for the Sidetrek CLI.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# start
+
+The sidetrek start command initiates the Sidetrek project by executing three separate commands:
+
+1. `dagster dev`: Starts the Dagster server, which executes user-defined code for Dagster, Meltano, and DBT.
+2. `docker-compose up -d` (project root): Launches Minio, Iceberg, and Trino in the background using the docker-compose.yml file generated during initialization.
+3. `docker-compose up -d` (Superset directory): Starts Superset in the background by running docker-compose up -d within the Superset directory.
