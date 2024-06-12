@@ -278,6 +278,10 @@ You'll see the job starts running. It might take a couple of minutes to finish t
 
 If the job is run successfully, you'll see the 4 different tables written inside Minio's `raw` prefix (which maps to `raw` Trino schema). 
 
+Check it out in Minio by going to http://localhost:9000 and logging in with the username `admin` and password `admin_secret`.
+
+<MyAlert variant="info" title="Want to change the username/password for Minio?" description='To change the username and/or password for Minio, change the value of `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` environment variables in the `minio` service section of the docker-compose.yaml file.' />
+
 ![raw-schema-on-minio](@/assets/docs/step-4-explore-example/4.jpg)
 
 ### Inspecting the Iceberg Tables with Trino
