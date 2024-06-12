@@ -488,16 +488,25 @@ We won't go through each table, but here's an example of a DBT model "stg_iceber
 
 with source as (
   select
-    CAST(order_id AS VARCHAR) AS order_id,
+    CAST(id AS VARCHAR) AS order_id,
     CAST(created_at AS TIMESTAMP) AS order_created_at,
     CAST(qty AS DECIMAL) AS qty,
     CAST(product_id AS VARCHAR) AS product_id,
     CAST(customer_id AS VARCHAR) AS customer_id,
-    CAST(store_id AS VARCHAR) AS store_id
+    CAST(store_id AS VARCHAR) AS store_id,
+    row_number() over (partition by id order by created_at desc) as row_num
   from {{ source('stg_iceberg', 'orders') }}
 )
 
-select * from source
+select
+  order_id,
+  order_created_at,
+  qty,
+  product_id,
+  customer_id,
+  store_id
+from source
+where row_num = 1
 ```
 
 I'm sure you recognize the SQL queries here. The part you might not be familiar with is the `config` block at the top.
@@ -505,6 +514,8 @@ I'm sure you recognize the SQL queries here. The part you might not be familiar 
 This is actually a Jinja template that DBT uses to augment SQL code. In this case, we're telling DBT how to materialize this model.
 
 When we run DBT build, it will take this code and create a valid SQL query that can be executed by Trino.
+
+<MyAlert variant="info" title="Deduplication of Tables" description="In the project_staging schema, the table stg_iceberg__orders undergoes a deduplication process to ensure each order_id remains unique. This process involves grouping rows by order_id, using row numbering, and retaining only one row from each group. By eliminating duplicate entries, we maintain data integrity and streamline data processing workflows. This approach ensures that our staging environment accurately reflects unique order information, aligning with data quality standards and enhancing the reliability of downstream analytics and reporting." />
 
 #### Adding Staging Model Configuration to "dbt_project.yml"
 

@@ -121,6 +121,20 @@ export const sideMenuTree: Tree[] = [
     label: 'API',
     tree: [
       {
+        label: 'CLI Options',
+        href: '/api/cli-options',
+        tree: [
+          {
+            label: '--version',
+            href: '/api/cli-options/version',
+          },
+          {
+            label: '--help or -h',
+            href: '/api/cli-options/help',
+          }
+        ],
+      },
+      {
         label: 'CLI Commands',
         href: '/api/cli-commands',
         tree: [
@@ -148,6 +162,10 @@ export const sideMenuTree: Tree[] = [
             label: 'run',
             href: '/api/cli-commands/run',
             tree: [
+              {
+                label: 'dbt *',
+                href: '/api/cli-commands/run/dbt',
+              },
               {
                 label: 'meltano *',
                 href: '/api/cli-commands/run/meltano',
