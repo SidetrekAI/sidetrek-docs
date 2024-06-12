@@ -3,51 +3,92 @@ title: S3 File Structure
 description: Learn about S3 file structure and how to organize your files in S3.
 draft: false
 ---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
 # Understanding S3 File Structure
 
-Amazon S3 (Simple Storage Service) is a scalable object storage service designed for storing and retrieving any amount of data at any time. It uses a simple and flexible structure that allows users to store and organize their data efficiently. The structure of S3 is straightforward, focusing on buckets, objects, and keys. MinIO is an open-source, high-performance, distributed object storage system designed to be compatible with Amazon S3's API. This compatibility allows MinIO to serve as an alternative to S3 for on-premises or private cloud environments. The structure of MinIO mirrors that of S3, providing a familiar setup for users who are already acquainted with Amazon S3.
+Amazon S3 (Simple Storage Service) is a highly scalable object storage service. S3 is a popular storage choice for Data Lakehouse architectures due to its durability, scalability, and cost-effectiveness.
+
+But S3 does not have a local version, so we use MinIO as a drop-in replacement for S3. MinIO is perfect for this since it has an S3-compatible API and we can use the same code in both development and production environment.
 
 ## Key Components of S3
 
-1. **Bucket**:
-    - **Description**: The top-level container for storing objects in S3. Each bucket must have a globally unique name and is created in a specific AWS region.
-    - **Role**: Acts as a namespace for objects and organizes them within the S3 service.
-2. **Object**:
-    - **Description**: The fundamental entity stored in a bucket, consisting of the data itself and metadata.
-    - **Role**: Represents the actual data stored in S3. Objects are identified within a bucket by a unique key.
-3. **Key**:
-    - **Description**: The unique identifier for an object within a bucket. It is essentially the "name" of the object.
-    - **Role**: Used to retrieve and manage objects. Keys can include slashes (**`/`**) to simulate a hierarchical directory structure, though S3 uses a flat namespace.
-4. **Metadata**:
-    - **Description**: Information about the object, such as its size, type, and other properties. Metadata can be system-defined (e.g., creation date, last modified date) or user-defined (custom metadata).
-    - **Role**: Provides additional context and information about the object, useful for managing and retrieving the data.
+S3 has a hierarchical structure that looks like a file system (but that's actually an illusion as we'll soon see).
 
-### Example Structure of S3
+1. **Bucket**: This is the top-level container for storing objects in S3. Each bucket must have a globally unique name and is created in a specific AWS region.
+2. **Prefix**: You can think of a prefix as a directory in a file system.
+3. **Key**: The unique identifier for an object within a bucket - this is like a file name.
+3. **Metadata**: This is metadata about the object stored in S3. It can include information like the object's name, size, ETag, and more.
 
-Let's consider a scenario where we have a bucket named `lakehouse` containing several objects:
-
-- **Bucket**: `lakehouse`
-    - **Object**: `/raw/orders/data/00000-0-2cd2668b-2b7a-4dac-8a1e-af3f02fa2495.parquet`
-        - **Key**: `/raw/orders/data/00000-0-2cd2668b-2b7a-4dac-8a1e-af3f02fa2495.parquet`
-        - **Metadata**: `{ "Name": "00000-0-2cd2668b-2b7a-4dac-8a1e-af3f02fa2495.parquet", "Date": "2024-05-26 17:35:45 UTC", “Size”: “189 KiB”, “ETag”: “edd2116fab95a1381e9ad50fb03c012a-1”, “Type”: “file” }`
-
-You can check the metadata of a file stored in Minio using MinIO Client (mc):
-
-```bash
-docker exec -it mc bash
-mc stat minio/<lakehouse-name>/<catalog-name>/<namespace>/data/<key-name>
-# For example
-mc stat minio/lakehouse/raw/orders/data/00000-0-2cd2668b-2b7a-4dac-8a1e-af3f02fa2495.parquet
-```
-
-You should see the metadata:
+For example, inside "family-photos" bucket, you might have a prefix named "2024" and inside that prefix, you might have an object named "birthday.jpg" and "vacation.jpg":
 
 ```plaintext
-Name      : 00000-0-2cd2668b-2b7a-4dac-8a1e-af3f02fa2495.parquet
-Date      : 2024-05-26 17:35:45 UTC 
-Size      : 189 KiB 
-ETag      : edd2116fab95a1381e9ad50fb03c012a-1 
-Type      : file 
-Metadata  :
-  Content-Type: application/octet-stream 
+family-photos
+├── 2024
+│   ├── birthday.jpg
+│   └── vacation.jpg
+```
+
+It looks just like a file system, but underneath, S3 is actually a flat storage system:
+
+```plaintext
+family-photos/2024/birthday.jpg
+family-photos/2024/vacation.jpg
+```
+
+Prefixes just make it easier to organize and manage objects in S3.
+
+### S3 Structure for Sidetrek Example Project
+
+In Sidetrek example project, we have a bucket named `lakehouse` containing several objects:
+
+```plaintext
+lakehouse
+└── raw
+    └── orders
+        ├── data
+        │   ├── 00000-0-21faf50e-3a3f-47a3-9d00-997c28b6a23c.parquet
+        │   ├── 00000-0-49376760-60b0-4455-8b32-1e39f7fb1db5.parquet
+        │   ├── ...
+        └── metadata
+            ├── 00000-f90d4e22-37b9-4bc6-bd98-2f08e6258a11.metadata.json
+            ├── 00001-5c8c6cf4-3fe7-478e-8add-9a8a15227783.metadata.json
+            ├── ...
+```
+
+These are Iceberg related objects. 
+
+Inside the `data` prefix, Iceberg stores the actual table data. In our example project, we store it in Parquet format (columnar storage format), but it could be any Iceberg supported formats like ORC, Avro, etc. In fact, we could even injest data as a row format like Avro and then convert it to Parquet inside the same Iceberg storage.
+
+Inside the `metadata` prefix, Iceberg stores metadata files in JSON format. These keep track of things like manifest files, snapshot information, stats about the data for query optimization, etc.
+
+To learn more about Apache Iceberg, check out the [Iceberg documentation](https://iceberg.apache.org/).
+
+## Querying Iceberg Tables in Trino
+
+The `raw` prefix in S3 in our example project matches up with Trino schema `raw`. And the `orders` prefix matches up with the table name `orders`.
+
+So to query that data in Trino, first enter the Trino shell.
+
+<BashCode code="sidetrek run trino shell" client:load />
+
+You'll see `trino>` at the beginning of the line on your console.
+
+To access the Iceberg table `orders` in the `raw` schema, you can first switch to the `raw` schema in `iceberg` catalog:
+
+<BashCode code="trino> use iceberg.raw;" client:load />
+
+Now you can run this command to see all the tables in the schema.
+
+<BashCode code="trino:raw> show tables;" client:load />
+
+```plaintext
+   Table   
+-----------
+ customers 
+ orders    
+ products  
+ stores    
+(4 rows)
 ```

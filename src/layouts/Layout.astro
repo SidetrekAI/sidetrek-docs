@@ -68,17 +68,17 @@ export const sideMenuTree: Tree[] = [
         label: 'Project Structure',
         href: '/concepts/project-structure',
       },
-      {
-        label: 'Apache Iceberg Structure',
-        href: '/concepts/iceberg-structure',
-      },
+      // {
+      //   label: 'Apache Iceberg Structure',
+      //   href: '/concepts/iceberg-structure',
+      // },
       {
         label: 'S3 File Structure',
         href: '/concepts/s3-structure',
       },
       {
-        label: 'Database Structures',
-        href: '/concepts/database-structure',
+        label: 'Database Schemas',
+        href: '/concepts/database-schemas',
       },
     ],
   },
@@ -103,19 +103,18 @@ export const sideMenuTree: Tree[] = [
       },
       {
         label: 'DBT',
-        href: '/guides/dbt-cli',
+        href: '/guides/dbt',
         tree: [
           {
             label: 'DBT Using CLI',
-            href: '/guides/dbt-cli',
+            href: '/guides/dbt/dbt-cli',
           },
-            {
+          {
             label: 'Generated SQL Code',
-            href: '/guides/sql-generated',
+            href: '/guides/dbt/generated-sql',
           },
-        ]
+        ],
       },
-      
     ],
   },
   {
@@ -156,22 +155,22 @@ export const sideMenuTree: Tree[] = [
               {
                 label: 'trino shell',
                 href: '/api/cli-commands/run/trino',
-              }
-            ]
+              },
+            ],
           },
         ],
       },
     ],
   },
-  {
-    label: 'Start Here',
-    tree: [
-      {
-        label: 'Quickstart',
-        href: '/start-here/quickstart',
-      },
-    ],
-  },
+  // {
+  //   label: 'Start Here',
+  //   tree: [
+  //     {
+  //       label: 'Quickstart',
+  //       href: '/start-here/quickstart',
+  //     },
+  //   ],
+  // },
 ]
 ---
 
