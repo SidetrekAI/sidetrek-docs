@@ -16,7 +16,11 @@ jobs:
           envVariableKeys: WEAVIATE_API_KEY,OPENAI_API_KEY
         env:
           WEAVIATE_API_KEY: ${{ secrets.WEAVIATE_API_KEY }}
+          TARGET_WEAVIATE_API_KEY: preview,production
+          TYPE_WEAVIATE_API_KEY: encrypted
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TARGET_OPENAI_API_KEY: preview,production
+          TYPE_OPENAI_API_KEY: encrypted
       - uses: amondnet/vercel-action@v20
         id: vercel-deploy
         with:
