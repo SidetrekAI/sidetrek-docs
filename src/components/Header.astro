@@ -17,11 +17,11 @@ const currentPath = Astro.url.pathname
     class="fixed top-0 z-50 w-full flex justify-between items-center border-b border-slate-200 bg-white"
     style=`height: ${HEADER_HEIGHT}px`
   >
-    <a href="/" class="hidden md:block shrink-0 md:px-4">
+    <a href="https://sidetrek.com" class="hidden md:block shrink-0 md:px-4">
       <Image src={sidetrekLogo} alt="Sidetrek logo" class="w-28 py-2" />
     </a>
 
-    <a href="/" class="md:hidden shrink-0 px-4">
+    <a href="https://sidetrek.com" class="md:hidden shrink-0 px-4">
       <Image src={sidetrekShortLogo} alt="Sidetrek logo mobile" class="w-6 py-2" />
     </a>
 
@@ -29,7 +29,7 @@ const currentPath = Astro.url.pathname
       <SearchBar client:load />
 
       <ul class="flex items-center space-x-6">
-        <li><a href="docs" class="text-slate-500 hover:text-slate-900">Docs</a></li>
+        <li><a href="/" class="text-slate-500 hover:text-slate-900">Docs</a></li>
       </ul>
 
       <div class="flex items-center">

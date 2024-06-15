@@ -1,5 +1,5 @@
 import path from 'node:path'
-import fs from 'node:fs/promises'
+import fs from 'node:fs'
 import * as R from 'ramda'
 import { $, Glob } from 'bun'
 import { fromMarkdown } from 'mdast-util-from-markdown'
@@ -91,19 +91,32 @@ const getAllDocFilepaths = async (): Promise<string[]> => {
   for await (const file of glob.scan(docsDir)) {
     allDocFiles.push(file)
   }
-  return allDocFiles.map((file) => `src/content/docs/${file}`)
+
+  // Filter out drafts
+  const publishableDocFiles = allDocFiles.filter((file) => {
+    const _path = `src/content/docs/${file}`
+    const content = fs.readFileSync(`./${_path}`, 'utf-8').toString()
+    const isDraft = R.compose(
+      R.includes('draft: true') as any,
+      R.nth(1),
+      R.split('---'),
+    )(content)
+    return !isDraft
+  })
+
+  return publishableDocFiles
 }
 
 const getChangedDocFilepaths = async (): Promise<string[]> => {
-  const changedFilepathsStr =
-    await $`echo $(git diff --name-only --diff-filter=A HEAD~ HEAD)`.text()
+  // We only want modified files (`--diff-filter=M`) because all the added/renamed files will be handled separately
+  const changedFilepathsStr = await $`echo $(git diff --name-only --diff-filter=M HEAD~ HEAD)`.text()
 
   const changedDocFilepaths = changedFilepathsStr
-  .slice(0, -1) // remove trailing newline
-  .split(' ')
-  .filter((file: string) => !file.endsWith('/')) // filter out directories
-  .filter((file: string) => file.startsWith('src/content/docs')) // filter out non-doc files
-  
+    .slice(0, -1) // remove trailing newline
+    .split(' ')
+    .filter((file: string) => !file.endsWith('/')) // filter out directories
+    .filter((file: string) => file.startsWith('src/content/docs')) // filter out non-doc files
+
   return changedDocFilepaths
 }
 
@@ -130,7 +143,7 @@ interface DbObject {
 
 export const buildDbObjectsFromMdx = async (mdxFilepath: string): Promise<DbObject[]> => {
   const pathname = getPathnameFromFilepath(mdxFilepath)
-  const file = (await fs.readFile(mdxFilepath, 'utf-8')).toString()
+  const file = fs.readFileSync(mdxFilepath, 'utf-8').toString()
   const mdastTree = fromMarkdown(file, { extensions: [mdxjs()], mdastExtensions: [mdxFromMarkdown()] })
   const children = mdastTree.children as any[]
 
@@ -201,63 +214,65 @@ const main = async () => {
 
   /**
    *
-   * Get all doc files and create/update them in db (only if it doesn't exist)
-   *
-   *   NOTE: exclude changed files since they'll be overwritten in the next step
+   * Sync the current docs with db by creating, updating (overwrite), and removing in db
    *
    */
   const allDocFilepaths = await getAllDocFilepaths()
   console.log('allDocFilepaths', allDocFilepaths)
 
+  return
+
   const changedDocFilepaths = await getChangedDocFilepaths()
   console.log('changedDocFilepaths', changedDocFilepaths)
-
-  return
 
   // Get all doc pathnames from db
   let existingDocPathnames: string[] = []
   for await (const item of docsCollection.iterator()) {
     existingDocPathnames.push(item.properties.pathname as string)
   }
+  existingDocPathnames = R.uniq(existingDocPathnames)
 
-  // Filter out changed doc files during this step - changed files will be overwritten in the next step
-  existingDocPathnames = R.compose(
-    R.reject((_pathname: string) => changedDocFilepaths.includes(_pathname)), 
-    R.uniq as any,
-  )(existingDocPathnames)
-  console.log('existingDocPathnames', existingDocPathnames)
+  // Filter out changed docs during this step (because changed docs will be overwritten separately in the next step)
+  // This will leave us with added/renamed docs
+  const filteredExistingDocPathnames = R.reject((_pathname: string) => changedDocFilepaths.includes(_pathname))(
+    existingDocPathnames
+  )
+  console.log('filteredExistingDocPathnames', filteredExistingDocPathnames)
 
   for await (const filepath of allDocFilepaths) {
     const pathname = getPathnameFromFilepath(filepath)
-    const pathnameExists = existingDocPathnames.includes(pathname)
+    const pathnameExists = filteredExistingDocPathnames.includes(pathname)
 
     if (!pathnameExists) {
       const dbObjects = await buildDbObjectsFromMdx(filepath)
 
       if (dbObjects.length !== 0) {
         await docsCollection.data.insertMany(dbObjects)
+        console.log(`Inserted ${dbObjects.length} objects for ${pathname}`)
       }
     }
   }
 
-  /**
-   *
-   * Get changed doc files and overwrite them in db
-   *
-   */
+  // Overwrite the change docs in db
   for await (const filepath of changedDocFilepaths) {
     const pathname = getPathnameFromFilepath(filepath)
 
     // Delete all objects in changed doc files first
     await docsCollection.data.deleteMany(docsCollection.filter.byProperty('pathname').like(pathname))
-    console.log(`Deleted all objects for ${pathname}`)
 
     const dbObjects = await buildDbObjectsFromMdx(filepath)
 
     if (dbObjects.length !== 0) {
       await docsCollection.data.insertMany(dbObjects)
-      console.log(`Inserted ${dbObjects.length} new objects for ${pathname}`)
+      console.log(`Updated (overwrote) ${dbObjects.length} objects for ${pathname}`)
     }
+  }
+
+  // Remove deleted docs from db
+  const deletedDocPathnames = R.difference(existingDocPathnames, allDocFilepaths.map(getPathnameFromFilepath))
+  for await (const pathname of deletedDocPathnames) {
+    await docsCollection.data.deleteMany(docsCollection.filter.byProperty('pathname').like(pathname))
+    console.log(`Deleted all objects for ${pathname}`)
   }
 
   // Close the db connection

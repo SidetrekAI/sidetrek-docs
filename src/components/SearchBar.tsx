@@ -144,7 +144,7 @@ export function SearchBar({ inputPlaceholder = 'Search the docs...' }: SearchBar
                           const { pathname, headingId, heading, excerpt } = properties || {}
                           console.log('pathname', pathname)
                           console.log('headingId', headingId)
-                          const uniqueId = `${pathname}-${headingId}`
+                          const uniqueId = `${pathname}#${headingId}`
                           // const maxExcerptLength = 70
                           // const truncatedExcerpt = excerpt.length > maxExcerptLength ? `${excerpt.slice(0, maxExcerptLength)}...` : excerpt
 
@@ -152,7 +152,7 @@ export function SearchBar({ inputPlaceholder = 'Search the docs...' }: SearchBar
                             <CommandItem
                               className="items-start rounded max-h-[84px] mb-1 px-1 py-1 bg-white hover:bg-slate-50 overflow-hidden"
                               key={uniqueId}
-                              value={headingId}
+                              value={uniqueId}
                               onSelect={() => {
                                 navigate(`${pathname}#${headingId}`)
                                 setOpen(false)
@@ -175,7 +175,7 @@ export function SearchBar({ inputPlaceholder = 'Search the docs...' }: SearchBar
                       <CommandGroup heading="Suggestions">
                         {suggestions.map((suggestion, i) => {
                           const { heading, headingId, pathname } = suggestion
-                          const uniqueId = `${pathname}-${headingId}`
+                          const uniqueId = `${pathname}#${headingId}`
                           return (
                             <CommandItem
                               key={uniqueId}

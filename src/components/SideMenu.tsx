@@ -25,7 +25,7 @@ function SideMenuItem({ item, level, isActive }: SideMenuItemProps) {
         marginLeft: `-${TREE_LEFT_PADDING + 1.5}px`,
       }}
     >
-      {item.tree ? <div>{item.label}</div> : <a href={item.href}>{item.label}</a>}
+      {item.tree ? <div>{item.label}</div> : <a href={item.href} className="block w-full">{item.label}</a>}
     </li>
   )
 }
@@ -90,6 +90,23 @@ interface SideMenuProps {
 }
 
 export default function SideMenu({ tree, currentPath }: SideMenuProps) {
+  // Expand the current path (and parent paths) by default
+  const setExpansion = useTreeExpansionStore((state) => state.setExpanded)
+  useEffect(() => {
+    if (!currentPath) return
+
+    const pathParts = currentPath.split('/')
+    const cumulativePaths = pathParts
+      .map((_, i) => {
+        return pathParts.slice(0, i + 1).join('/')
+      })
+      .filter((item) => item !== '')
+
+    cumulativePaths.forEach((path) => {
+      setExpansion(path, true)
+    })
+  }, [currentPath])
+
   return (
     <div className="relative w-[300px]">
       <aside
@@ -100,9 +117,7 @@ export default function SideMenu({ tree, currentPath }: SideMenuProps) {
           height: `calc(100vh - ${HEADER_HEIGHT + FOOTER_HEIGHT}px)`,
         }}
       >
-        <ScrollArea className="h-full pl-4 pr-6 pt-6">
-          {TreeComponent({ tree, currentPath })}
-        </ScrollArea>
+        <ScrollArea className="h-full pl-4 pr-6 pt-6">{TreeComponent({ tree, currentPath })}</ScrollArea>
       </aside>
     </div>
   )

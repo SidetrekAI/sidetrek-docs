@@ -325,26 +325,6 @@ This will show you the number of rows in the `orders` table.
 (1 row)
 ```
 
-### Deduping
-
-Because `target-iceberg` currently only supports APPEND operation, you will probably want to dedupe the data during the `staging` stage of the DBT transformation. 
-
-This way you can make sure the ingestion process is idempotent (i.e. you can run it multiple times with the same result). 
-
-The example code already includes deduping logic in the `staging` stage, but let's see how this works.
-
-TODO
-Show the deduping logic in the `staging` stage.
-Show the number of rows in the raw table to show that there's 100k
-Show the number of rows in the staging table to show that there's 100k
-Run the ingestion again in dagster
-Show the number of rows in the table to show that it's deduped via Trino shell.
-Show the number of rows in the staging table to show that there's 100k
-Explain row_num method for deduping
-Run DBT assets in dagster (reload def first)
-Show the number of rows in the staging table to show that there's still only 100k
-
-
 ## Data Transformation
 
 Now that we have the data in the Iceberg tables, we can start the transformation process to turn the raw data into a more useful form for analytics.
@@ -378,7 +358,7 @@ It makes it easy to write complex SQL queries, but it cannot execute those SQL q
 
 DBT provides a Trino adapter (`dbt-trino`) that allows us to run our DBT transformations on Trino easily.
 
-This Trino connection is configured in "dbt/your_project/profiles.yml":
+This Trino connection is configured in `dbt/your_project/profiles.yml`:
 
 ```yaml title="dbt/your_project/profiles.yml"
 trino:
@@ -397,9 +377,9 @@ trino:
         query_max_run_time: 5d
 ```
 
-<MyAlert variant='info' title='Notice the `schema` of `project`' description='DBT creates schema names based on the `models` section of "dbt_project.yml". For better control, we add `schema` in the root "profile.yml" which adds `project_` prefix to all schema names in this DBT project.' />
+<MyAlert variant='info' title='Notice the `schema` of `project`' description='DBT creates schema names based on the `models` section of `dbt_project.yml`. For better control, we add `schema` in the root `profile.yml` which adds `project_` prefix to all schema names in this DBT project.' />
 
-In "dbt/your_project/dbt_project.yml", you'll see the project configuration.
+In `dbt/your_project/dbt_project.yml`, you'll see the project configuration.
 
 ```yaml title="dbt/your_project/dbt_project.yml" {3}
 name: demo_project_32
@@ -410,7 +390,7 @@ profile: trino
 
 There's one more step required. We need to create the `raw` schema in Trino before we can run the DBT transformations.
 
-We do this by adding the `on-run-start` hook inside "dbt/your_project/dbt_project.yml".
+We do this by adding the `on-run-start` hook inside `dbt/your_project/dbt_project.yml`.
   
 ```yaml title="dbt/your_project/dbt_project.yml" {3-4}
 ...
@@ -457,9 +437,9 @@ OK, now let's take a look at how we set up each stage in our example project.
 
 ### Staging
 
-In "dbt/your_project/models" directory, you'll see the staging directory. 
+In `dbt/your_project/models` directory, you'll see the staging directory. 
 
-Inside, you'll find "stg_iceberg.yml" where we specify the data sources for the staging tables as well as define the staging tables (or "models" in DBT terms) themselves.
+Inside, you'll find `stg_iceberg.yml` where we specify the data sources for the staging tables as well as define the staging tables (or "models" in DBT terms) themselves.
 
 ```yaml title="dbt/your_project/models/staging/stg_iceberg.yml"
 version: 2
@@ -491,7 +471,7 @@ Staging tables are then defined under `models`.
 
 #### Example DBT Model in Staging
 
-We won't go through each table, but here's an example of a DBT model "stg_iceberg__orders".
+We won't go through each table, but here's an example of a DBT model `stg_iceberg__orders`.
 
 ```sql title="dbt/your_project/models/staging/stg_iceberg__orders.sql"
 {{
@@ -536,9 +516,9 @@ When we run DBT build, it will take this code and create a valid SQL query that 
 
 <MyAlert variant="info" title="Deduplication of Tables" description="In the project_staging schema, the table stg_iceberg__orders undergoes a deduplication process to ensure each order_id remains unique. This process involves grouping rows by order_id, using row numbering, and retaining only one row from each group. By eliminating duplicate entries, we maintain data integrity and streamline data processing workflows. This approach ensures that our staging environment accurately reflects unique order information, aligning with data quality standards and enhancing the reliability of downstream analytics and reporting." />
 
-#### Adding Staging Model Configuration to "dbt_project.yml"
+#### Adding Staging Model Configuration to `dbt_project.yml`
 
-Finally, we need to add a bit of extra configuration. We do this in the "dbt_project.yml" file in the /dbt directory.
+Finally, we need to add a bit of extra configuration. We do this in the `dbt_project.yml` file in the `dbt` directory.
 
 ```yaml title="dbt/your_project/dbt_project.yml" {4-7} showLineNumbers
 ...
@@ -551,11 +531,116 @@ models:
 ...
 ```
 
+#### Deduping
+
+There's one more thing we should go over: deduping.
+
+Because `target-iceberg` currently only supports APPEND operation, you will probably want to dedupe the data during the `staging` stage of the DBT transformation. 
+
+This way you can make sure the ingestion process is idempotent (i.e. you can run it multiple times with the same result). 
+
+There are many ways to dedupe your data here, but let's see how we did it in the example project.
+
+Before we get to the code, let's enter the Trino shell and see how many rows are in the raw `orders` table (i.e. ingested frmo Meltano before any transformation).
+
+<BashCode code="sidetrek run trino shell" client:load />
+
+<BashCode code="select count(*) from iceberg.raw.orders;" client:load />
+
+You'll see that we have 100k rows in the raw `orders` table as expected (since our source `orders.csv` has 100k rows). 
+
+```plaintext
+_col0  
+---------
+ 1000000 
+(1 row)
+```
+
+Once we run the `staging` DBT models, we can see that `stg_iceberg__orders` table also has 100k rows as expected.
+
+<BashCode code="select count(*) from iceberg.project_staging.stg_iceberg__orders;" client:load />
+
+The output should be:
+
+```plaintext
+ _col0  
+---------
+ 1000000 
+(1 row)
+```
+
+Now, if we run the Meltano ingestion job AGAIN in Dagster, we'll see that the `orders` table in Trino will have 200k rows. This is because `target-iceberg` APPENDs the data.
+
+<BashCode code="select count(*) from iceberg.raw.orders;" client:load />
+
+You should see:
+
+```plaintext
+_col0  
+---------
+ 2000000 
+(1 row)
+```
+
+Clearly we don't want this to happen in our staging model since we don't want any duplicate data.
+
+To dedupe the data, we add the `row_num` column to the source raw `orders` table by using the `row_number()` function in the `stg_iceberg__orders` model.
+
+```sql title="dbt/your_project/models/staging/stg_iceberg__orders.sql" {4, 17}
+...
+
+with source as (
+  select *, row_number() over (partition by id order by id desc) as row_num
+  from {{ source('stg_iceberg', 'orders') }}
+),
+
+deduped_and_renamed as (
+  select
+    CAST(id AS VARCHAR) AS order_id,
+    CAST(created_at AS TIMESTAMP) AS order_created_at,
+    CAST(qty AS DECIMAL) AS qty,
+    CAST(product_id AS VARCHAR) AS product_id,
+    CAST(customer_id AS VARCHAR) AS customer_id,
+    CAST(store_id AS VARCHAR) AS store_id
+  from source
+  where row_num = 1
+)
+
+select * from deduped_and_renamed
+```
+
+This code adds a row number to duplicate rows based on `id` field. For example, if we have two rows with the same `id`, the row with the higher `id` will have `row_num` of 1 and the other will have `row_num` of 2. 
+
+```plaintext {2-3}
+id | row_num
+1 | 1
+1 | 2
+2 | 1
+3 | 1
+```
+
+Then in `deduped_and_renamed` CTE, we only select rows where `row_num` is 1. This effectively dedupes the data.
+
+Now if you go back to the Trino shell and run the query to see the number of rows in the `stg_iceberg__orders` table, you'll see that it's still only 100k.
+
+<BashCode code="select count(*) from iceberg.project_staging.stg_iceberg__orders;" client:load />
+
+The output should be:
+
+```plaintext
+ _col0  
+---------
+ 1000000 
+(1 row)
+```
+
+We can do this for all tables in the staging area to make sure our ingestion process is idempotent at the `staging` stage.
+
 ### Intermediate
 
-Similar to the staging stage, we have the intermediate stage in the "dbt/your_project/models/intermediate" directory.
+Similar to the staging stage, we have the intermediate stage in the `dbt/your_project/models/intermediate` directory.
 
-As with staging, you'll notice we specify the sources and models in the "int_iceberg.yml" file.
+As with staging, you'll notice we specify the sources and models in the `int_iceberg.yml` file.
 
 ```yaml title="dbt/your_project/models/intermediate/int_iceberg.yml"
 version: 2
@@ -574,7 +659,7 @@ models:
   - name: int_iceberg__denormalized_orders
 ```
 
-Then we add the model SQL file "int_iceberg__denormalized_orders.sql".
+Then we add the model SQL file `int_iceberg__denormalized_orders.sql`.
 
 ```sql title="dbt/your_project/models/intermediate/int_iceberg__denormalized_orders.sql"
 {{
@@ -660,7 +745,7 @@ models:
 
 ### Marts
 
-Same deal with marts. We have the "dbt/your_project/models/marts" directory where we specify the sources and models in the "mart_iceberg.yml" file.
+Same deal with marts. We have the `dbt/your_project/models/marts` directory where we specify the sources and models in the `mart_iceberg.yml` file.
 
 ```yaml title="dbt/your_project/models/marts/marts_iceberg.yml"
 version: 2
@@ -682,7 +767,7 @@ models:
 
 Then we add the model SQL files. We'll skip an example here, but you get the idea.
 
-Finally, we add the configuration for the marts stage in "dbt/dbt_project.yml".
+Finally, we add the configuration for the marts stage in `dbt/dbt_project.yml`.
 
 ```yaml title="dbt/your_project/dbt_project.yml" {12-15} showLineNumbers
 ...
@@ -711,7 +796,7 @@ Dagster has a deep DBT integration. It can infer the dependencies between all yo
 
 ![dbt-assets-dagster](@/assets/docs/step-4-explore-example/7a.jpg)
 
-We add all DBT assets into Dagster in "dagster/your_project/your_project/dbt_assets.py".
+We add all DBT assets into Dagster in `dagster/your_project/your_project/dbt_assets.py`.
 
 ```python title="your_project/dagster/your_project/your_project/__init__.py"
 ...
@@ -722,7 +807,7 @@ def dbt_project_assets(context: AssetExecutionContext, dbt: DbtCliResource):
 
 In the code above, we're using the `dagster_dbt` package, which the Dagster team created to build DBT assets and then import them as Dagster assets.
 
-Once we've done that, we can add the DBT assets to the Dagster definitions in "dagster/your_project/your_project/__init__.py".
+Once we've done that, we can add the DBT assets to the Dagster definitions in `dagster/your_project/your_project/__init__.py`.
 
 ```python title="your_project/dagster/your_project/your_project/__init__.py" {4, 6, 10, 12-14}
 import os

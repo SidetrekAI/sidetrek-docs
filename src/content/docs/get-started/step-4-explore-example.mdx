@@ -152,7 +152,7 @@ The example code already includes deduping logic in the `staging` stage, but if 
 
 We've already added and configured the extractor/loader for you and added the Meltano ingestion job inside Dagster. 
 
-You can take a look at the configured `tap-csv` and `target-iceberg` in "meltano/meltano.yml" file. Here's a snippet:
+You can take a look at the configured `tap-csv` and `target-iceberg` in `meltano/meltano.yml` file. Here's a snippet:
 
 ```yaml title="meltano/meltano.yml" showLineNumbers
 ...
@@ -166,7 +166,7 @@ plugins:
     ...
 ```
 
-The Meltano ingestion job is defined in "dagster/your_project/meltano.py".
+The Meltano ingestion job is defined in `dagster/your_project/meltano.py`.
 
 ```python title="your_project/dagster/your_project/meltano.py" {7, 11}
 ...
@@ -324,7 +324,7 @@ For more details, we highly recommend you check out DBT's excellent [Best Practi
 
 ### DBT Models
 
-Take a look at the "models" directory inside "dbt/your_project" directory to see the example DBT models.
+Take a look at the `models` directory inside `dbt/your_project` directory to see the example DBT models.
 
 ```plaintext {8-11}
 your_project
