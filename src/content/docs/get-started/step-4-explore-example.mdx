@@ -140,11 +140,19 @@ Note that currently, there is no official Meltano target for Iceberg, so we've c
 
 <MyAlert variant="warning" title="Currently, `target-iceberg` only supports APPEND operation!" description="`target-iceberg` implements pyiceberg underneath and it does not yet support merge operation for incremental ingestion. All data is appended during ingestion so if you need to do any deduping, you'll have to do it during the transformation stage." />
 
+#### Deduping
+
+Because `target-iceberg` currently only supports APPEND operation, you will probably want to dedupe the data during the `staging` stage of the DBT transformation. 
+
+This way you can make sure the ingestion process is idempotent (i.e. you can run it multiple times with the same result). 
+
+The example code already includes deduping logic in the `staging` stage, but if you'd like more details on this, see the [Deduping](/tutorial/bi-stack-example-iceberg#deduping) section in the BI stack tutorial.
+
 ### Meltano + Dagster
 
 We've already added and configured the extractor/loader for you and added the Meltano ingestion job inside Dagster. 
 
-You can take a look at the configured `tap-csv` and `target-iceberg` in "meltano/meltano.yml" file. Here's a snippet:
+You can take a look at the configured `tap-csv` and `target-iceberg` in `meltano/meltano.yml` file. Here's a snippet:
 
 ```yaml title="meltano/meltano.yml" showLineNumbers
 ...
@@ -158,7 +166,7 @@ plugins:
     ...
 ```
 
-The Meltano ingestion job is defined in "dagster/your_project/meltano.py".
+The Meltano ingestion job is defined in `dagster/your_project/meltano.py`.
 
 ```python title="your_project/dagster/your_project/meltano.py" {7, 11}
 ...
@@ -241,7 +249,9 @@ This will show you the number of rows in the `orders` table.
 
 ### (Optional) Running Meltano Ingestion Directly via Meltano CLI
 
-We just ran the ingestion job inside Dagster, but you can also run it directly via Meltano CLI by executing the following command:
+We just ran the ingestion job inside Dagster, but you can also run it directly via Meltano CLI. This is useful if you want to run the job manually or if you want to debug the job. 
+
+Run the following command to run Meltano job directly via CLI:
 
 <BashCode code="sidetrek run meltano run tap-csv target-iceberg" client:load />
 
@@ -314,7 +324,7 @@ For more details, we highly recommend you check out DBT's excellent [Best Practi
 
 ### DBT Models
 
-Take a look at the "models" directory inside "dbt/your_project" directory to see the example DBT models.
+Take a look at the `models` directory inside `dbt/your_project` directory to see the example DBT models.
 
 ```plaintext {8-11}
 your_project

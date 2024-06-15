@@ -4,7 +4,7 @@ import type { APIRoute } from 'astro'
 import weaviate, { type WeaviateClient } from 'weaviate-client'
 
 // Connect to Weaviate DB
-const weaviateClusterUrl = 'https://sidetrek-sandbox-z2qg54k4.weaviate.network'
+const weaviateClusterUrl = 'https://aqgyk2vxr1kvwtb0ebdz6w.c0.us-west3.gcp.weaviate.cloud'
 const dbClient: WeaviateClient = await weaviate.connectToWCS(weaviateClusterUrl, {
   authCredentials: new weaviate.ApiKey(import.meta.env.WEAVIATE_API_KEY || ''),
   headers: {
@@ -17,10 +17,6 @@ export const POST: APIRoute = async ({ params, request }) => {
   const collectionName = 'Docs'
   const docsCollection = await dbClient.collections.get(collectionName)
 
-  // const searchResults = await docsCollection.query.nearText([searchQuery], {
-  //   returnProperties: ['headingId', 'pathname', 'content'],
-  //   limit: 10,
-  // })
   const searchResults = await docsCollection.query.hybrid(searchQuery, {
     returnProperties: ['content', 'pathname', 'headingId', 'heading', 'excerpt'],
     limit: 10,

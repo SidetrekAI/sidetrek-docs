@@ -5,9 +5,10 @@ import { useState } from 'react'
 interface BashCodeProps {
   code: string
   clipboardCopy?: string // overwrites code to be copied to clipboard
+  plaintext?: boolean
 }
 
-export default function BashCode({ code, clipboardCopy }: BashCodeProps) {
+export default function BashCode({ code, clipboardCopy, plaintext = false }: BashCodeProps) {
   const [copied, setCopied] = useState<boolean>(false)
 
   const lines = code?.split('\\n')
@@ -30,7 +31,7 @@ export default function BashCode({ code, clipboardCopy }: BashCodeProps) {
           <div key={i}>
             {i === 0 ? (
               <div className="flex items-center space-x-2">
-                <div className="text-indigo-400 font-medium">$</div>
+                {!plaintext && <div className="text-indigo-400 font-medium">$</div>}
                 <div>{line}</div>
               </div>
             ) : (

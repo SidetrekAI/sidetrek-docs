@@ -3,8 +3,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronRight } from 'lucide-react'
 import type { Tree } from '@/lib/types'
 import { FOOTER_HEIGHT, HEADER_HEIGHT } from '@/lib/constants'
-import { useMediaQuery } from 'usehooks-ts'
-import { ScrollArea, ScrollBar } from './ui/scroll-area'
+import { ScrollArea } from './ui/scroll-area'
+import { useTreeExpansionStore } from '@/lib/store'
 
 const TREE_LEFT_PADDING = 16
 
@@ -25,7 +25,7 @@ function SideMenuItem({ item, level, isActive }: SideMenuItemProps) {
         marginLeft: `-${TREE_LEFT_PADDING + 1.5}px`,
       }}
     >
-      {item.tree ? <div>{item.label}</div> : <a href={item.href}>{item.label}</a>}
+      {item.tree ? <div>{item.label}</div> : <a href={item.href} className="block w-full">{item.label}</a>}
     </li>
   )
 }
@@ -37,20 +37,8 @@ interface GetTreeArgs {
 }
 
 export const TreeComponent = ({ tree, level = 0, currentPath }: GetTreeArgs) => {
-  const isDesktop = useMediaQuery('(min-width: 768px)')
-  const [openIds, setOpenIds] = useState<{ [key: string]: boolean }>({})
-
-  useEffect(() => {
-    // Open the first level of the tree by default
-    if (level === 0 && isDesktop) {
-      const idsToOpen = tree.reduce((acc, curr, index) => ({ ...acc, [`${level}-${index}`]: true }), {})
-      setOpenIds(idsToOpen)
-    }
-  }, [])
-
-  const toggleOpen = (id: string) => {
-    setOpenIds({ ...openIds, [id]: id in openIds ? !openIds[id] : true })
-  }
+  const expanded = useTreeExpansionStore((state) => state.expanded)
+  const toggleExpansion = useTreeExpansionStore((state) => state.toggle)
 
   return (
     <ul
@@ -60,20 +48,25 @@ export const TreeComponent = ({ tree, level = 0, currentPath }: GetTreeArgs) => 
       {tree?.map((treeItem, index) => {
         const itemId = `${level}-${index}`
         const subtree = treeItem.tree
-        const isActive = treeItem.href === currentPath
+        const pathname = treeItem.href
+        const isActive = pathname === currentPath
+        const isExpanded = expanded?.[pathname]
 
         if (subtree) {
-          const subtreeUI = TreeComponent({ tree: subtree, level: level + 1, currentPath })
-          const isOpen = openIds[itemId] === true
+          const subtreeUI = TreeComponent({
+            tree: subtree,
+            level: level + 1,
+            currentPath,
+          })
 
           return (
             <div key={itemId}>
-              <Collapsible open={isOpen} onOpenChange={() => toggleOpen(itemId)}>
+              <Collapsible open={isExpanded} onOpenChange={() => toggleExpansion(pathname)}>
                 <CollapsibleTrigger className="w-full text-left">
                   <div className="w-full flex items-center justify-between">
                     <SideMenuItem item={treeItem} level={level} isActive={isActive} />
                     <div className="mb-3">
-                      <div className={`${isOpen ? 'rotate-90' : ''} transition-transform`}>
+                      <div className={`transition-transform ${isExpanded ? 'rotate-90' : 'rotate-0'}`}>
                         <ChevronRight size={16} strokeWidth={1.5} />
                       </div>
                     </div>
@@ -97,15 +90,34 @@ interface SideMenuProps {
 }
 
 export default function SideMenu({ tree, currentPath }: SideMenuProps) {
+  // Expand the current path (and parent paths) by default
+  const setExpansion = useTreeExpansionStore((state) => state.setExpanded)
+  useEffect(() => {
+    if (!currentPath) return
+
+    const pathParts = currentPath.split('/')
+    const cumulativePaths = pathParts
+      .map((_, i) => {
+        return pathParts.slice(0, i + 1).join('/')
+      })
+      .filter((item) => item !== '')
+
+    cumulativePaths.forEach((path) => {
+      setExpansion(path, true)
+    })
+  }, [currentPath])
+
   return (
     <div className="relative w-[300px]">
       <aside
         className="fixed w-full shrink-0 text-sm text-slate-600"
-        style={{ top: `${HEADER_HEIGHT}px`, width: 'inherit', height: `calc(100vh - ${HEADER_HEIGHT + FOOTER_HEIGHT}px)` }}
+        style={{
+          top: `${HEADER_HEIGHT}px`,
+          width: 'inherit',
+          height: `calc(100vh - ${HEADER_HEIGHT + FOOTER_HEIGHT}px)`,
+        }}
       >
-        <ScrollArea className="h-full pl-4 pr-6 pt-6">
-          {TreeComponent({ tree, currentPath })}
-        </ScrollArea>
+        <ScrollArea className="h-full pl-4 pr-6 pt-6">{TreeComponent({ tree, currentPath })}</ScrollArea>
       </aside>
     </div>
   )

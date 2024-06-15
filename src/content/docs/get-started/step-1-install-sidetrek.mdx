@@ -7,6 +7,7 @@ import SubH1 from '@/components/SubH1.astro'
 import { Button } from '@/components/ui/button'
 import BashCode from '@/components/BashCode'
 import DownloadSidetrekTabs from '@/components/docs/DownloadSidetrekTabs'
+import { getLatestSidetrekVersion } from '@/lib/utils'
 
 # Download & install Sidetrek
 
@@ -29,7 +30,11 @@ To download and install Sidetrek, select your Operating System and then run the 
 
 To verify that Sidetrek has been installed correctly, run the following command in your terminal.
 
-<BashCode code="sidetrek --version\nv0.1.26" clipboardCopy="sidetrek --version" client:load />
+<BashCode code="sidetrek --version" client:load />
+
+You should see: 
+
+<BashCode code={await getLatestSidetrekVersion()} plaintext={true} client:load />
 
 ## Next Steps
 
