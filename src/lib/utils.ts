@@ -28,3 +28,9 @@ export async function getShikiHtml({ lang, code, theme }: GetShikiHtmlArgs) {
   const html = highlighter.codeToHtml(code, { lang, theme: 'slack-dark' })
   return html
 }
+
+export const getLatestSidetrekVersion = async () => {
+  const response = await fetch('https://api.github.com/repos/SidetrekAI/sidetrek-cli/releases/latest')
+  const data = await response.json()
+  return data?.tag_name
+}

@@ -133,6 +133,8 @@ In our example project, our data is stored in CSV files and we want to load that
 
 Note that currently, there is no official Meltano target for Iceberg, so we've created a custom target. This is also open-source, so feel free to check out the source code [here](https://github.com/SidetrekAI/target-iceberg).
 
+<MyAlert variant="warning" title="Currently, `target-iceberg` only supports APPEND operation!" description="`target-iceberg` implements pyiceberg underneath and it does not yet support merge operation for incremental ingestion. All data is appended during ingestion so if you need to do any deduping, you'll have to do it during the transformation stage." />
+
 #### Adding the Extractor
 
 We've already added and configured the extractor for you in the example project, but we'll go through the setup so you can acquaint yourself with the setup. 
@@ -323,6 +325,26 @@ This will show you the number of rows in the `orders` table.
 (1 row)
 ```
 
+### Deduping
+
+Because `target-iceberg` currently only supports APPEND operation, you will probably want to dedupe the data during the `staging` stage of the DBT transformation. 
+
+This way you can make sure the ingestion process is idempotent (i.e. you can run it multiple times with the same result). 
+
+The example code already includes deduping logic in the `staging` stage, but let's see how this works.
+
+TODO
+Show the deduping logic in the `staging` stage.
+Show the number of rows in the raw table to show that there's 100k
+Show the number of rows in the staging table to show that there's 100k
+Run the ingestion again in dagster
+Show the number of rows in the table to show that it's deduped via Trino shell.
+Show the number of rows in the staging table to show that there's 100k
+Explain row_num method for deduping
+Run DBT assets in dagster (reload def first)
+Show the number of rows in the staging table to show that there's still only 100k
+
+
 ## Data Transformation
 
 Now that we have the data in the Iceberg tables, we can start the transformation process to turn the raw data into a more useful form for analytics.
@@ -487,26 +509,23 @@ We won't go through each table, but here's an example of a DBT model "stg_iceber
 }}
 
 with source as (
+  select *, row_number() over (partition by id order by id desc) as row_num
+  from {{ source('stg_iceberg', 'orders') }}
+),
+
+deduped_and_renamed as (
   select
     CAST(id AS VARCHAR) AS order_id,
     CAST(created_at AS TIMESTAMP) AS order_created_at,
     CAST(qty AS DECIMAL) AS qty,
     CAST(product_id AS VARCHAR) AS product_id,
     CAST(customer_id AS VARCHAR) AS customer_id,
-    CAST(store_id AS VARCHAR) AS store_id,
-    row_number() over (partition by id order by created_at desc) as row_num
-  from {{ source('stg_iceberg', 'orders') }}
+    CAST(store_id AS VARCHAR) AS store_id
+  from source
+  where row_num = 1
 )
 
-select
-  order_id,
-  order_created_at,
-  qty,
-  product_id,
-  customer_id,
-  store_id
-from source
-where row_num = 1
+select * from deduped_and_renamed
 ```
 
 I'm sure you recognize the SQL queries here. The part you might not be familiar with is the `config` block at the top.

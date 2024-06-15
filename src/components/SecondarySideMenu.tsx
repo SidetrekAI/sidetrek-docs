@@ -22,8 +22,10 @@ export default function SecondarySideMenu({ page }: SecondarySideMenuProps) {
 
       // Filter out the first heading
       const mdastTreePruned = R.reject((node: any) => node.type === 'heading' && node.depth === 1, mdastTree.children)
-
+      
       const _tocTree = toc({ type: 'root', children: mdastTreePruned })
+
+      if (!_tocTree?.map) return
 
       const mdx = toMarkdown(
         { type: 'root', children: _tocTree?.map?.children as any },

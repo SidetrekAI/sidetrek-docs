@@ -29,6 +29,7 @@ const { title, description } = Astro.props
 export const sideMenuTree: Tree[] = [
   {
     label: 'Get Started',
+    href: '/get-started',
     tree: [
       {
         label: 'Overview',
@@ -54,6 +55,7 @@ export const sideMenuTree: Tree[] = [
   },
   {
     label: 'Tutorials',
+    href: '/tutorials',
     tree: [
       {
         label: 'BI Stack Example (Iceberg)',
@@ -63,6 +65,7 @@ export const sideMenuTree: Tree[] = [
   },
   {
     label: 'Concepts',
+    href: '/concepts',
     tree: [
       {
         label: 'Project Structure',
@@ -84,15 +87,16 @@ export const sideMenuTree: Tree[] = [
   },
   {
     label: 'Guides',
+    href: '/guides',
     tree: [
-      {
-        label: 'Scheduling',
-        href: '/guides/scheduling',
-      },
-      {
-        label: 'Testing',
-        href: '/guides/testing',
-      },
+      // {
+      //   label: 'Scheduling',
+      //   href: '/guides/scheduling',
+      // },
+      // {
+      //   label: 'Testing',
+      //   href: '/guides/testing',
+      // },
       {
         label: 'Trino CLI',
         href: '/guides/trino-cli',
@@ -119,60 +123,47 @@ export const sideMenuTree: Tree[] = [
   },
   {
     label: 'API',
+    href: '/api',
     tree: [
       {
-        label: 'CLI Options',
-        href: '/api/cli-options',
-        tree: [
-          {
-            label: '--version',
-            href: '/api/cli-options/version',
-          },
-          {
-            label: '--help or -h',
-            href: '/api/cli-options/help',
-          }
-        ],
-      },
-      {
         label: 'CLI Commands',
-        href: '/api/cli-commands',
+        href: '/api/cli',
         tree: [
           {
             label: 'init',
-            href: '/api/cli-commands/init',
+            href: '/api/cli/init',
           },
           {
             label: 'start',
-            href: '/api/cli-commands/start',
+            href: '/api/cli/start',
           },
           {
             label: 'stop',
-            href: '/api/cli-commands/stop',
+            href: '/api/cli/stop',
           },
           {
             label: 'down',
-            href: '/api/cli-commands/down',
+            href: '/api/cli/down',
           },
           {
             label: 'logs',
-            href: '/api/cli-commands/logs',
+            href: '/api/cli/logs',
           },
           {
             label: 'run',
-            href: '/api/cli-commands/run',
+            href: '/api/cli/run',
             tree: [
               {
                 label: 'dbt *',
-                href: '/api/cli-commands/run/dbt',
+                href: '/api/cli/run/dbt',
               },
               {
                 label: 'meltano *',
-                href: '/api/cli-commands/run/meltano',
+                href: '/api/cli/run/meltano',
               },
               {
                 label: 'trino shell',
-                href: '/api/cli-commands/run/trino',
+                href: '/api/cli/run/trino',
               },
             ],
           },
@@ -191,7 +182,6 @@ export const sideMenuTree: Tree[] = [
   // },
 ]
 ---
-
 <!doctype html>
 <html lang="en" class="scroll-smooth">
   <head>

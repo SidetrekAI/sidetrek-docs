@@ -13,7 +13,7 @@ const glob = new Glob('**/*.mdx')
 const docsDir = path.resolve(__dirname, '../src/content/docs')
 
 // Connect to Weaviate DB
-const weaviateClusterUrl = 'https://sidetrek-sandbox-z2qg54k4.weaviate.network'
+const weaviateClusterUrl = 'https://aqgyk2vxr1kvwtb0ebdz6w.c0.us-west3.gcp.weaviate.cloud'
 const dbClient: WeaviateClient = await weaviate.connectToWCS(weaviateClusterUrl, {
   authCredentials: new weaviate.ApiKey(process.env.WEAVIATE_API_KEY || ''),
   headers: {
@@ -96,14 +96,14 @@ const getAllDocFilepaths = async (): Promise<string[]> => {
 
 const getChangedDocFilepaths = async (): Promise<string[]> => {
   const changedFilepathsStr =
-    await $`echo $(git diff --name-only HEAD~ HEAD) $(git status --porcelain | awk '{print $2}')`.text()
+    await $`echo $(git diff --name-only --diff-filter=A HEAD~ HEAD)`.text()
 
   const changedDocFilepaths = changedFilepathsStr
-    .slice(0, -1) // remove trailing newline
-    .split(' ')
-    .filter((file: string) => !file.endsWith('/')) // filter out directories
-    .filter((file: string) => file.startsWith('src/content/docs')) // filter out non-doc files
-
+  .slice(0, -1) // remove trailing newline
+  .split(' ')
+  .filter((file: string) => !file.endsWith('/')) // filter out directories
+  .filter((file: string) => file.startsWith('src/content/docs')) // filter out non-doc files
+  
   return changedDocFilepaths
 }
 
@@ -212,14 +212,19 @@ const main = async () => {
   const changedDocFilepaths = await getChangedDocFilepaths()
   console.log('changedDocFilepaths', changedDocFilepaths)
 
+  return
+
   // Get all doc pathnames from db
   let existingDocPathnames: string[] = []
   for await (const item of docsCollection.iterator()) {
     existingDocPathnames.push(item.properties.pathname as string)
   }
 
-  // Filter out changed doc files
-  existingDocPathnames = R.reject((_pathname: string) => changedDocFilepaths.includes(_pathname))(existingDocPathnames)
+  // Filter out changed doc files during this step - changed files will be overwritten in the next step
+  existingDocPathnames = R.compose(
+    R.reject((_pathname: string) => changedDocFilepaths.includes(_pathname)), 
+    R.uniq as any,
+  )(existingDocPathnames)
   console.log('existingDocPathnames', existingDocPathnames)
 
   for await (const filepath of allDocFilepaths) {

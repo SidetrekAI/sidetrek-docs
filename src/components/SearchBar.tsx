@@ -15,8 +15,9 @@ import { navigate } from 'astro:transitions/client'
 
 const suggestions = [
   {
-    heading: 'Quickstart',
-    pathname: '/start-here/quickstart',
+    heading: 'Get started with Sidetrek',
+    headingId: 'get-started-with-sidetrek',
+    pathname: '/get-started/overview',
   },
 ]
 
@@ -141,25 +142,29 @@ export function SearchBar({ inputPlaceholder = 'Search the docs...' }: SearchBar
                         {items.map((item, i) => {
                           const { properties } = item || {}
                           const { pathname, headingId, heading, excerpt } = properties || {}
+                          console.log('pathname', pathname)
+                          console.log('headingId', headingId)
+                          const uniqueId = `${pathname}-${headingId}`
                           // const maxExcerptLength = 70
                           // const truncatedExcerpt = excerpt.length > maxExcerptLength ? `${excerpt.slice(0, maxExcerptLength)}...` : excerpt
 
                           return (
                             <CommandItem
-                              className="items-start rounded max-h-[60px] mb-1 px-1 py-1 bg-white hover:bg-slate-50 overflow-hidden"
-                              key={i}
+                              className="items-start rounded max-h-[84px] mb-1 px-1 py-1 bg-white hover:bg-slate-50 overflow-hidden"
+                              key={uniqueId}
                               value={headingId}
                               onSelect={() => {
                                 navigate(`${pathname}#${headingId}`)
                                 setOpen(false)
                               }}
                             >
-                              <div className="w-full flex items-center space-x-2.5">
+                              <div className="w-full flex items-center space-x-2.5 cursor-pointer">
                                 <div className="shrink-0 text-indigo-400">
                                   <Box size={24} strokeWidth={1} />
                                 </div>
                                 <div className="w-full min-w-0 flex flex-col justify-center space-y-1">
                                   <div className="text-slate-900 font-medium truncate">{heading}</div>
+                                  <div className="text-slate-500 text-xs">{pathname}</div>
                                   {excerpt && <div className="text-slate-500 font-normal truncate">{excerpt}</div>}
                                 </div>
                               </div>
@@ -169,9 +174,11 @@ export function SearchBar({ inputPlaceholder = 'Search the docs...' }: SearchBar
                       </CommandGroup>
                       <CommandGroup heading="Suggestions">
                         {suggestions.map((suggestion, i) => {
-                          const { heading, pathname } = suggestion
+                          const { heading, headingId, pathname } = suggestion
+                          const uniqueId = `${pathname}-${headingId}`
                           return (
                             <CommandItem
+                              key={uniqueId}
                               className="items-start rounded max-h-[60px] mb-1 px-1 py-1 bg-white hover:bg-slate-50 overflow-hidden"
                               onSelect={() => {
                                 navigate(`${pathname}`)

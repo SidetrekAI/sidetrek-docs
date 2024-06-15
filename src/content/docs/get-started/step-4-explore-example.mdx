@@ -140,6 +140,14 @@ Note that currently, there is no official Meltano target for Iceberg, so we've c
 
 <MyAlert variant="warning" title="Currently, `target-iceberg` only supports APPEND operation!" description="`target-iceberg` implements pyiceberg underneath and it does not yet support merge operation for incremental ingestion. All data is appended during ingestion so if you need to do any deduping, you'll have to do it during the transformation stage." />
 
+#### Deduping
+
+Because `target-iceberg` currently only supports APPEND operation, you will probably want to dedupe the data during the `staging` stage of the DBT transformation. 
+
+This way you can make sure the ingestion process is idempotent (i.e. you can run it multiple times with the same result). 
+
+The example code already includes deduping logic in the `staging` stage, but if you'd like more details on this, see the [Deduping](/tutorial/bi-stack-example-iceberg#deduping) section in the BI stack tutorial.
+
 ### Meltano + Dagster
 
 We've already added and configured the extractor/loader for you and added the Meltano ingestion job inside Dagster. 

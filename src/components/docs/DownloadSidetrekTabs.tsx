@@ -9,7 +9,7 @@ export default function DownloadSidetrekTabs() {
       value: 'darwin_x86',
       content: (
         <BashCode
-          code={`curl -fsSL https://sidetrek.com/sidetrek.${SIDETREK_VERSION}-darwin-x64.tar.gz | install.sh`}
+          code={`curl -fsSL https://sidetrek.com/cli.sh | sh`}
         />
       ),
       default: true,
@@ -19,7 +19,7 @@ export default function DownloadSidetrekTabs() {
       value: 'darwin_arm64',
       content: (
         <BashCode
-          code={`curl -fsSL https://sidetrek.com/sidetrek.${SIDETREK_VERSION}-darwin-arm64.tar.gz | install.sh`}
+          code={`curl -fsSL https://sidetrek.com/cli.sh | sh`}
         />
       ),
     },
@@ -27,7 +27,7 @@ export default function DownloadSidetrekTabs() {
       label: 'Linux x64',
       value: 'linux_x86',
       content: (
-        <BashCode code={`curl -fsSL https://sidetrek.com/sidetrek.${SIDETREK_VERSION}-linux-x64.tar.gz | install.sh`} />
+        <BashCode code={`curl -fsSL https://sidetrek.com/cli.sh | sh`} />
       ),
     },
     {
@@ -35,7 +35,7 @@ export default function DownloadSidetrekTabs() {
       value: 'linux_arm64',
       content: (
         <BashCode
-          code={`curl -fsSL https://sidetrek.com/sidetrek.${SIDETREK_VERSION}-linux-arm64.tar.gz | install.sh`}
+          code={`curl -fsSL https://sidetrek.com/cli.sh | sh`}
         />
       ),
     },
