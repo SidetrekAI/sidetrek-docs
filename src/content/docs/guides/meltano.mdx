@@ -1,0 +1,144 @@
+---
+title: Meltano CLI
+description: Learn how to use CLI to directly manage your Meltano project.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# Meltano
+
+Meltano is an ingestion tool that makes it easy to ingest from hundreds of data sources using pre-built connectors. Essentially, it handles the EL ("Extract, Load") part of the ELT process.
+
+The reason we favor Meltano over other managed connectors is that it is open-source and it's CLI based rather than UI based. Primarily UI based tools are not easy to automate and we believe automation is an important part of a robust data pipeline.
+
+## Meltano CLI
+
+In Sidetrek, Meltano is already integrated with Dagster and you can trigger Meltano ingestion jobs from Dagster (or schedule it).
+
+This is great for production automation, but often, you might want to use Meltano directly using CLI - for testing and debugging, for example.
+
+It's faster and also in case of issues, easier to debug because you don't have to try and figure out if the error is from Meltano or from Dagster.
+
+You can run any `meltano` CLI commands using `sidetrek run` in the project root:
+
+<BashCode code="sidetrek run meltano --version" client:load />
+
+It should show you the version of meltano installed.
+
+```plaintext
+meltano, version 3.4.2
+```
+
+All `sidetrek run` is doing underneath is running Meltano CLI within the right directory (`meltano` command must be run inside meltano project directory) and wrapping the command with `poetry run` so it's in the right vitrual env.
+
+So it's identical to running:
+
+<BashCode code="cd your_project/meltano && poetry run meltano --version" client:load />
+
+You can run any `meltano` command using `sidetrek run meltano`:
+
+<BashCode code="sidetrek run meltano run tap-csv target-iceberg" client:load />
+
+## Installing Meltano Taps and Targets
+
+To use Meltano to ingest data, you need to set up two things: 1) an extractor ("tap") and 2) a loader ("target").
+
+<MyAlert variant="info" title="Taps and Targets?" description='Meltano follows the Singer protocol for their extractors and loaders. In the Singer protocol, extractors are called "taps" and loaders are called "targets".' />
+
+For example, to ingest data from a CSV file to Postgres, you can use the `tap-csv` to extract data from any CSV files and `target-postgres` to load the extracted data into Postgres tables.
+
+<BashCode code="sidetrek run meltano add extractor tap-csv" client:load />
+
+<BashCode code="sidetrek run meltano add loader target-postgres" client:load />
+ 
+If multiple variants of a discoverable plugin are available, you can choose a specific (non-default) variant using the `--variant` option on `meltano add`:
+
+<BashCode code="sidetrek run meltano add loader target-postgres --variant=transferwise" client:load />
+
+## Installing Custom Taps or Targets
+
+Custom plugins for packages can be added to your project using the `--custom`:
+
+For example, in our example we have a custom loader for Iceberg called `target-iceberg` because there's no official loader for Iceberg yet. You can install a custom target like this:
+
+<BashCode code="sidetrek run meltano add --custom loader target-iceberg" client:load />
+
+## Configuring Taps or Targets
+
+Once the `taps` and `targets` are installed, we need to configure them. You can set the configuration settings for a plugin using the `meltano config` command.
+
+<BashCode code="sidetrek run meltano config target-postgres set password my_password" client:load />
+
+You can also use `--interactive` flag instead:
+
+<BashCode code="sidetrek run meltano config --interactive" client:load />
+
+Running this will show you a list of all configurations.
+
+Finally, you can alternatively add the configuration settings in the `meltano.yml` file in your project directory.
+
+```yaml title="meltano/meltano.yml"
+...
+plugins:
+  extractors:
+    - name: tap-csv
+      variant: meltanolabs
+      pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+      config:
+        csv_files_definition: extract/example_csv_files_def.json
+  loaders:
+  ...
+```
+
+If you change anything directly in the `meltano.yml` file, you need to run `meltano install` to apply the changes.
+
+<BashCode code="sidetrek run meltano install" client:load />
+
+This will install all the `taps` and `targets` specified in the `meltano.yml` file. If you've installed them already, it'll simply use the cached version.
+
+Sometimes you want to make sure you re-install them from scratch. You can do that using the `--clean` flag:
+
+<BashCode code="sidetrek run meltano install --clean" client:load />
+
+If you have a lot of `taps` and `targets`, you probably don't want to have to reinstall everything, so you can update a specific tap or target like this:
+
+<BashCode code="sidetrek run meltano install --clean extractor tap-csv" client:load />
+
+Or for a target:
+
+<BashCode code="sidetrek run meltano install --clean loader target-postgres" client:load />
+
+## Explicit Inheritance
+
+Sometimes you want to use the same plugin with multiple different configurations. 
+
+You can do so using explicit inheritance. Essentially, you're creating a new plugin that inherits from an existing plugin.
+
+For example, to create a variation of `tap-postgres` called `tap-postgres--billing`, you can use the `--inherit-from` flag:
+
+<BashCode code="sidetrek run meltano add extractor tap-postgres--billing --inherit-from tap-postgres" client:load />
+
+The corresponding inheriting plugin definition in your `meltano.yml` project file  will have an `inherit_from` field to specify the parent plugin.
+
+```yaml title="example-project>/meltano/meltano.yml"
+...
+plugins:
+  extractors:
+  - name: tap-postgres--billing
+    inherit_from: tap-postgres
+    variant: transferwise
+    pip_url: pipelinewise-tap-postgres
+...
+```
+
+## Updating plugins
+
+You can update a plugin in your project using the `--update` option. Updating a plugin will re-add it to your project. This will do two things:
+
+- Update the plugin lock file the same as `meltano lock --update` would
+- Update the plugin entry in the `meltano.yml`, without overwriting any user-defined config or extras
+
+For example, this will update the `tap-gitlab` extractor without changing any of the existing configurations:
+
+<BashCode code="sidetrek run meltano add --update extractor tap-gitlab" client:load />

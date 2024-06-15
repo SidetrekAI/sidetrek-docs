@@ -1,0 +1,14 @@
+.toc a:hover {
+  color: #0f172a;
+}
+
+.toc ul:not(:first-child) {
+  list-style-type: none;
+  padding-left: 16px;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.toc li {
+  margin-bottom: 0.75rem;
+}

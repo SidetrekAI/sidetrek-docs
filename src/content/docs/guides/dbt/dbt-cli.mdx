@@ -1,0 +1,63 @@
+---
+title: DBT Using CLI
+description: Learn how to use CLI to directly manage your DBT project.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# DBT
+
+DBT is a data transformation tool that makes it easy to transform data in your warehouse. It's a popular tool among data engineers because it's SQL-based and easy to use.
+
+Dagster integrates nicely with DBT and can infer DBT transformation dependencies. You can run DBT models directly from the Dagster UI or schedule them.
+
+## DBT CLI
+
+But sometimes it's useful to run DBT directly using CLI - for testing and debugging, for example. 
+
+It's faster and also in case of issues, easier to debug because you don't have to try and figure out if the error is from DBT or from Dagster.
+
+You can run DBT CLI commands using `sidetrek run` in the project root:
+
+<BashCode code="sidetrek run dbt --version" client:load />
+
+All `sidetrek run` is doing underneath is running DBT CLI within the right directory (`dbt` command should be run inside dbt project directory) and wrapping the command with `poetry run` so it's in the right vitrual env.
+
+So it's identical to running:
+
+<BashCode code="cd your_project/dbt/your_project && poetry run dbt --version" client:load />
+
+You can run any `dbt` command using `sidetrek run dbt`:
+
+<BashCode code="sidetrek run dbt run" client:load />
+
+## Running DBT Models
+
+You can run all DBT models via DBT CLI using the following command:
+
+<BashCode code="sidetrek run dbt run" client:load />
+
+### Running A Specific Model
+
+To run a specific model, you can use the `--select` flag. 
+
+For example, to run a model named `marts_iceberg__general`, you can use the following command:
+
+<BashCode code="sidetrek run dbt run --select marts_iceberg__general" client:load />
+
+### Running A Set of Models
+
+If you want to run a set of models with names starting with `stg_` such as `stg_iceberg__products`, `stg_iceberg__orders`, etc., you can use the `--select` flag with `+`:
+
+<BashCode code="sidetrek run dbt run --select +stg_>" client:load />
+
+This is useful for example when you want to run all staging models.
+
+### Excluding A Model
+
+You can also exclude a specific model or a list of models using the `--exclude` flag.
+
+For example, you can run all models except `int_iceberg__denormalized_orders` model using the following command:
+
+<BashCode code="sidetrek run dbt run --exclude int_iceberg__denormalized_orders" client:load />

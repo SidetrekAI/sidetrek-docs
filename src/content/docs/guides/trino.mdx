@@ -1,0 +1,80 @@
+---
+title: Trino
+description: How to directly query data in Trino
+draft: false
+---
+import BashCode from '@/components/BashCode'
+
+# Trino CLI
+
+You can use Trino shell to query your Iceberg tables directly. This is useful when you want to inspect the data in your Iceberg tables for debugging or ad hoc queries.
+
+## How to Enter into Trino Shell
+
+In your console, run the following to enter into Trino shell:
+
+<BashCode code="sidetrek run trino shell" client:load />
+
+When you see `trino>`, you're in.
+
+## Trino Catalog/Schema
+
+The top level of Trino is the `catalog`. A catalog is a connector to a data source. For example, the `iceberg` catalog is a connector to the Iceberg tables in your project. This is like a database in Postgres.
+
+Inside a catalog, there are `schemas`. A schema is a namespace for tables - it's useful for grouping a bunch of tables. For example, the `raw` schema might contain the `orders` table and the `project_staging` schema might contain `stg_iceberg__orders` table. This is like a schema in Postgres.
+
+Finally inside a schema, there are `tables`.
+
+If you'd like to see a comparison of how Trino catalog/schema structure maps to other database systems, take a look at [Database/Schema Terminologies](/docs/concepts/database-schemas) docs.
+
+Now, let's list all the Trino catalogs (connectors) you have inside Trino shell:
+
+<BashCode code="show catalogs;" client:load />
+
+You should see the `iceberg` catalog.
+
+```plaintext
+ Catalog 
+---------
+ iceberg 
+ system  
+(2 rows)
+```
+
+You can also check all the available schemas inside the `iceberg` catalog.
+
+<BashCode code="show schemas in iceberg;" client:load />
+
+Let's query the number of rows in the table `stg_iceberg__orders` in the schema `project_staging` in the catalog `iceberg`. Run the following:
+
+<BashCode code="select count(*) from iceberg.project_staging.stg_iceberg__orders;" client:load />
+
+You'll see the output:
+
+```plaintext
+ _col0  
+---------
+ 1000000 
+(1 row)
+```
+
+It's cumbersome to have to type the catalog and schema name every time you want to query a table. You can set the default catalog and schema so you don't have to type them every time.
+
+<BashCode code="use iceberg.raw;" client:load />
+
+Instead of `trino>` you'll see `trino:raw>` on the terminal. Now you can view all the tables in this schema by running:
+
+<BashCode code="show tables;" client:load />
+
+You can also run any query you'd like in that schema:
+
+<BashCode code="select count(*) from orders;" client:load />
+
+And you should see the output:
+
+```plaintext
+ _col0  
+---------
+ 1000000 
+(1 row)
+```

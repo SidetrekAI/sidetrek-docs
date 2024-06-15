@@ -1,0 +1,15 @@
+---
+title: stop
+description: stop command reference for the Sidetrek CLI.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# stop
+
+The sidetrek stop command halts the core services of the Sidetrek project:
+
+<BashCode code="sidetrek stop" client:load />
+
+This command stops all services managed by Docker Compose, including Minio, Iceberg, and Trino.

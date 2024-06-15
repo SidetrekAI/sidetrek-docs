@@ -1,58 +1,60 @@
 ---
 import { Image } from 'astro:assets'
-import sidetrekLogo from '../images/logos/logo-0.svg'
-import githubIcon from '../images/icons/github.svg?raw'
-import { HEADER_HEIGHT } from '../lib/constants'
-import SideMenuMobile from './SideMenuMobile'
+import sidetrekLogo from '@/assets/images/logos/sidetrek.svg'
+import sidetrekShortLogo from '@/assets/images/logos/sidetrek-short.svg'
+import { HEADER_HEIGHT } from '@/lib/constants'
+import SideMenuMobile from '@/components/SideMenuMobile'
 import { sideMenuTree } from '@/layouts/Layout.astro'
-import { SearchBar } from './SearchBar'
+import { SearchBar } from '@/components/SearchBar'
+import { AiOutlineSlack, AiOutlineGithub } from 'react-icons/ai'
+import { ModeToggle } from '@/components/ModeToggle'
 
 const currentPath = Astro.url.pathname
 ---
 
-<header
-  class="fixed top-0 z-50 w-full flex justify-between items-center border-b border-slate-200 bg-white"
-  style={`height: ${HEADER_HEIGHT}px`}
->
-  <a href="/">
-    <Image src={sidetrekLogo} alt="Sidetrek logo" class="w-36 py-3 px-4" />
-  </a>
+<div class="relative w-full" style={`height: ${HEADER_HEIGHT}px`}>
+  <header
+    class="fixed top-0 z-50 w-full flex justify-between items-center border-b border-slate-200 bg-white"
+    style=`height: ${HEADER_HEIGHT}px`
+  >
+    <a href="https://sidetrek.com" class="hidden md:block shrink-0 md:px-4">
+      <Image src={sidetrekLogo} alt="Sidetrek logo" class="w-28 py-2" />
+    </a>
 
-  <div class="flex items-center py-3 px-4 space-x-6 md:space-x-12 text-sm">
-    <SearchBar client:load />
+    <a href="https://sidetrek.com" class="md:hidden shrink-0 px-4">
+      <Image src={sidetrekShortLogo} alt="Sidetrek logo mobile" class="w-6 py-2" />
+    </a>
 
-    <ul class="flex items-center space-x-6">
-      <li><a href="docs" class="text-slate-500 hover:text-slate-900">Docs</a></li>
-    </ul>
+    <div class="flex items-center py-2 px-4 space-x-4 md:space-x-8 text-sm">
+      <SearchBar client:load />
 
-    <div class="flex items-center">
-      <div class="w-5 h-5 flex justify-center items-center">
-        <a href="https://github.com/sidetrekAI" target="_blank">
-          <div class="text-slate-500 hover:text-slate-900">
-            <Fragment set:html={githubIcon} />
+      <ul class="flex items-center space-x-6">
+        <li><a href="/" class="text-slate-500 hover:text-slate-900">Docs</a></li>
+      </ul>
+
+      <div class="flex items-center">
+        <div class="flex items-center space-x-4 md:space-x-6">
+          <div class="w-5 h-5 flex justify-center items-center">
+            <a
+              href="https://join.slack.com/t/sidetrek-community/shared_invite/zt-2jt7qd46b-FmqAl3WSU~2uWtAFTXjj7A"
+              target="_blank"
+            >
+              <AiOutlineSlack className="text-2xl hover:text-slate-500" />
+            </a>
           </div>
-        </a>
-      </div>
-      <div class="block md:hidden -mr-3">
-        <SideMenuMobile tree={sideMenuTree} currentPath={currentPath} client:load />
+          <div class="w-5 h-5 flex justify-center items-center">
+            <a href="https://github.com/SidetrekAI/sidetrek-cli" target="_blank">
+              <AiOutlineGithub className="text-2xl hover:text-slate-500" />
+            </a>
+          </div>
+        </div>
+
+        <!-- <ModeToggle client:load /> -->
+
+        <div class="block md:hidden -mr-3">
+          <SideMenuMobile tree={sideMenuTree} currentPath={currentPath} client:load />
+        </div>
       </div>
     </div>
-  </div>
-</header>
-
-<script>
-  // Smooth scroll to anchor links
-  function smoothScroll(target: string) {
-    const element = document.getElementById(target.replace('#', ''))
-    if (element) {
-      window.scrollTo({
-        top: element.offsetTop - 60,
-        behavior: 'smooth',
-      })
-    }
-  }
-  document.addEventListener('DOMContentLoaded', function () {
-    const hash = window.location.hash
-    smoothScroll(hash)
-  })
-</script>
+  </header>
+</div>

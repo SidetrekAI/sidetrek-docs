@@ -1,11 +1,21 @@
 ---
 import '@/styles/globals.css'
-import '@fontsource/geist-sans'
-import { ViewTransitions } from "astro:transitions"
+import '@fontsource/geist-sans/100.css'
+import '@fontsource/geist-sans/200.css'
+import '@fontsource/geist-sans/300.css'
+import '@fontsource/geist-sans/400.css'
+import '@fontsource/geist-sans/500.css'
+import '@fontsource/geist-sans/600.css'
+import '@fontsource/geist-sans/700.css'
+import '@fontsource/geist-sans/800.css'
+import '@fontsource/geist-sans/900.css'
+import { ViewTransitions } from 'astro:transitions'
 import { fade } from 'astro:transitions'
 import Header from '@/components/Header.astro'
 import SideMenu from '@/components/SideMenu'
 import { HEADER_HEIGHT } from '@/lib/constants'
+import Footer from '@/components/Footer.astro'
+import type { Tree } from '@/lib/types'
 
 interface Props {
   title: string
@@ -16,95 +26,164 @@ const currentPath = Astro.url.pathname
 
 const { title, description } = Astro.props
 
-export const sideMenuTree = [
+export const sideMenuTree: Tree[] = [
   {
-    label: 'Start Here',
+    label: 'Get Started',
+    href: '/get-started',
     tree: [
       {
-        label: 'Getting Started',
-        href: '/start-here/getting-started',
+        label: 'Overview',
+        href: '/get-started/overview',
       },
       {
-        label: 'Why Sidetrek?',
-        href: '/start-here/why-sidetrek',
+        label: 'Step 1 - Install Sidetrek',
+        href: '/get-started/step-1-install-sidetrek',
       },
       {
-        label: 'Quickstart',
-        href: '/start-here/quickstart',
+        label: 'Step 2 - Initialize Your Project',
+        href: '/get-started/step-2-initialize-your-project',
+      },
+      {
+        label: 'Step 3 - Run Your Project',
+        href: '/get-started/step-3-run-your-project',
+      },
+      {
+        label: 'Step 4 - Explore Example',
+        href: '/get-started/step-4-explore-example',
       },
     ],
   },
   {
     label: 'Tutorials',
+    href: '/tutorials',
     tree: [
       {
-        label: 'Overview',
-        href: '/tutorials/overview',
-      },
-      {
-        label: 'BI Stack Example 1',
-        href: '/tutorials/bi-stack-1',
+        label: 'BI Stack Example (Iceberg)',
+        href: '/tutorials/bi-stack-example-iceberg',
       },
     ],
   },
   {
-    label: 'Basics',
+    label: 'Concepts',
+    href: '/concepts',
     tree: [
       {
         label: 'Project Structure',
-        href: '/basics/project-structure',
+        href: '/concepts/project-structure',
+      },
+      // {
+      //   label: 'Apache Iceberg Structure',
+      //   href: '/concepts/iceberg-structure',
+      // },
+      {
+        label: 'S3 File Structure',
+        href: '/concepts/s3-structure',
+      },
+      {
+        label: 'Database Schemas',
+        href: '/concepts/database-schemas',
       },
     ],
   },
   {
     label: 'Guides',
+    href: '/guides',
     tree: [
+      // {
+      //   label: 'Scheduling',
+      //   href: '/guides/scheduling',
+      // },
+      // {
+      //   label: 'Testing',
+      //   href: '/guides/testing',
+      // },
       {
-        label: 'Validation',
-        href: '/guides/validation',
+        label: 'Trino',
+        href: '/guides/trino',
       },
       {
-        label: 'Testing',
-        href: '/guides/testing',
+        label: 'Meltano',
+        href: '/guides/meltano',
       },
-    ],
-  },
-  {
-    label: 'API',
-    tree: [
       {
-        label: 'CLI Commands',
-        href: '/api/cli-commands',
+        label: 'DBT',
+        href: '/guides/dbt',
         tree: [
           {
-            label: 'init',
-            href: '/api/cli-commands/init',
+            label: 'DBT CLI',
+            href: '/guides/dbt/dbt-cli',
           },
           {
-            label: 'start',
-            href: '/api/cli-commands/start',
-          },
-          {
-            label: 'stop',
-            href: '/api/cli-commands/stop',
-          },
-          {
-            label: 'down',
-            href: '/api/cli-commands/down',
-          },
-          {
-            label: 'logs',
-            href: '/api/cli-commands/logs',
+            label: 'Inspect Generated SQL',
+            href: '/guides/dbt/inspect-generated-sql',
           },
         ],
       },
     ],
   },
+  {
+    label: 'API',
+    href: '/api',
+    tree: [
+      {
+        label: 'CLI Commands',
+        href: '/api/cli',
+        tree: [
+          {
+            label: 'init',
+            href: '/api/cli/init',
+          },
+          {
+            label: 'start',
+            href: '/api/cli/start',
+          },
+          {
+            label: 'stop',
+            href: '/api/cli/stop',
+          },
+          {
+            label: 'down',
+            href: '/api/cli/down',
+          },
+          {
+            label: 'logs',
+            href: '/api/cli/logs',
+          },
+          {
+            label: 'run',
+            href: '/api/cli/run',
+            tree: [
+              {
+                label: 'dbt *',
+                href: '/api/cli/run/dbt',
+              },
+              {
+                label: 'meltano *',
+                href: '/api/cli/run/meltano',
+              },
+              {
+                label: 'trino shell',
+                href: '/api/cli/run/trino',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  // {
+  //   label: 'Start Here',
+  //   tree: [
+  //     {
+  //       label: 'Quickstart',
+  //       href: '/start-here/quickstart',
+  //     },
+  //   ],
+  // },
 ]
 ---
-
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
@@ -117,11 +196,55 @@ export const sideMenuTree = [
   <body class="antialiased">
     <Header />
 
-    <div class="container mx-auto" style={`height: calc(100vh - ${HEADER_HEIGHT}px); margin-top: ${HEADER_HEIGHT}px`} transition:animate={fade({ duration: '0.1s' })}>
+    <div
+      class="container mx-auto h-max"
+      style={`min-height: calc(100vh - ${HEADER_HEIGHT}px);`}
+      transition:animate={fade({ duration: '0.1s' })}
+    >
       <div class="flex">
-        <div class="hidden md:block"><SideMenu tree={sideMenuTree} currentPath={currentPath} client:load /></div>
+        <div class="hidden md:block">
+          <SideMenu tree={sideMenuTree} currentPath={currentPath} client:load />
+        </div>
         <slot />
       </div>
     </div>
+
+    <Footer />
+
+    <script>
+      // Smooth scroll to hash value on page load
+      function smoothScroll(targetId: string) {
+        const element = document.getElementById(targetId)
+        if (element) {
+          window.scrollTo({
+            top: element.offsetTop - 20,
+            behavior: 'smooth',
+          })
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const hash = window.location.hash
+        smoothScroll(`#${hash}`)
+      })
+
+      // Light/dark theme toggle
+      const getThemePreference = () => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme')
+        }
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      }
+      const isDark = getThemePreference() === 'dark'
+      document.documentElement.classList[isDark ? 'add' : 'remove']('dark')
+
+      if (typeof localStorage !== 'undefined') {
+        const observer = new MutationObserver(() => {
+          const isDark = document.documentElement.classList.contains('dark')
+          localStorage.setItem('theme', isDark ? 'dark' : 'light')
+        })
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+      }
+    </script>
   </body>
 </html>

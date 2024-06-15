@@ -1,0 +1,116 @@
+---
+title: Database Structures
+description: Learn about the structure of various databases.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# Comparison of Database/Schema Terminologies
+
+Every database system has its own terminology and hierarchy to organize data. 
+
+Because there are many types of databases, it can be confusing to understand the structure of each one and how they compare.
+
+<MyAlert variant="info" title="Not all of these are databases" description="Some of the databases listed below are not technically databases at all. Trino, for example, is a query engine, not a database. But we'll include them here because understanding these terminologies are important for data querying." />
+
+This table provides a quick reference to the terminology and hierarchy for different database systems.
+
+| Database | Top Level | Middle Level | Bottom Level |
+| --- | --- | --- | --- |
+| PostgreSQL | Database | Schema | Table |
+| MySQL | Database | - | Table |
+| Trino | Catalog | Schema | Table |
+| Iceberg | Catalog | Namespace | Table |
+| MongoDB | Database | Collection | Document |
+| Oracle | Database | Schema | Table |
+| SQL Server | Database | Schema | Table |
+| Cassandra | Keyspace | - | Table |
+| Redis | Database | - | Key-Value |
+| S3 | Bucket | - | Object |
+| DuckDB | Database | Schema | Table |
+
+## Example 1 - Querying Postgres
+
+Since most data engineers are familiar with SQL databases, let's take Postgres as an example.
+
+There are many ways to access a Postgres database, but for simplicity, we'll use the `psql` command line tool.
+
+You can access the Postgres database from inside a container using the following command:
+
+<BashCode code="docker exec -it postgres-container psql -U postgres -d test_db" client:load />
+
+`postgres-container` is the container name for `postgresql`, `postgres` is the username and `test_db` is the database name. You'll see `test_db=#` at the beginning of the line on your console. You can run Postgres queries here.
+
+Run this command to see all the available schemas under a database.
+
+<BashCode code="test_db=# \dn" client:load />
+
+It will show all the schemas under the database:
+
+```plaintext
+         List of schemas
+  Name  |       Owner       
+--------+-------------------
+ public | pg_database_owner
+ raw    | admin
+(2 rows)
+```
+
+You can also run SQL queries to show the tables in the schema.
+
+<BashCode code="test_db=# \dt raw.*" client:load />
+
+It will show all the tables in the schema: 
+
+```plaintext
+        List of relations
+ Schema |  Name  | Type  | Owner 
+--------+--------+-------+-------
+ raw    | orders | table | admin
+(1 row)
+```
+
+You can run SQL queries to see the data in the tables.
+
+<BashCode code="test_db=# select * from raw.orders;" client:load />
+
+It will show all the data in the table:
+```plaintext
+ order_id |  order_created_at   | qty | product_id | customer_id | store_id 
+----------+---------------------+-----+------------+-------------+----------
+        1 | 2024-06-01 10:00:00 |   2 |        101 |        1001 |        1
+        2 | 2024-06-02 11:30:00 |   1 |        102 |        1002 |        1
+        3 | 2024-06-03 15:45:00 |   3 |        103 |        1003 |        2
+        4 | 2024-06-04 09:20:00 |   5 |        104 |        1004 |        2
+        5 | 2024-06-05 13:10:00 |   4 |        105 |        1005 |        3
+(5 rows)
+```
+
+## Example 2 - Querying using Trino
+
+As a second example, let's see how to query data in Trino.
+
+You can use Trino CLI to access Trino database.
+
+<BashCode code="sidetrek run trino shell" client:load />
+
+You'll see `trino>` at the beginning of the line on your console.
+
+To access the Iceberg table `orders` in the `raw` schema, you can first switch to the `raw` schema in `iceberg` catalog:
+
+<BashCode code="trino> use iceberg.raw;" client:load />
+
+Now you can run this command to see all the tables in the schema.
+
+<BashCode code="trino:raw> show tables;" client:load />
+
+```plaintext
+   Table   
+-----------
+ customers 
+ orders    
+ products  
+ stores    
+(4 rows)
+```

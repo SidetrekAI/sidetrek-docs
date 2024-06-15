@@ -1,0 +1,40 @@
+---
+title: run trino shell
+description: run trino shell command reference for the Sidetrek CLI.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# run trino shell
+
+The sidetrek run trino shell command launches the Trino CLI, allowing you to interactively run SQL queries against your Trino cluster. This command is essential for querying and analyzing your data directly within the Sidetrek environment.
+
+### Usage
+<BashCode code="sidetrek run trino shell" client:load />
+
+## Examples
+
+### Start Trino CLI:
+
+<BashCode code="sidetrek run trino shell" client:load />
+
+This command opens the Trino command-line interface.
+
+### Run a SQL query:
+
+Once in the Trino CLI, you can execute SQL queries such as:
+
+<BashCode code="SHOW CATALOGS;" client:load />
+
+This command retrieves all the catalogs in trino database.
+
+### Exiting Trino CLI
+To exit the Trino CLI, simply type:
+
+<BashCode code="EXIT;" client:load />
+
+
+or
+
+<BashCode code="QUIT;" client:load />

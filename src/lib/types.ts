@@ -1,5 +1,5 @@
 export interface Tree {
   label: string
-  href?: string
+  href: string
   tree?: Tree[]
 }

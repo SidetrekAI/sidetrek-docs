@@ -1,0 +1,244 @@
+---
+title: Sidetrek Project Structure
+description: Learn about the structure of a Sidetrek project.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# Sidetrek Project Structure
+
+Here's the overall structure of a Sidetrek project.
+
+<MyAlert variant="info" title='"your_project" placeholder' description='We use "your_project" as a placeholder for the name of your project.' />
+
+```plaintext
+your_project
+├── .venv
+├── .sidetrek
+├── superset
+├── trino
+├── your_project
+│   ├── __init__.py
+│   ├── dagster
+│   ├── data
+│   ├── dbt
+│   └── meltano
+├── .env
+├── .gitignore
+├── docker-compose.yaml
+├── poetry.lock
+├── pyproject.toml
+├── README.md
+└── sidetrek.config.yaml
+```
+
+### Root Directory
+
+- **.venv**: All your project dependencies are installed here. You may not see this directory here depending on your Poetry settings.
+- **.sidetrek**: Sidetrek-specific configurations and metadata. It's safe to push this directory to git.
+- **superset**: Superset files. Superset is managed separately from the rest of the project in this directory for easy replacement.
+- **trino**: Trino configuration files.
+- **your_project**: All your project code goes here.
+    - **init.py**: Initializes the `your_project` Python package.
+    - **dagster**: Contains Dagster project.
+    - **data**: Directory for example data files. Typically, you wouldn't want to store your data in this repository - this is just for example data.
+    - **dbt**: Contains DBT project.
+    - **meltano**: Contains Meltano project.
+- **.env**: Environment variables for the project.
+- **.gitignore**: Specifies files and directories to be ignored by Git.
+- **docker-compose.yaml**: Docker Compose file for core services like Trino, Iceberg, etc. Does NOT include Superset - that's managed separately in /superset directory.
+- **poetry.lock**: Lock file for Poetry managed dependencies.
+- **pyproject.toml**: Project configuration for Poetry.
+- **README.md**: Project overview and documentation.
+- **sidetrek.config.yaml**: Configuration file for Sidetrek.
+
+### Why is Trino and Superset Outside the Project Folder?
+
+Trino and Superset are not included within the "your_project" folder because they are deployed as separate services rather than being part of the project code. 
+
+These tools are independently managed and deployed, ensuring that any changes made to the user code do not affect their deployment. This separation allows for independent updates and maintenance of Trino and Superset without impacting the core project, making your data project more modular and manageable.
+
+### "dagster" Directory
+
+Contains Dagster project files.
+
+```plaintext
+your_project
+...
+└── your_project
+    ...
+    └── dagster
+        └── your_project
+            ├── .logs_queue
+            ├── .nux
+            ├── .telemetry
+            ├── history
+            │   ├── runs
+            │   └── runs.db
+            ├── logs
+            │   └── event.log
+            ├── schedules
+            │   └── schedules.db
+            ├── storage
+            │   ├── 8407b3f3-504d-4a32-91c2-b447a485dc5c
+            │   └── abe21850-81be-4de9-932a-017194e6ff35
+            ├── your_project
+            │   ├── __init__.py
+            │   ├── __pycache__
+            │   ├── assets.py
+            │   ├── dbt_assets.py
+            │   └── meltano.py
+            ├── your_project_tests
+            │   ├── __init__.py
+            │   └── test_assets.py
+            ├── .env
+            ├── .gitignore
+            ├── pyproject.toml
+            ├── README.md
+            ├── setup.cfg
+            └── setup.py
+```
+
+- **.logs_queue, .nux, .telemetry**: Dagster-specific metadata and configurations.
+- **history**: Stores historical data for runs.
+    - **runs**: Directory for individual run data.
+    - **runs.db**: SQLite database file for storing run history.
+- **logs**: Directory for logs.
+    - **event.log**: Log file for events.
+- **schedules**: Directory for schedule data.
+    - **schedules.db**: SQLite database for schedules.
+- **storage**: Directory for storage files.
+- **your_project**: Core Dagster project files.
+    - **init.py**: Initializes the `your_project` module.
+    - **assets.py, dbt_assets.py, meltano.py**: Python scripts defining various assets and integrations.
+- **your_project_tests**: Contains tests for the Dagster project.
+    - **init.py**: Initializes the `your_project_tests` module.
+    - **test_assets.py**: Test cases for the assets.
+- **.env**: Environment variables specific to Dagster.
+- **pyproject.toml, setup.cfg, setup.py**: Configuration files for Dagster project.
+
+### "data" Directory
+
+Contains example data files for the project.
+
+<MyAlert variant="warning" title="Do NOT put your actual data in this repository" description='Data is typically should not be kept in the data project - it should live in a proper storage elsewhere.' />
+
+```plaintext
+your_project
+...
+└── your_project
+    ...
+    └── data
+        └── example
+            ├── customers.csv
+            ├── orders.csv
+            ├── products.csv
+            └── stores.csv
+```
+
+### "dbt" Directory
+
+Contains DBT project files.
+
+```plaintext
+your_project
+...
+└── your_project
+    ...
+    └── dbt
+        ├── logs
+        └── your_project
+            ├── analyses
+            ├── dbt_packages
+            ├── logs
+            ├── macros
+            ├── models
+            │   ├── intermediate
+            │   ├── marts
+            │   └── staging
+            ├── seeds
+            ├── snapshots
+            ├── target
+            │   ├── compiled
+            │   ├── dbt.log
+            │   ├── dbt_project_assets-8407b3f-90ffd3b
+            │   ├── graph.gpickle
+            │   ├── graph_summary.json
+            │   ├── manifest.json
+            │   ├── partial_parse.msgpack
+            │   ├── perf_info.json
+            │   ├── run
+            │   ├── run_results.json
+            │   └── semantic_manifest.json
+            ├── tests
+            ├── .gitignore
+            ├── .user.yml
+            ├── dbt_project.yml
+            ├── profiles.yml
+            └── README.md
+
+```
+
+- **logs**: Directory for log files.
+- **your_project**: Core DBT project files.
+    - **analyses**: Directory for analyses.
+    - **dbt_packages**: Directory for DBT packages.
+    - **logs**: Log files for DBT operations.
+    - **macros**: Directory for DBT macros.
+    - **models**: Directory for DBT models.
+        - **intermediate, marts, staging**: Subdirectories for different stages of models.
+    - **seeds**: Directory for seed data.
+    - **snapshots**: Directory for snapshots.
+    - **target**: Directory for target files.
+        - **compiled, dbt.log, graph.gpickle, manifest.json, etc.**: Various files generated by DBT during runs.
+    - **tests**: Directory for tests.
+    - **dbt_project.yml**: DBT project configurations.
+    - **profiles.yml**: This is where you define your query engine adapter configurations (e.g. Trino).
+
+### "meltano" Directory
+
+Contains Meltano project files.
+
+```plaintext
+...
+└── your_project
+    ...
+    └── meltano
+        ├── .meltano
+        │   ├── analytics.json
+        │   ├── cache
+        │   ├── extractors
+        │   │   └── tap-csv
+        │   ├── loaders
+        │   │   └── target-iceberg
+        │   ├── logs
+        │   ├── meltano.db
+        │   └── run
+        │       ├── bin
+        │       └── meltano.yml.lock
+        ├── analyze
+        ├── extract
+        │   └── example_csv_files_def.json
+        ├── load
+        ├── notebook
+        ├── orchestrate
+        ├── output
+        ├── plugins
+        ├── transform
+        ├── .env
+        ├── .gitignore
+        ├── meltano.yml
+        ├── requirements.txt
+        └── README.md
+```
+
+- **.meltano**: This directory hosts Meltano generated files as well as virtual env for each extractor and loader.
+- **.env, .gitignore**: Environment variables and Git ignore file for Meltano.
+- **README.md**: Documentation for the Meltano project.
+- **analyze, extract, load, notebook, orchestrate, output**: Directories for different stages of ELT (Extract, Load, Transform) and analysis.
+    - For example, you can add "example_csv_files_def.json" to "extract" folder for defining files for the extractor "tap-csv"
+- **plugins**: Directory for Meltano plugins.
+- **transform**: Directory for transformation files.
+- **meltano.yml**: Main configuration file for Meltano.
+- **requirements.txt**: Meltano-specific dependencies.

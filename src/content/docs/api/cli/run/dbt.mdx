@@ -1,0 +1,35 @@
+---
+title: run dbt *
+description: run dbt * command reference for the Sidetrek CLI.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# run dbt *
+
+The sidetrek run dbt command allows you to execute DBT (Data Build Tool) commands within the Sidetrek environment. This command provides a convenient way to manage your DBT workflows without needing additional command prefixes.
+
+### Usage
+<BashCode code="sidetrek run meltano [command]" client:load />
+sidetrek run dbt [command]
+
+## Examples
+### Check DBT version:
+
+<BashCode code="sidetrek run dbt --version" client:load />
+
+This command outputs the current version of DBT installed in your Sidetrek environment.
+
+### Run DBT models:
+
+<BashCode code="sidetrek run dbt run" client:load />
+
+This command executes all models defined in your DBT project.
+
+### Compile DBT models:
+
+<BashCode code="sidetrek run dbt compile" client:load />
+
+This command compiles all DBT models and generates the compiled SQL files.
+

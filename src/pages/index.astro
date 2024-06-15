@@ -2,18 +2,19 @@
 import Layout from '@/layouts/Layout.astro'
 import Main from '@/components/Main.astro'
 import H1 from '@/components/H1.astro'
-import H2 from '@/components/H2.astro'
-import H3 from '@/components/H3.astro'
+import BashCode from '@/components/BashCode'
+import DownloadSidetrekTabs from '@/components/docs/DownloadSidetrekTabs'
+
+// Redirect to /get-started/overview
+const currentPath = Astro.url.pathname
+if (currentPath === '/') {
+  return Astro.redirect('/get-started/overview')
+}
+
 ---
 
 <Layout
   title="Sidetrek - the fastest way to build a modern data stack"
   description="Build a modern data stack in minutes using open-source tools"
 >
-  <Main>
-    <H1>What is Sidetrek?</H1>
-    <p>Sidetrek is the fastest way to build a modern data stack using open-source tools.</p>
-
-    <!-- <CodeBlock client:load>console.log('Hello world')</CodeBlock> -->
-  </Main>
-</Layout>
+ </Layout>
