@@ -63,8 +63,6 @@ Every time you want to restart the containers, run `sidetrek down` and then `sid
 
 Once, project is started successfully, you can see Dagster GUI at http://0.0.0.0:3000/
 
-![dagsterui](../../../assets/dagster-ui.png)
-
 ## About the Dataset
 
 We’ll work with a dataset consisting of 4 csv files:
@@ -210,15 +208,12 @@ defs = Definitions(
     
 Go to http://0.0.0.0:3000/ and after reloading you’ll see `run_csv_to_iceberg_meltano_job` added to the list of jobs. 
 
-![meltanojob](../../../assets/meltano-job.png)
 
 Click on the job, go to the tab Launchpad and click on Launch Run. The job will be run. 
 
-![meltanojobrun](../../../assets/meltano-job-launch.png)
 
 If the job is successfully run, you’ll see a new folder raw in your lakehouse, where you’ll see the 4 different tables written in iceberg table format.
 
-![minio-raw](../../../assets/minio-raw.png)
 
 >> 💡 Every time you make any change, reload the job on Dagster UI 
 
@@ -416,11 +411,9 @@ select * from source
 ```
 Test if the staging models are found on dagster Global Asset Lineage.
 
-![stagingassets](../../../assets/staging-assets.png)
 
 If the models are successfully materialized, you should see 4 table in project_staging schema.
 
-![miniostaging](../../../assets/minio-staging.png)
 
 ### Intermediate Models:
 
@@ -531,7 +524,6 @@ If the models are successfully materialized, you should see 4 table in project_s
     
 - Test if the intermediate models are found on dagster Global Asset Lineage and materialize them. You should see a de-normalized table in `project_intermediate` schema.
 
-![miniointermediate](../../../assets/minio-int.png)
 
 ### Marts Models:
 
@@ -689,11 +681,9 @@ If the models are successfully materialized, you should see 4 table in project_s
     
 - Test if the marts models are found on dagster Global Asset Lineage.
 
-![martsassets](../../../assets/marts-assets.png)
 
 If materialized successfully, you should see 4 analytics-ready tables in project_marts schema.
 
-![minio-marts](../../../assets/minio-marts.png)
 
 ## Data Visualization
 
@@ -701,7 +691,6 @@ If materialized successfully, you should see 4 analytics-ready tables in project
 
 Go to http://localhost:8088 and login with the username `admin` and password `admin`
 
-![supersetlogin](../../../assets/superset-login.png)
 
 ### Connect Database
 
@@ -725,58 +714,47 @@ Create a dashboard by going to http://localhost:8088/dashboard/list/ and clickin
     - Type: Line Chart
     - Columns: `order_created_at` and `COUNT(order_id)`
     - Description: The number of orders over time to visualize trends in order volume
-    ![orders-over-time](../../../assets/chart/1.jpg)
 - **Total Revenue by Category:**
     - Type: Bar Chart
     - Columns: `product_category` and `SUM(total_product_price)`
     - Description: The total sales for each product category to identify the top-selling categories.
-    ![categories-viz](../../../assets/chart/2.jpg)
 - **Customer Distribution by Country**
     - Type: World Map
     - Columns: `country` [full name] and `COUNT_DISTINCT(customer_id)`
     - Description: The distribution of customers by country to understand the geographic spread of your customer base.
-    ![customer-distribution](../../../assets/chart/3.jpg)
 - **Average Order Value Over Time:**
     - Type: Line Chart
     - Columns: `order_created_at` and `AVG(total_price_with_shipping)`
     - Description: The average order value over time to track changes in purchasing behavior.
-    ![order-value](../../../assets/chart/4.jpg)
 - **Customer Acquisition by Traffic Source:**
     - Type: Pie Chart
     - Columns: `traffic_source` and `COUNT(customer_id)`
     - Description: How customers are finding your store by visualizing the number of customers acquired from different traffic sources.
-    ![traffic-sources](../../../assets/chart/5.jpg)
 - **Average Customer Age by Gender:**
     - Type: Bar Chart
     - Columns: `gender` and `AVG(customer_age)`
     - Description: The customer ages by gender to understand the demographics of your customer base.
-    ![supersetchart](../../../assets/chart/6.jpg)
 - **Top 10 Highest Revenue Generating Referrers:**
     - Type: Table
     - Columns: `referrer` and `SUM(total_product_price)`
     - Description: The top 10 referrer with the highest total sales generated
-    ![supersetchart](../../../assets/chart/7.jpg)
 - **Payment Received by Payment Method:**
     - Type: Pie Chart
     - Columns: `payment_method` and `SUM(total_price_with_tax)`
     - Description: The total amount of payment received through payment methods
-    ![payment-methods](../../../assets/chart/8.jpg)
 - **Big Numbers:**
     - No. of Countries
     - No. of Customers
     - No. of Orders
     - Sales Generated
-    ![supersetchart](../../../assets/chart/9.jpg)
 
 ### Exporting/Importing Dashboards
 
 You can also export and import dashboards on Superset. To export a dashboard, go to http://localhost:8088/dashboard/list/ and find the `Export` icon in the Actions column of your preferred dashboard.
 
-![supersetexport](../../../assets/export-dashboard-icon.png)
 
 To import a dashboard, click on the `Import Dashboard` icon at the top-right corner, select file, and click on `Import`
 
-![supersetimport](../../../assets/import-dashboard-icon.png)
 
 You can download and import the dashboard and charts we are building in this quick example from here.
 <br />
