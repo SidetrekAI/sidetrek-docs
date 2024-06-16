@@ -1,8 +1,8 @@
-<img src="https://raw.githubusercontent.com/sidetrekAI/sidetrek-cli/master/.github/logo-tagline-light-svg.svg" width="100%"/>
+<img src="https://raw.githubusercontent.com/sidetrekAI/sidetrek/master/.github/logo-tagline-light-svg.svg" width="100%"/>
 
 <div align="center">
-<img src="https://img.shields.io/github/license/SidetrekAI/sidetrek-cli?color=%23866eea" style="max-width: 100%;" />
-<img src="https://img.shields.io/github/last-commit/SidetrekAI/sidetrek-cli?color=%23ff4d84&logo=github&logoColor=white" style="max-width: 100%;" />
+<img src="https://img.shields.io/github/license/SidetrekAI/sidetrek?color=%23866eea" style="max-width: 100%;" />
+<img src="https://img.shields.io/github/last-commit/SidetrekAI/sidetrek?color=%23ff4d84&logo=github&logoColor=white" style="max-width: 100%;" />
 <img src="https://img.shields.io/badge/python-v3.10%20%7C%20v3.11-black?logo=python&logoColor=yellow" style="max-width: 100%;" />
 <a href="https://join.slack.com/t/sidetrek-community/shared_invite/zt-2jt7qd46b-FmqAl3WSU~2uWtAFTXjj7A"><img src="https://img.shields.io/badge/slack-white?logo=slack&logoColor=red" style="max-width: 100%;" /></a>
 <a href="https://www.linkedin.com/company/35626712"><img src="https://img.shields.io/badge/linkedin-white?logo=linkedin&logoColor=blue" style="max-width: 100%;" /></a>
@@ -38,7 +38,7 @@ If you're new to Sidetrek, the best place to start is our [Get Started](https://
 
 ### Download and Install
 
-Download the latest release for your OS. After you install it, verify installation by checking the version
+Download the latest release for your OS. After you install it, verify installation by checking the version:
 
 ```bash
 sidetrek --version
@@ -52,15 +52,13 @@ Initialize a new project by simply running this command:
 sidetrek init
 ```
 
-It will ask you to select the Python version- v3.10 and v3.11, enter the project name, and select the data stack. Currently, we only have one data stack available.
+It will ask you to select the Python version, enter the project name, and select the data stack. Currently, we only have one data stack available.
 
-After pressing Enter, Sidetrek will start scaffolding your project and you'll see this message `You're all set - enjoy building your new data project! 🚀`
-
-You can load our demo project if you want to take inspiration.
+After pressing Enter, Sidetrek will start scaffolding your project and when it's done, you'll see the message `You're all set - enjoy building your new data project! 🚀`
 
 ### Start The Project
 
-Change working directory to your project directory by running `cd <project-name>`
+Change working directory to your project directory by running `cd <your_project>`
 
 Once you are in the project folder, run the following command:
 
@@ -68,7 +66,7 @@ Once you are in the project folder, run the following command:
 sidetrek start
 ```
 
-It will take a while to pull images when you run it for the first time.
+It will take a while to pull all the images when you run it for the first time, so please be patient!
 
 ## Data Stack
 
@@ -88,15 +86,21 @@ Your data project will include the following open-source tools:
 - 🔭 [Follow us on LinkedIn](https://www.linkedin.com/company/35626712)
 - 👋 [Join us on Slack](https://join.slack.com/t/sidetrek-community/shared_invite/zt-2jt7qd46b-FmqAl3WSU~2uWtAFTXjj7A)
 - ✏️ [Start a GitHub Discussion](https://github.com/SidetrekAI/sidetrek/discussions)
-- ✉️ [Contact us on our website](https://sidetrek-website.vercel.app/contact)
+- ✉️ [Contact us via email](https://sidetrek.com/contact)
 
-## How to Report An Issue
+## Contributions
 
 Contributions are welcome!
 
 We're also building a team here at Sidetrek and are always on the lookout for great contributors to join us.
 
+## Report an Issue
+
 To report an issue, please open a new issue in [Issues](https://github.com/SidetrekAI/sidetrek/issues).
+
+## Have questions?
+
+If you have any questions, feel free to reach out to us on [Slack](https://join.slack.com/t/sidetrek-community/shared_invite/zt-2jt7qd46b-FmqAl3WSU~2uWtAFTXjj7A), [Github](https://github.com/SidetrekAI/sidetrek) or [email](https://sidetrek.com/contact).
 
 ## License
 

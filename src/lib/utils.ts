@@ -30,7 +30,7 @@ export async function getShikiHtml({ lang, code, theme }: GetShikiHtmlArgs) {
 }
 
 export const getLatestSidetrekVersion = async () => {
-  const response = await fetch('https://api.github.com/repos/SidetrekAI/sidetrek-cli/releases/latest')
+  const response = await fetch('https://api.github.com/repos/SidetrekAI/sidetrek/releases/latest')
   const data = await response.json()
   return data?.tag_name
 }
