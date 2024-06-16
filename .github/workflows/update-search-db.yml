@@ -34,7 +34,7 @@ jobs:
           bun-version: "latest"
       - name: Update search DB
         run: pnpm run update-search-db
-        with:
+        env:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           WEAVIATE_API_KEY: ${{ secrets.WEAVIATE_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
