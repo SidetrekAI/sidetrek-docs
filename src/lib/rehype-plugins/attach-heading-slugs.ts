@@ -13,7 +13,7 @@ export const attachHeadingSlugsPlugin: RehypePlugin = () => {
       const headingTextNodeValue = headingTextNode?.value
       const slug = slugify(headingTextNodeValue)
 
-      node.data = { ...node.data, id: slug }
+      node.properties = { ...node.properties, id: slug }
     })
   }
 }
