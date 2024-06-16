@@ -19,6 +19,8 @@ jobs:
           fetch-depth: 0
       - name: Install pnpm
         uses: pnpm/action-setup@v3
+        with:
+          version: 9
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
@@ -28,5 +30,7 @@ jobs:
         run: pnpm install
       - name: Set up bun
         uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: "latest"
       - name: Update search DB
         run: pnpm run update-search-db

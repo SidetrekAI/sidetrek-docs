@@ -2,19 +2,45 @@
 import Layout from '@/layouts/Layout.astro'
 import Main from '@/components/Main.astro'
 import H1 from '@/components/H1.astro'
+import H2 from '@/components/H2.astro'
+import A from '@/components/mdx/A.astro'
 import BashCode from '@/components/BashCode'
-import DownloadSidetrekTabs from '@/components/docs/DownloadSidetrekTabs'
-
-// Redirect to /get-started/overview
-const currentPath = Astro.url.pathname
-if (currentPath === '/') {
-  return Astro.redirect('/get-started/overview')
-}
-
+import { Button } from '@/components/ui/button'
 ---
 
 <Layout
-  title="Sidetrek - the fastest way to build a modern data stack"
+  title="Sidetrek - the fastest way to build a modern data stack using open-source tools"
   description="Build a modern data stack in minutes using open-source tools"
 >
- </Layout>
+  <div class="md:flex min-w-0 w-full h-full">
+    <Main>
+      <div class="bg-indigo-50 rounded-md px-8 pt-2 pb-8 mb-10">
+        <div class="mb-4">
+          <H1>Sidetrek Docs</H1>
+          <div class="text-lg mb-6">
+            <div class="mb-3">Sidetrek is the fastest way to build a modern data stack using open-source tools.</div>
+            <div>Start your next data project in minutes.</div>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <Button><a href="/get-started/overview">Get Started</a></Button>
+          <Button variant="outline"><a href="/get-started/step-1-install-sidetrek">Install</a></Button>
+        </div>
+      </div>
+
+      <div>
+        <H2>Have questions?</H2>
+        <div>
+          If you have any questions, feel free to reach out to us on <A
+            href="https://join.slack.com/t/sidetrek-community/shared_invite/zt-2jt7qd46b-FmqAl3WSU~2uWtAFTXjj7A"
+            target="_blank">Slack</A
+          >, <A href="https://github.com/SidetrekAI/sidetrek-cli" target="_blank">Github</A> or <A
+            href="https://sidetrek.com/contact"
+            target="_blank">email</A
+          >
+        </div>
+      </div>
+    </Main>
+  </div>
+</Layout>

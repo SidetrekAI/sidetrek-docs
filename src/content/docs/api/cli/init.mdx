@@ -6,15 +6,38 @@ draft: false
 import BashCode from '@/components/BashCode'
 import MyAlert from '@/components/MyAlert'
 
-# init
+# sidetrek init
 
-The `init` command initializes a new Sidetrek project in the current directory by performing the following steps:
+The `sidetrek init` command initializes a new Sidetrek project in the current directory.
 
-* Creates a new Poetry project: Initializes a new Python project using Poetry, a dependency management tool.
+You don't need to create a new directory before running this command. The CLI will create a new directory for you.
 
-* Installs required libraries: Pip installs all necessary libraries for Dagster, Meltano, DBT, and establishes connections between them within the project environment.
+## Usage
 
-* Generates docker-compose file: Creates a docker-compose.yml file in the project root, configuring core services such as Minio, Iceberg (with Iceberg REST catalog and PostgreSQL backend), and Trino.
+<BashCode code="sidetrek init" client:load />
 
-* Sets up Superset: Creates a directory for Superset and clones the latest version, enabling seamless integration for data visualization needs.
+## What's Happening Underneath
 
+`sidetrek init` command does a few things under the hood:
+- It creates a new Poetry project.
+- Inside the new project, it `pip install`s all required libraries for Dagster, Meltano, DBT, and the necessary connections between them.
+- In the project root, it creates a docker-compose file with all the core services: Minio, Iceberg (i.e. Iceberg REST catalog and Postgres backing the catalog), and Trino.
+- It creates a new directory for Superset and clones the latest version.
+
+
+Here's the project structure you should see after running `sidetrek init`:
+
+```plaintext
+your_project
+├── .sidetrek
+├── .venv
+├── superset
+├── trino
+└── your_project
+    ├── dagster
+    ├── data
+    ├── dbt
+    └── meltano
+```
+
+For more details about the project structure, please refer to the [Project Structure](/concepts/project-structure) documentation.

@@ -93,16 +93,14 @@ const getAllDocFilepaths = async (): Promise<string[]> => {
   }
 
   // Filter out drafts
-  const publishableDocFiles = allDocFiles.filter((file) => {
-    const _path = `src/content/docs/${file}`
-    const content = fs.readFileSync(`./${_path}`, 'utf-8').toString()
-    const isDraft = R.compose(
-      R.includes('draft: true') as any,
-      R.nth(1),
-      R.split('---'),
-    )(content)
-    return !isDraft
-  })
+  const publishableDocFiles = allDocFiles
+    .filter((file) => {
+      const _path = `src/content/docs/${file}`
+      const content = fs.readFileSync(`./${_path}`, 'utf-8').toString()
+      const isDraft = R.compose(R.includes('draft: true') as any, R.nth(1), R.split('---'))(content)
+      return !isDraft
+    })
+    .map((file) => `src/content/docs/${file}`)
 
   return publishableDocFiles
 }
@@ -219,8 +217,6 @@ const main = async () => {
    */
   const allDocFilepaths = await getAllDocFilepaths()
   console.log('allDocFilepaths', allDocFilepaths)
-
-  return
 
   const changedDocFilepaths = await getChangedDocFilepaths()
   console.log('changedDocFilepaths', changedDocFilepaths)

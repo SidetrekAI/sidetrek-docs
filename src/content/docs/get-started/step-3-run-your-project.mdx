@@ -34,6 +34,7 @@ Once everything is running, you can access the Dagster dashboard at [http://loca
 ### What's Happening Underneath?
 
 Underneath, all this command is doing is running three separate commands:
+
 1. `dagster dev` to start the Dagster server - this runs the user code (Dagster, Meltano, and DBT).
 2. `docker-compose up -d` in the project root to run Minio, Iceberg, and Trino in the background.
 3. `docker-compose up -d` inside superset directory to run Superset in the background.
@@ -41,8 +42,6 @@ Underneath, all this command is doing is running three separate commands:
 The step 1 runs all your user code. The step 2 runs all other core services for your data pipeline. 
 
 The step 3 runs Superset separately because it's not part of the core data pipeline. This way you can easily swap it out for another data visualization solution. 
-
-{/* For more details, please refer to the [Project Structure](/concepts/project-structure) documentation. */}
 
 ### Common Issues
 
