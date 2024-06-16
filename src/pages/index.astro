@@ -4,17 +4,11 @@ import Main from '@/components/Main.astro'
 import H1 from '@/components/H1.astro'
 import BashCode from '@/components/BashCode'
 import DownloadSidetrekTabs from '@/components/docs/DownloadSidetrekTabs'
-
-// Redirect to /get-started/overview
-const currentPath = Astro.url.pathname
-if (currentPath === '/') {
-  return Astro.redirect('/get-started/overview')
-}
-
 ---
 
 <Layout
-  title="Sidetrek - the fastest way to build a modern data stack"
+  title="Sidetrek - the fastest way to build a modern data stack using open-source tools"
   description="Build a modern data stack in minutes using open-source tools"
 >
+
  </Layout>
