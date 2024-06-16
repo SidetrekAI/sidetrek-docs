@@ -38,7 +38,7 @@ If you're new to Sidetrek, the best place to start is our [Get Started](https://
 
 ### Download and Install
 
-Download the latest release for your OS. After you install it, verify installation by checking the version
+Download the latest release for your OS. After you install it, verify installation by checking the version:
 
 ```bash
 sidetrek --version
