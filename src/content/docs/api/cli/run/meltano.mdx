@@ -1,27 +1,37 @@
 ---
-title: run meltano *
-description: run meltano * command reference for the Sidetrek CLI.
+title: sidetrek run meltano *
+description: sidetrek run meltano * command reference for the Sidetrek CLI.
 draft: false
 ---
 import BashCode from '@/components/BashCode'
 import MyAlert from '@/components/MyAlert'
 
-# run meltano *
+# sidetrek run meltano *
 
-The sidetrek run meltano command allows you to run any Meltano command within the Sidetrek environment. This eliminates the need to prefix your Meltano commands with poetry run. It streamlines your workflow by directly invoking Meltano commands through Sidetrek.
+The `sidetrek run dbt *` command allows you to execute Meltano commands within your project virtual environment and in the right directory (Meltano project root). 
 
-### Usage
-<BashCode code="sidetrek run meltano [command]" client:load />
+## What's Happening Underneath?
+
+This command provides a convenient way to run Meltano CLI commands without having to move into Meltano project directory and activating virtual environment.
+
+It's identical to running:
+
+<BashCode code="cd your_project/meltano && poetry run meltano *" client:load />
+
+## Usage
+
+<BashCode code="sidetrek run meltano <any meltano command and options>" client:load />
 
 ## Examples
-### Check Meltano version:
 
-<BashCode code="sidetrek run meltano --version" client:load />
+### Check Meltano Version
 
 This command outputs the current version of Meltano installed in your Sidetrek environment.
 
-### Add a new extractor:
+<BashCode code="sidetrek run meltano --version" client:load />
+
+### Add a New Extractor
+
+This command adds the `tap-github` extractor to your Meltano project.
 
 <BashCode code="sidetrek run meltano add extractor tap-github" client:load />
-
-This command adds the tap-github extractor to your Meltano project.

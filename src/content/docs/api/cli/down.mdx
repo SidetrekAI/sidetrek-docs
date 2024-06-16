@@ -6,10 +6,22 @@ draft: false
 import BashCode from '@/components/BashCode'
 import MyAlert from '@/components/MyAlert'
 
-# down
+# sidetrek down
 
-The sidetrek down command shuts down and removes all Sidetrek services:
+The `sidetrek down` command stops and removes all running docker containers including Minio, Iceberg, Trino, and Superset as well as removing the docker compose networks.
+
+## Usage
 
 <BashCode code="sidetrek down" client:load />
 
-Running this command stops and deletes all Docker containers and networks associated with the Sidetrek project.
+## What's Happening Underneath?
+
+This command is identical to running `docker compose down` in the project root and `docker compose down` in the `superset` directory.
+
+It's simply running:
+
+<BashCode code="docker compose down" client:load />
+
+And:
+
+<BashCode code="cd superset && docker compose down" client:load />

@@ -6,15 +6,45 @@ draft: false
 import BashCode from '@/components/BashCode'
 import MyAlert from '@/components/MyAlert'
 
-# logs
+# sidetrek logs
 
-The sidetrek logs command allows viewing logs for specific services:
+The `sidetrek logs` command allows viewing logs for any service that's running.
 
-<BashCode code="sidetrek logs [options] [string]" client:load />
+## Usage
 
-Select a service when prompted to view its logs. For example, to view Trino logs:
+<BashCode code="sidetrek logs" client:load />
+
+Or you can specify a service to view its logs:
+
+<BashCode code="sidetrek logs [service]" client:load />
+
+## What's Happening Underneath
+
+For most of the core services that's running in project root (like Minio, Iceberg, and Trino), it's identical to running:
+
+<BashCode code="docker compose logs [service]" client:load />
+
+For Superset, it's identical to running:
+
+<BashCode code="cd superset && docker compose logs" client:load />
+
+## Examples
+
+Simply run `sidetrek logs`:
+
+<BashCode code="sidetrek logs" client:load />
+
+You'll be prompted to select a service to view the logs for:
 
 ```plaintext
 Which service would you like to view the logs for?
 > trino
 ```
+
+Pick the service you want to view logs for and press Enter to view the logs.
+
+Or you can specify a service to view its logs directly:
+
+<BashCode code="sidetrek logs trino" client:load />
+
+This command will show the logs for the running Trino docker container.
