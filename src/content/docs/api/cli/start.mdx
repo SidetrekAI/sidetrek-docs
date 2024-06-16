@@ -6,10 +6,28 @@ draft: false
 import BashCode from '@/components/BashCode'
 import MyAlert from '@/components/MyAlert'
 
-# start
+# sidetrek start
 
-The sidetrek start command initiates the Sidetrek project by executing three separate commands:
+The `sidetrek start` command starts all the services required to run your data project. This includes the Dagster server, Minio, Iceberg, Trino, and Superset.
 
-1. `dagster dev`: Starts the Dagster server, which executes user-defined code for Dagster, Meltano, and DBT.
-2. `docker-compose up -d` (project root): Launches Minio, Iceberg, and Trino in the background using the docker-compose.yml file generated during initialization.
-3. `docker-compose up -d` (Superset directory): Starts Superset in the background by running docker-compose up -d within the Superset directory.
+## Usage
+
+<BashCode code="sidetrek start" client:load />
+
+## What's Happening Underneath?
+
+Underneath, all this command is doing is running three separate commands:
+
+1. `dagster dev` to start the Dagster server - this runs the user code (Dagster, Meltano, and DBT).
+2. `docker-compose up -d` in the project root to run Minio, Iceberg, and Trino in the background.
+3. `docker-compose up -d` inside superset directory to run Superset in the background.
+
+The step 1 runs all your user code. This includes Dagster, Meltano, and DBT. 
+
+We do not run this part in Docker for performance and debugging reasons. Since you need to interate quickly on your code, it's faster to run it directly on your machine and also less hassle to debug.
+
+The step 2 runs all other core services for your data pipeline. These include Minio, Iceberg, and Trino. 
+
+These core services are run inside Docker containers because they do not change often and you run into fewer environment related issues.
+
+The step 3 runs Superset separately because it's not part of the core data pipeline. This way you can easily swap it out for another data visualization solution. 

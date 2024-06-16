@@ -1,40 +1,49 @@
 ---
-title: run trino shell
-description: run trino shell command reference for the Sidetrek CLI.
+title: sidetrek run trino shell
+description: sidetrek run trino shell command reference for the Sidetrek CLI.
 draft: false
 ---
 import BashCode from '@/components/BashCode'
 import MyAlert from '@/components/MyAlert'
 
-# run trino shell
+# sidetrek run trino shell
 
-The sidetrek run trino shell command launches the Trino CLI, allowing you to interactively run SQL queries against your Trino cluster. This command is essential for querying and analyzing your data directly within the Sidetrek environment.
+The `sidetrek run trino shell` command puts you in the Trino shell, allowing you to interactively run SQL queries against your local Trino cluster. 
 
-### Usage
+It's convenient when you want to directly query Iceberg tables for debugging or ad hoc queries, for example.
+
+## Usage
+
 <BashCode code="sidetrek run trino shell" client:load />
+
+## What's Happening Underneath?
+
+It's identical to running:
+
+<BashCode code="docker exec -it trino trino" client:load />
 
 ## Examples
 
-### Start Trino CLI:
+### Enter Trino Shell
 
 <BashCode code="sidetrek run trino shell" client:load />
 
 This command opens the Trino command-line interface.
 
-### Run a SQL query:
+### Run a SQL Query:
 
-Once in the Trino CLI, you can execute SQL queries such as:
+Once in the Trino CLI, you can execute SQL queries.
 
-<BashCode code="SHOW CATALOGS;" client:load />
+For example, this command retrieves all the catalogs in trino database.
 
-This command retrieves all the catalogs in trino database.
+<BashCode code="show catalogs;" client:load />
 
-### Exiting Trino CLI
+### Exit Trino Shell
+
 To exit the Trino CLI, simply type:
 
-<BashCode code="EXIT;" client:load />
+<BashCode code="exit;" client:load />
 
+Or:
 
-or
-
-<BashCode code="QUIT;" client:load />
+<BashCode code="quit;" client:load />

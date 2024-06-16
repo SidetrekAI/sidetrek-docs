@@ -6,10 +6,22 @@ draft: false
 import BashCode from '@/components/BashCode'
 import MyAlert from '@/components/MyAlert'
 
-# stop
+# sidetrek stop
 
-The sidetrek stop command halts the core services of the Sidetrek project:
+The `sidetrek stop` command stops all running docker containers.
+
+## Usage
 
 <BashCode code="sidetrek stop" client:load />
 
-This command stops all services managed by Docker Compose, including Minio, Iceberg, and Trino.
+## What's Happening Underneath?
+
+This command stops all running docker containers including Minio, Iceberg, Trino, and Superset.
+
+It's simply running:
+
+<BashCode code="docker compose stop" client:load />
+
+And:
+
+<BashCode code="cd superset && docker compose stop" client:load />
