@@ -50,6 +50,9 @@ export const TreeComponent = ({ tree, level = 0, currentPath }: GetTreeArgs) => 
         const subtree = treeItem.tree
         const pathname = treeItem.href
         const isActive = pathname === currentPath
+        console.log('pathname', pathname)
+        console.log('currentPath', currentPath)
+        console.log('isActive', isActive)
         const isExpanded = expanded?.[pathname]
 
         if (subtree) {
