@@ -206,7 +206,7 @@ It requires AWS credentials, an S3 endpoint (which is a Minio endpoint in our ca
 
 Iceberg is a table format that sits on top of a physical storage layer like S3. When you load data into Iceberg tables, the actual data is stored as files in S3, and Iceberg specifies how those files are organized into tables we're familiar with.
 
-In essence, Iceberg makes object storage like S3 work like a relational database or data warehouse.
+In essence, Iceberg turns object storage like S3 into a data warehouse.
 
 This is why this loader requires AWS credentials and a Minio endpoint, not just Iceberg configurations.
 
