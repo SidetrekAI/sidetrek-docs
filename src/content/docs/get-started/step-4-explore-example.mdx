@@ -167,7 +167,7 @@ You'll see the job starts running. It might take a couple of minutes to finish t
 
 ![meltano-job-run-success](@/assets/docs/step-4-explore-example/1c.jpg)
 
-If the job is run successfully, you'll see the 4 different tables written inside Minio's `raw` prefix (which maps to `raw` Trino schema). 
+If the job is run successfully, you'll see the 4 different tables written inside Minio's `raw` directory (i.e. prefix).
 
 Check it out in Minio by going to http://localhost:9000 and logging in with the username `admin` and password `admin_secret`.
 
@@ -177,7 +177,7 @@ Check it out in Minio by going to http://localhost:9000 and logging in with the 
 
 ### Inspect the Iceberg Tables with Trino
 
-We can see that there's data in the Minio storage, but we can't actually query the data in Minio. How many rows are in each table? What data is in there?
+We can see that there's data in Minio, but we can't actually query the data directly from Minio. How many rows are in each table? What data is in there?
 
 This is where Trino comes in - we can actually query our Iceberg tables and inspect them using our query engine, Trino.
 
@@ -247,13 +247,13 @@ your_project
     └── meltano
 ```
 
-Before we actually run the transformations, note that our DBT "models" (i.e. tables) are organized in three stages: staging, intermediate, and mart. 
+Before we actually run the transformations, note that our DBT "models" (i.e. tables) are organized in three stages: staging, intermediate, and marts. 
 
 - **Staging**: This is where we create atomic tables from the raw data. You can think of each of these tables as the most basic unit of data — an atomic building block we'll later compose together to build more complex SQL queries. This makes our SQL code more modular.
 - **Intermediate**: This is where we compose a bunch of atomic tables from the staging stage to create more complex tables. You can think of this stage as an intermediate step between the modular tables in the staging stage and the final, business-conformed tables in the marts stage.
 - **Marts**: This is where you have the final, business-conformed data ready for analytics. Each mart is typically designed to be consumed by a specific function in the business, such as the finance team, marketing team, etc.
 
-All these DBT models are imported into Dagster so we can automate them (schedule them, for example). When we import DBT models, they're called "assets" in Dagster.
+All these DBT models are imported into Dagster so we can automate them (schedule them, for example). When we import DBT models in Dagster, they are imported as Dagster "assets".
 
 You can see all the DBT assets in Global Asset Lineage section of the Dagster dashboard:
 
@@ -262,11 +262,11 @@ You can see all the DBT assets in Global Asset Lineage section of the Dagster da
 
 ![dbt-assets-lineage-dagster](@/assets/docs/step-4-explore-example/8a.jpg)
 
-In the global asset lineage view, click "Materialize all" to execute the DBT transformations (underneath, Trino is executing these DBT queries). Of course, in a production environment, you might want to schedule them instead of manually triggering them.
+In the global asset lineage view, click "Materialize all" to execute the DBT transformations (underneath, Trino is executing these DBT queries). Of course, in a production environment, you might want to schedule them instead of manually triggering them as we're doing now.
 
 ![dbt-assets-lineage-dagster](@/assets/docs/step-4-explore-example/8b.jpg)
 
-If the materialization was successful, you should see 3 analytics-ready tables in `project_marts` prefix in minio.
+If the materialization was successful, you should see 3 analytics-ready tables in `project_marts` directory (i.e. prefix) in minio.
 
 ![marts-tables-minio](@/assets/docs/step-4-explore-example/10.jpg)
 
@@ -297,7 +297,7 @@ Let's configure Superset to connect to Trino so we can visualize the data.
 
 Go to the Superset dashboard at http://localhost:8088 and log in with the username `admin` and password `admin`.
 
-You can change the username and password in the `docker-init.sh` file inside the `superset/docker` directory:
+If you'd like, you can change the username and password in the `docker-init.sh` file inside the `superset/docker` directory:
 
 ```plaintext title="superset/docker/docker-init.sh" {2, 7}
 ...
@@ -313,7 +313,7 @@ superset fab create-admin \
               --password $ADMIN_PASSWORD
 ```
 
-### Add Trino as a Database Connection in Superset (Step 3)
+### Add Trino as a Database Connection in Superset
 
 Now we need to add Trino as a database connection in Superset.
 
@@ -337,9 +337,9 @@ Trino should now be connected to Superset.
 
 ### Add an Example Dashboard
 
-Now that we've connected Superset to Trino, let's add an example dashboard.
+Now that we've connected Superset to Trino, let's add an example dashboard we created for you.
 
-1. First download the example dashboard we created for you [here](https://docs.sidetrek.com/superset/demo_dashboard.zip).
+1. First download the example dashboard [here](https://docs.sidetrek.com/superset/demo_dashboard.zip).
 2. Go to the "Dashboards" tab and click on the Import Dashboard icon at the top-right corner.
 
 ![superset-import-module](@/assets/docs/step-4-explore-example/12a.jpg)
