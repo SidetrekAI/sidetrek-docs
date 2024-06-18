@@ -3,6 +3,7 @@ title: Install Sidetrek
 description: Install Sidetrek
 draft: false
 ---
+import A from '@/components/mdx/A.astro'
 import SubH1 from '@/components/SubH1.astro'
 import { Button } from '@/components/ui/button'
 import BashCode from '@/components/BashCode'
@@ -35,6 +36,12 @@ To verify that Sidetrek has been installed correctly, run the following command 
 You should see: 
 
 <BashCode code={await getLatestSidetrekVersion()} plaintext={true} client:load />
+
+## Updating Sidetrek
+
+To update Sidetrek to the latest version, you simply need to run the install command again:
+
+<DownloadSidetrekTabs client:load />
 
 ## Next Steps
 

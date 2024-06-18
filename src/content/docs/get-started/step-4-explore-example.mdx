@@ -3,11 +3,13 @@ title: Explore the example project
 description: Explore the example project
 draft: false
 ---
+import A from '@/components/mdx/A.astro'
 import SubH1 from '@/components/SubH1.astro'
 import { Button } from '@/components/ui/button'
 import BashCode from '@/components/BashCode'
 import MyAlert from '@/components/MyAlert'
-
+import MyAccordion from '@/components/MyAccordion'
+ 
 # Explore the Example Project
 
 <SubH1>Let's take a look at the example project.</SubH1>
@@ -25,18 +27,39 @@ This stack consists of the following tools:
 
 All these tools are pre-configured for you in the example project. But the data pipeline still needs to be run in order for the example data to flow through the pipeline so you can visualize them.
 
-In this guide, we'll walk you through how to run the data pipeline and visualize the data in Superset.
+In this guide, we'll walk you through how to run the example data pipeline and visualize the data in Superset.
+
+Note that we're going to fly through these steps - if you're not familiar with all the tools in our stack, we strongly recommend checking out our in-depth [BI Stack Example Tutorial](/tutorials/bi-stack-example-iceberg).
 
 ## TLDR; Summary of the Required Steps
 
-- *[Step 1](#running-meltano-ingestion-in-dagster-step-1)*: Run the Meltano ingestion job in Dagster to load the data into Iceberg tables.
-- *[Step 2](#running-dbt-transformations-in-dagster-step-2)*: Run the DBT transformations in Dagster
-- *[Step 3](#adding-trino-as-a-database-connection-in-superset-step-3)*: Add Trino as a database connection in Superset
-- *[Step 4](#adding-an-example-dashboard-step-4)*: Add an example dashboard in Superset
+- *[Step 1](#step-1-data-ingestion)*: Run the Meltano ingestion job in Dagster to load the example data into Iceberg tables.
+- *[Step 2](#step-2-data-transformation)*: Run the DBT transformations in Dagster.
+- *[Step 3](#step-3-data-visualization)*: Add Trino as a database connection in Superset and add an example dashboard.
 
-## The Dataset
+## Some Context
 
-We've included a simple dataset with four tables: `orders`, `customers`, `products`, and `stores`. This emulates the typical e-commerce data.
+Before we go through these steps to run the example project, let's quickly look at our data pipeline architecture and example dataset.
+
+### Data Pipeline Architecture
+
+The data pipeline consists of five components:
+
+1. **Data Ingestion**: First, we extract the data from our source systems (in our example, that's the example CSV files) and load them into our storage (Minio + Iceberg) using Meltano.
+2. **Data Storage**: This is where all the data is stored. We're using Minio as a local replacement for S3 and Iceberg as the table format on top of Minio.
+3. **Data Transformation**: Once the raw data is in our storage, we transform them into analytics-ready tables using DBT and Trino.
+4. **Orchestration**: All the above steps are orchestrated by our orchestrator, Dagster.
+5. **Data Visualization**: Finally we visualize our data in Superset.
+
+To sum up:
+
+Data sources (e.g. CSV files) -> Ingestion (Meltano) -> Storage (Minio + Iceberg) -> Transformation (DBT + Trino) -> Visualization (Superset)
+
+...all orchestrated by Dagster.
+
+### The Dataset
+
+We've included a simple dataset with four tables: `orders` (100k rows), `customers` (20k rows), `products` (2k rows), and `stores` (200 rows). This emulates the typical e-commerce data.
 
 Each table has its own csv file in the `/your_project/data` directory.
 
@@ -109,11 +132,13 @@ Each table has its own csv file in the `/your_project/data` directory.
 </div>
 </div>
 
-## Data Ingestion
+## Step 1: Data Ingestion
+
+OK, let's run the ingestion process to load the example data into our storage (i.e. Iceberg tables).
 
 Data ingestion is handled by Meltano. Meltano is a managed connector with hundreds of pre-built connectors to popular data sources and targets. Essentially, it handles the EL ("Extract, Load") part of the ELT process.
 
-As a quick reminder, here's where Meltano fits into the project structure:
+As a quick reminder, here's where Meltano is in the project structure:
 
 ```plaintext {10}
 your_project
@@ -128,61 +153,7 @@ your_project
     └── meltano
 ```
 
-### Meltano Extractor and Loader
-
-To use Meltano to ingest data, you need to set up two things: 1) an extractor ("tap") and 2) a loader ("target").
-
-<MyAlert variant="info" title="Taps and Targets?" description='Meltano follows the Singer protocol for their extractors and loaders. In the Singer protocol, extractors are called "taps" and loaders are called "targets".' />
-
-In our example project, our data is stored in CSV files and we want to load that data into Iceberg tables, so we're using the `tap-csv` extractor and `target-iceberg` loader.
-
-Note that currently, there is no official Meltano target for Iceberg, so we've created a custom target. This is also open-source, so feel free to check out the source code [here](https://github.com/SidetrekAI/target-iceberg).
-
-<MyAlert variant="warning" title="Currently, `target-iceberg` only supports APPEND operation!" description="`target-iceberg` implements pyiceberg underneath and it does not yet support merge operation for incremental ingestion. All data is appended during ingestion so if you need to do any deduping, you'll have to do it during the transformation stage." />
-
-#### Deduping
-
-Because `target-iceberg` currently only supports APPEND operation, you will probably want to dedupe the data during the `staging` stage of the DBT transformation. 
-
-This way you can make sure the ingestion process is idempotent (i.e. you can run it multiple times with the same result). 
-
-The example code already includes deduping logic in the `staging` stage, but if you'd like more details on this, see the [Deduping](/tutorial/bi-stack-example-iceberg#deduping) section in the BI stack tutorial.
-
-### Meltano + Dagster
-
-We've already added and configured the extractor/loader for you and added the Meltano ingestion job inside Dagster. 
-
-You can take a look at the configured `tap-csv` and `target-iceberg` in `meltano/meltano.yml` file. Here's a snippet:
-
-```yaml title="meltano/meltano.yml" showLineNumbers
-...
-plugins:
-  ...
-  extractors:
-    - name: tap-csv
-    ...
-  loaders:
-    - name: target-iceberg
-    ...
-```
-
-The Meltano ingestion job is defined in `dagster/your_project/meltano.py`.
-
-```python title="your_project/dagster/your_project/meltano.py" {7, 11}
-...
-
-@job(resource_defs={"meltano": meltano_resource}, config=default_config)
-def run_csv_to_iceberg_meltano_job():
-    tap_done = meltano_run_op("tap-csv target-iceberg")()
-```
-
-As you can see here, this is simply running the Meltano CLI inside a Dagster job.
-
-In the example project, this is all we've done, but for your own data pipeline, you can easily add scheduling on top of this job to run it daily or hourly.
-
-### Running Meltano Ingestion in Dagster (Step 1)
-
-Finally, let's run the Meltano ingestion job inside Dagster.
+We can run the Meltano ingestion job inside Dagster. In your example project, this is already set up for you. 
 
 1. Go to the Dagster dashboard at http://localhost:3000 and click on the `run_csv_to_iceberg_meltano_job` job
 
@@ -192,7 +163,7 @@ Finally, let's run the Meltano ingestion job inside Dagster.
 
 ![meltano-job-launch](@/assets/docs/step-4-explore-example/1b.jpg)
 
-You'll see the job starts running. It might take a couple of minutes to finish the ~100k rows of data we're using in our example project.
+You'll see the job starts running. It might take a couple of minutes to finish the ~100k+ rows of data we're using in our example project.
 
 ![meltano-job-run-success](@/assets/docs/step-4-explore-example/1c.jpg)
 
@@ -204,13 +175,13 @@ Check it out in Minio by going to http://localhost:9000 and logging in with the 
 
 ![raw-schema-on-minio](@/assets/docs/step-4-explore-example/4.jpg)
 
-### Inspecting the Iceberg Tables with Trino
+### Inspect the Iceberg Tables with Trino
 
-Iceberg is a table format that sits on top of a physical storage layer like S3. When you load data into Iceberg tables, the actual data is stored as files in S3, and Iceberg specifies how those files are organized into tables we're familiar with.
+We can see that there's data in the Minio storage, but we can't actually query the data in Minio. How many rows are in each table? What data is in there?
 
-In essence, Iceberg makes object storage like S3 work like a relational database or data warehouse.
+This is where Trino comes in - we can actually query our Iceberg tables and inspect them using our query engine, Trino.
 
-You can inspect the Iceberg tables from inside the Trino shell.
+To do that, let's enter the Trino shell.
 
 <BashCode code="sidetrek run trino shell" client:load />
 
@@ -247,27 +218,19 @@ This will show you the number of rows in the `orders` table.
 (1 row)
 ```
 
-### (Optional) Running Meltano Ingestion Directly via Meltano CLI
+Looks like our data made it in just fine!
 
-We just ran the ingestion job inside Dagster, but you can also run it directly via Meltano CLI. This is useful if you want to run the job manually or if you want to debug the job. 
-
-Run the following command to run Meltano job directly via CLI:
-
-<BashCode code="sidetrek run meltano run tap-csv target-iceberg" client:load />
-
-`sidetrek run` here is a simple convenience wrapper around `meltano run *` command. It runs the meltano CLI inside the project virtual env and also sets the cwd to /meltano directory.
-
-It's identical to running:
-
-<BashCode code="cd your_project/meltano && poetry run meltano run tap-csv target-iceberg" client:load />
-
-## Data Transformation
+## Step 2: Data Transformation
 
 Now that we have the data in the Iceberg tables, we can run transformation on them to turn them into analytics-ready tables.
 
-For this, we use DBT for writing SQL for data transformation and Trino for actually executing the SQL queries DBT generates. 
+For this, we use DBT for writing SQL for data transformation and Trino for actually executing the SQL queries DBT generates.
 
-And then we add this to Dagster so we can automate the running of the transformations.
+Trino, in turn, is connected to Iceberg where the data is actually stored so we can query them.
+
+Finally, we connect DBT to Dagster so we can automate the running of the transformations.
+
+In the example project, all these connections are already set up for you.
 
 Here's a quick reminder of where dbt and Trino are in the project structure.
 
@@ -284,79 +247,13 @@ your_project
     └── meltano
 ```
 
-### DBT + Trino
-
-DBT is a SQL data transformation tool that follows software engineering best practices.
-
-It makes it easy to write complex SQL queries, but it cannot execute those SQL queries itself. This is where Trino comes in. Trino is a query engine that can execute our DBT SQL queries.
-
-DBT provides a Trino adapter (`dbt-trino`) that allows us to run our DBT transformations on Trino easily.
-
-This is already all set up for you in the example project.
-
-### Trino + Iceberg
-
-Trino is a query engine (or "compute engine" to be more general). 
-
-But query engines need to know where the data is stored. If you want to dig up gold (our data), you need both the shovel (the compute engine, which is Trino) and the gold deposit (the storage, which is Iceberg + Minio). 
-
-In our case, the data is stored in Iceberg tables in Minio so we need to connect Trino with Iceberg somehow.
-
-We've already set this up for you - if you look at the `trino` directory in the example project, you'll see the iceberg.properties file inside /trino/etc/catalog directory. This is the file that connects Trino with Iceberg.
-
-To learn more about this, see the [Trino Iceberg connector documentation](https://trino.io/docs/current/connector/iceberg.html).
-
-### Staging, Intermediate, and Marts
-
-OK, now we've set up all the tools required to write our transformation queries in DBT.
-
-We can start writing SQL queries in DBT now, but instead, let's take a look at a helpful organizational pattern: Staging, Intermediate, and Marts.
-
-This is a common pattern in data warehousing where you have three layers of transformations, progressively turning raw data into a more business-conformed form suitable for analytics.
-
-This pattern not only makes our SQL code more modular and maintainable but also makes it easier to collaborate with others. With a common design pattern like this, everyone knows exactly what to expect.
+Before we actually run the transformations, note that our DBT "models" (i.e. tables) are organized in three stages: staging, intermediate, and mart. 
 
 - **Staging**: This is where we create atomic tables from the raw data. You can think of each of these tables as the most basic unit of data — an atomic building block we'll later compose together to build more complex SQL queries. This makes our SQL code more modular.
 - **Intermediate**: This is where we compose a bunch of atomic tables from the staging stage to create more complex tables. You can think of this stage as an intermediate step between the modular tables in the staging stage and the final, business-conformed tables in the marts stage.
 - **Marts**: This is where you have the final, business-conformed data ready for analytics. Each mart is typically designed to be consumed by a specific function in the business, such as the finance team, marketing team, etc.
 
-For more details, we highly recommend you check out DBT's excellent [Best Practices Guide](https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview).
-
-### DBT Models
-
-Take a look at the `models` directory inside `dbt/your_project` directory to see the example DBT models.
-
-```plaintext {8-11}
-your_project
-...
-└── your_project
-    ├── dagster
-    ├── data
-    ├── dbt
-    |   └── your_project
-    |       └── models
-    |           ├── staging
-    |           ├── intermediate
-    |           └── marts
-    └── meltano
-```
-
-### DBT + Dagster
-
-Let's see how we can run these transformation SQL code in Dagster.
-
-Dagster has a deep DBT integration. It can infer the dependencies between all your DBT models and run them in the correct order.
-
-In the example project, we've already added the DBT assets to Dagster for you:
-
-```python title="your_project/dagster/your_project/your_project/__init__.py"
-...
-@dbt_assets(manifest=dbt_manifest_path)
-def dbt_project_assets(context: AssetExecutionContext, dbt: DbtCliResource):
-    yield from dbt.cli(["build"], context=context).stream()
-```
-
-### Running DBT Transformations in Dagster (Step 2)
+All these DBT models are imported into Dagster so we can automate them (schedule them, for example). When we import DBT models, they're called "assets" in Dagster.
 
 You can see all the DBT assets in Global Asset Lineage section of the Dagster dashboard:
 
@@ -373,11 +270,11 @@ If the materialization was successful, you should see 3 analytics-ready tables i
 
 ![marts-tables-minio](@/assets/docs/step-4-explore-example/10.jpg)
 
-## Data Visualization
+Voila! The data is now transformed and ready for analytics.
 
-OK, we have the data in the form we want for analytics! 
+## Step 3: Data Visualization
 
-Now we can visualize them using a tool like Superset.
+OK, now we're ready to visualize our data. For that, we'll use Superset.
 
 We know that Data Analysts are particular about which tool they use here. So we've separated out Superset in its own directory so it can be easily replaced by another tool of your choice.
 
@@ -394,7 +291,7 @@ your_project
     └── meltano
 ```
 
-Let's configure Superset to connect to Trino and visualize the data.
+Let's configure Superset to connect to Trino so we can visualize the data.
 
 ### Superset + Trino
 
@@ -416,7 +313,7 @@ superset fab create-admin \
               --password $ADMIN_PASSWORD
 ```
 
-### Adding Trino as a Database Connection in Superset (Step 3)
+### Add Trino as a Database Connection in Superset (Step 3)
 
 Now we need to add Trino as a database connection in Superset.
 
@@ -438,7 +335,7 @@ Now we need to add Trino as a database connection in Superset.
 
 Trino should now be connected to Superset.
 
-### Adding an Example Dashboard (Step 4)
+### Add an Example Dashboard
 
 Now that we've connected Superset to Trino, let's add an example dashboard.
 
@@ -463,6 +360,6 @@ That's it! You should now see a bunch of charts we created for you based on the 
 
 Great! You should now have a better idea as to how this project setup can be used to run your data pipeline.
 
-If you're interested in digging deeper into how we built the example project step-by-step, check out the in-depth tutorial.
+If you're interested in digging deeper into how we built the example project step-by-step, check out the in-depth BI Stack Example Tutorial.
 
-<Button><a href="/tutorials/bi-stack-example-iceberg">Check out the BI stack tutorial</a></Button>
+<Button><a href="/tutorials/bi-stack-example-iceberg">Check out the BI Stack Example Tutorial</a></Button>

@@ -1,6 +1,6 @@
 ---
 const href = Astro.props.href || '#'
-const target = Astro.props.target || '_blank'
+const target = Astro.props.target || '_self'
 ---
 
 <a href={href} target={target} class="decoration-1 hover:underline underline-offset-4 text-sky-500 hover:text-indigo-500 cursor-pointer"><slot /></a>
