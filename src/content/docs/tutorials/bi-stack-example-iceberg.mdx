@@ -29,9 +29,25 @@ This stack consists of the following tools:
 
 In the example project, all these tools are pre-configured and connected for you.
 
+## Data Pipeline Architecture
+
+The data pipeline consists of five components:
+
+1. **Data Ingestion**: First, we extract the data from our source systems (in our example, that's the example CSV files) and load them into our storage (Minio + Iceberg) using Meltano.
+2. **Data Storage**: This is where all the data is stored. We're using Minio as a local replacement for S3 and Iceberg as the table format on top of Minio.
+3. **Data Transformation**: Once the raw data is in our storage, we transform them into analytics-ready tables using DBT and Trino.
+4. **Orchestration**: All the above steps are orchestrated by our orchestrator, Dagster.
+5. **Data Visualization**: Finally we visualize our data in Superset.
+
+To sum up:
+
+Data sources (e.g. CSV files) -> Ingestion (Meltano) -> Storage (Minio + Iceberg) -> Transformation (DBT + Trino) -> Visualization (Superset)
+
+...all orchestrated by Dagster.
+
 ## The Dataset
 
-We've included a simple dataset with four tables: `orders`, `customers`, `products`, and `stores`. This emulates the typical e-commerce data.
+We've included a simple dataset with four tables: `orders` (100k rows), `customers` (20k rows), `products` (2k rows), and `stores` (200 rows). This emulates the typical e-commerce data.
 
 Each table has its own csv file in the `/your_project/data` directory.
 
@@ -108,7 +124,7 @@ Each table has its own csv file in the `/your_project/data` directory.
 
 Data ingestion is handled by Meltano. Meltano is a managed connector with hundreds of pre-built connectors to popular data sources and targets. Essentially, it handles the EL ("Extract, Load") part of the ELT process.
 
-As a quick reminder, here's where Meltano fits into the project structure:
+As a quick reminder, here's where Meltano is in the project structure:
 
 ```plaintext {10}
 your_project
