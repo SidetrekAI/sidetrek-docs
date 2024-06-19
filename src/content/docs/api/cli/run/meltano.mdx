@@ -10,6 +10,10 @@ import MyAlert from '@/components/MyAlert'
 
 The `sidetrek run dbt *` command allows you to execute Meltano commands within your project virtual environment and in the right directory (Meltano project root). 
 
+## Usage
+
+<BashCode code="sidetrek run meltano <any meltano command and options>" client:load />
+
 ## What's Happening Underneath?
 
 This command provides a convenient way to run Meltano CLI commands without having to move into Meltano project directory and activating virtual environment.
@@ -17,10 +21,6 @@ This command provides a convenient way to run Meltano CLI commands without havin
 It's identical to running:
 
 <BashCode code="cd your_project/meltano && poetry run meltano *" client:load />
-
-## Usage
-
-<BashCode code="sidetrek run meltano <any meltano command and options>" client:load />
 
 ## Examples
 
