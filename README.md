@@ -10,7 +10,9 @@
 
 ### What is Sidetrek?
 
-Sidetrek is the fastest way to build a modern data stack. It's an open-source CLI that helps you create a data project from scratch.
+Sidetrek is the fastest way to build an OSS modern data stack. It's an open-source CLI that helps you create a data project from scratch.
+
+With Sidetrek, you can set up an end-to-end data pipeline locally in minutes.
 
 Sidetrek is built on top of popular open-source tools like Dagster, Meltano, DBT, Minio, Apache Iceberg, Trino, and Superset. We're continuously adding new tools and use cases - if you'd like to see a specific tool added, please let us know by opening an issue on our GitHub repository.
 
@@ -34,7 +36,7 @@ Make sure you have the following installed on your machine:
 
 ### Supported Platforms
 
-Currently we support MacOs and Linux, but NOT Windows.
+Currently we only support MacOs and Linux.
 
 ## Quick Start
 
@@ -62,7 +64,7 @@ To update Sidetrek to the latest version, you simply need to run the install com
 curl -fsSL https://sidetrek.com/cli.sh | sh
 ```
 
-### Initialize A Project
+### Initialize a Project
 
 Initialize a new project by running this command:
 
@@ -70,7 +72,7 @@ Initialize a new project by running this command:
 sidetrek init
 ```
 
-It will ask you to select the Python version, enter the project name, and select the data stack. Currently, we only have one data stack available made up of the following open-source tools:
+It will ask you to select the Python version, project name, and data stack. Currently, we only have one data stack available made up of the following open-source tools:
 
 - **Dagster** for orchestration
 - **Meltano** for data ingestion
@@ -79,11 +81,11 @@ It will ask you to select the Python version, enter the project name, and select
 - **Trino** for querying your data
 - **Superset** for data visualization
 
-After pressing Enter, Sidetrek will start scaffolding your project and when it's done, you'll see the message `You're all set - enjoy building your new data project! 🚀`
+After pressing Enter, Sidetrek will start scaffolding your project and in a couple of minutes, you should see the success message `You're all set - enjoy building your new data project! 🚀`.
 
 ### Start the Project
 
-Change working directory to your project directory by running `cd <your_project>`
+Change working directory to your project directory by running `cd <your_project>`.
 
 Once you are in the project folder, run the following command:
 
@@ -94,6 +96,8 @@ sidetrek start
 If you're running it for the first time, it will take a while to pull all the images, so please be patient!
 
 Once it's up and running, you can see the Dagster UI here: http://localhost:3000.
+
+You'll also see a bunch of docker services running for the core services: Minio, Iceberg, Trino, and Superset.
 
 ### Explore the Example Project
 
@@ -108,7 +112,9 @@ You still have to do a few things though if you want to see the example data vis
 
 Once you've completed the above steps, you should be able to see the Superset dashboard with charts!
 
-For more information, please check out the [example project guide](https://docs.sidetrek.com/get-started/step-4-explore-example).
+For more information, please check out the [Explore Example Guide](https://docs.sidetrek.com/get-started/step-4-explore-example).
+
+For a full guide from installation to example data visualization, check out our [Get Started](https://docs.sidetrek.com/get-started/overview) guide.
 
 ## Data Stack
 
@@ -120,6 +126,10 @@ Your data project will include the following open-source tools:
 - **Minio** and Apache Iceberg for data storage
 - **Trino** for querying your data
 - **Superset** for data visualization
+
+We're working on adding more tools and use cases. If you have a suggestion, please feel free to reach out to us.
+
+We'd love to learn more about your use case!
 
 ## Connect with Us
 
