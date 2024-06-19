@@ -530,8 +530,6 @@ This is actually a Jinja template that DBT uses to augment SQL code. In this cas
 
 When we run DBT build, it will take this code and create a valid SQL query that can be executed by Trino.
 
-<MyAlert variant="info" title="Deduplication of Tables" description="In the project_staging schema, the table stg_iceberg__orders undergoes a deduplication process to ensure each order_id remains unique. This process involves grouping rows by order_id, using row numbering, and retaining only one row from each group. By eliminating duplicate entries, we maintain data integrity and streamline data processing workflows. This approach ensures that our staging environment accurately reflects unique order information, aligning with data quality standards and enhancing the reliability of downstream analytics and reporting." />
-
 #### Adding Staging Model Configuration to `dbt_project.yml`
 
 Finally, we need to add a bit of extra configuration. We do this in the `dbt_project.yml` file in the `dbt` directory.
@@ -821,7 +819,9 @@ def dbt_project_assets(context: AssetExecutionContext, dbt: DbtCliResource):
     yield from dbt.cli(["build"], context=context).stream()
 ```
 
-In the code above, we're using the `dagster_dbt` package, which the Dagster team created to build DBT assets and then import them as Dagster assets.
+In the code above, we're using the `dagster_dbt` package, which the Dagster team created to import DBT models as Dagster "assets".
+
+<MyAlert variant="info" title='What are Dagster "assets"?' description="An example of a Dagster asset is a database table. The important thing to remember about assets is that unlike something like an Airflow task, it's declarative rather than imperative. This comes with many interesting advantages. To learn more, check out the Dagster documentation on assets." />
 
 Once we've done that, we can add the DBT assets to the Dagster definitions in `dagster/your_project/your_project/__init__.py`.
 
@@ -950,4 +950,4 @@ Congratulations! You've just built an end-to-end data pipeline from scratch.
 
 This is a simple example, but it's a great starting point for building more complex data pipelines.
 
-If you have any questions or need help, feel free to reach out to us at our [Slack community](https://join.slack.com/t/sidetrek-community/shared_invite/zt-2jt7qd46b-FmqAl3WSU~2uWtAFTXjj7A).
+If you have any questions or need help, feel free to reach out to us in our [Slack community](https://join.slack.com/t/sidetrek-community/shared_invite/zt-2jt7qd46b-FmqAl3WSU~2uWtAFTXjj7A).
