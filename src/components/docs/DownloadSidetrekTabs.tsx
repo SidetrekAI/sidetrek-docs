@@ -29,13 +29,13 @@ export default function DownloadSidetrekTabs() {
     {
       label: 'macOS ARM',
       value: 'darwin_arm64',
-      content: <BashCode code={`curl -fsSL https://sidetrek.com/cli | bash`} />,
+      content: <BashCode code={`curl -fsSL https://sidetrek.com/cli | sh`} />,
       default: true,
     },
     {
       label: 'macOS x64',
       value: 'darwin_x86',
-      content: <BashCode code={`curl -fsSL https://sidetrek.com/cli | bash`} />,
+      content: <BashCode code={`curl -fsSL https://sidetrek.com/cli | sh`} />,
     },
     {
       label: 'Linux ARM',
@@ -43,7 +43,7 @@ export default function DownloadSidetrekTabs() {
       content: (
         <div>
           <LinuxWarning />
-          <BashCode code={`curl -fsSL https://sidetrek.com/cli | bash`} />
+          <BashCode code={`curl -fsSL https://sidetrek.com/cli | sh`} />
         </div>
       ),
     },
@@ -53,7 +53,7 @@ export default function DownloadSidetrekTabs() {
       content: (
         <div>
           <LinuxWarning />
-          <BashCode code={`curl -fsSL https://sidetrek.com/cli | bash`} />
+          <BashCode code={`curl -fsSL https://sidetrek.com/cli | sh`} />
         </div>
       ),
     },
