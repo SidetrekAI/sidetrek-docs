@@ -1,0 +1,54 @@
+---
+title: Jupyter Notebook Magics
+description: List of available Jupyter Notebook magics in Sidetrek.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# Magics
+
+## What are Magics?
+
+Magics are special commands that start with `%` (line magic) or `%%` (cell magic) you can add to the top* of the cell to tell Jupyter how to run the cell. 
+
+There are few built-in [magics](https://ipython.readthedocs.io/en/stable/interactive/magics.html) but you can also create a custom one, which is what Sidetrek is doing to enable the DBT notebook. 
+
+For example, `%%writefile_dbt` is a custom magic that writes the cell content to a file with the `.sql` extension without executing the cell (which would cause an error since `code` cells in Jupyter executes with Python and does not understand DBT).
+
+This allows us to run the generated `.sql` files using the Sidetrek CLI. You can use either Dagster or DBT via Sidetrek CLI to run the generated DBT files.
+
+## %%writefile_dbt
+
+The `%%writefile_dbt` magic writes the cell content to a file with the `.sql` extension without executing the cell.
+
+### Usage
+
+In cell #1, you could have some DBT code:
+
+```plaintext
+%%writefile_dbt my_table.sql
+select * from my_table
+```
+
+And in cell #2, you could run the following command to execute the DBT code:
+
+```plaintext
+sidetrek run dbt run my_table.sql
+```
+
+Then in cell #3, you could query it:
+
+```python
+conn = trino.connect(catalog="iceberg", schema="project_staging")
+cur = conn.cursor()
+cur.execute("SELECT * FROM stg_iceberg__your_model LIMIT 10")
+rows = cur.fetchall()
+```
+
+Once you have the data, you could analyze it with something like `pandas` if you'd like:
+
+```python
+df = pd.DataFrame(rows)
+print(df.head(5))
+```
