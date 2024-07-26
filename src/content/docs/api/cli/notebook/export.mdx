@@ -1,0 +1,70 @@
+---
+title: sidetrek notebook export
+description: sidetrek notebook export command reference for the Sidetrek CLI.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# sidetrek notebook export
+
+The `sidetrek notebook export` command is used to export Jupyter notebook(s) to a Python module (`.py`) or DBT model (`.sql`).
+
+You can either export all models in the project or specify a specific model to export. Simple run the above command and follow the interactive guide.
+
+## Usage
+
+Only cells with `#| export` or `#| export_dbt` directives will be exported. 
+
+### Export Python Modules (#| export)
+
+In the top cell of your notebook, you need to have `#| default_exp` directive to specify the module name.
+
+```plaintext
+#| default_exp my_module
+```
+
+In cell #1, you could have some Python code:
+
+```python
+#| export
+print('Hello, world!')
+```
+
+In cell #2, you could have some more Python code:
+
+```python
+#| export
+print('Goodbye, world!')
+```
+
+When you run `sidetrek notebook export`, cell #1 and cell #2 will now be exported as a single Python module named `my_module` and saved as `my_module.py` in the same directory as the notebook.
+
+### Export DBT Models (#| export_dbt)
+
+Let's say you have a notebook named `your_model.ipynb`.
+
+In the cell where DBT code is, add `#| export_dbt` directive to export the cell as a DBT model.
+
+```plaintext
+%%writefile_dbt your_model.sql
+#| export_dbt your_model.sql
+
+with source as (
+  select * from {{ ref('raw_orders') }}
+)
+
+renamed as (
+  select
+    id as order_id,
+    user_id as customer_id,
+    order_date,
+  from source
+)
+
+select * from renamed
+```
+
+Note that each cell with this directive will be exported as a separate `.sql` DBT file.
+
+When you run `sidetrek notebook export`, cell #1 will now be exported as a `your_model.sql` DBT file in the same directory as your notebook.

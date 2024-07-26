@@ -1,6 +1,6 @@
 ---
-title: logs
-description: logs command reference for the Sidetrek CLI.
+title: sidetrek logs
+description: sidetrek logs command reference for the Sidetrek CLI.
 draft: false
 ---
 import BashCode from '@/components/BashCode'
@@ -17,6 +17,13 @@ The `sidetrek logs` command allows viewing logs for any service that's running.
 Or you can specify a service to view its logs:
 
 <BashCode code="sidetrek logs [service]" client:load />
+
+## Options
+
+- `-f, --follow`: Follow logs
+- `--since <value>`: Only show logs since a specific time ago
+- `-n, --tail`: Follow logs
+
 
 ## What's Happening Underneath
 

@@ -106,6 +106,28 @@ export const sideMenuTree: Tree[] = [
         href: '/guides/meltano',
       },
       {
+        label: 'Jupyter Notebook',
+        href: '/guides/jupyter-notebook',
+        tree: [
+          {
+            label: 'Jupyter Notebook',
+            href: '/guides/jupyter-notebook/jupyter-notebook',
+          },
+          {
+            label: 'DBT in Notebook',
+            href: '/guides/jupyter-notebook/dbt',
+          },
+          {
+            label: 'Magics',
+            href: '/guides/jupyter-notebook/magics',
+          },
+          {
+            label: 'Directives',
+            href: '/guides/jupyter-notebook/directives',
+          },
+        ]
+      },
+      {
         label: 'DBT',
         href: '/guides/dbt',
         tree: [
@@ -164,6 +186,20 @@ export const sideMenuTree: Tree[] = [
               {
                 label: 'trino shell',
                 href: '/api/cli/run/trino',
+              },
+            ],
+          },
+          {
+            label: 'notebook',
+            href: '/api/cli/notebook',
+            tree: [
+              {
+                label: 'new',
+                href: '/api/cli/notebook/new',
+              },
+              {
+                label: 'export',
+                href: '/api/cli/notebook/export',
               },
             ],
           },

@@ -1,0 +1,88 @@
+---
+title: Jupyter Notebook Directives
+description: List of available Jupyter Notebook directives in Sidetrek.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# Directives
+
+## What are Directives?
+
+Directives are special comments that start with `#|` you can add to the top* of the cell to tell Sidetrek how to run the cell **at the build time**.
+
+The important part here is to understand that directives don't do anything when you run the cell. It's only used during build time.
+
+For example, `#| export` is a directive that tells Sidetrek to export the cells with the directive to a Python module. All cells in a notebook marked with this directive will be aggregated into a single Python module.
+
+When you run `sidetrek notebook export` (i.e. at build time), it will export the notebooks as Python modules. This way, there's no need to duplicate code for production! You could just run this as part of a CI/CD pipeline.
+
+## #| export
+
+The `#| export` directive tells Sidetrek to export the cells with the directive as a Python module. 
+
+All cells in a notebook marked with this directive will be aggregated into a single DBT model.
+
+You need to add `#| default_exp` directive to a separate cell at the top of the notebook to specify the module name.
+
+### Usage
+
+In the top cell of your notebook, you could have:
+
+```plaintext
+#| default_exp my_module
+```
+
+In cell #1, you could have some Python code:
+
+```python
+#| export
+print('Hello, world!')
+```
+
+In cell #2, you could have some more Python code:
+
+```python
+#| export
+print('Goodbye, world!')
+```
+
+When you run `sidetrek notebook export`, cell #1 and cell #2 will now be exported as a single Python module named `my_module` and saved as `my_module.py` in the same directory as the notebook.
+
+## #| export_dbt
+
+The `#| export_dbt` directive tells Sidetrek to export the cells with the directive to a DBT model. 
+
+Each cell with this directive will be exported as a separate `.sql` file.
+
+### Usage
+
+Let's say you have a notebook named stg_iceberg__your_model.ipynb. 
+
+In cell #1, you could have some DBT code:
+
+```plaintext
+%%writefile_dbt your_model.sql
+#| export_dbt your_model.sql
+
+with source as (
+  select * from {{ ref('raw_orders') }}
+)
+
+renamed as (
+  select
+    id as order_id,
+    user_id as customer_id,
+    order_date,
+  from source
+)
+
+select * from renamed
+```
+
+When you run `sidetrek notebook export`, cell #1 will now be exported as a `stg_iceberg__your_model.sql` DBT file in the same directory as your notebook.
+
+We need magic at the top here too since during development (i.e. while you're locally experimenting), we want to still generate the DBT files so we can run them and inspect the results. Remember, the `#| export_*` directives are only executed when you run `sidetrek notebook export` during the build time.
+
+One caveat: magic command always need to be at the top of the cell - so it has to be above the directive if both magic and directives are used in the same cell.
