@@ -1,0 +1,84 @@
+---
+title: DBT Notebook
+description: How to use DBT notebooks with Sidetrek.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# DBT Notebook
+
+You can use DBT with Jupyter notebooks in Sidetrek.
+
+DBT notebooks are a great way to work with DBT as you can write the DBT code in the notebook cells and run them to see the results.
+
+You need two things to get this to work: 1) `%%writefile_dbt` magic and 2) `#| export_dbt` directive.
+
+The `%%writefile_dbt` magic writes the cell content to a file with the `.sql` extension without executing the cell. This lets us run the generated `.sql` files using the Sidetrek CLI during development.
+
+The `#| export_dbt` directive tells Sidetrek to export the cells with the directive to a DBT model. Each cell with this directive will be exported as a separate `.sql` file, which then can be used like any other DBT model in production code. This can be done during build time.
+
+## Create a New DBT Notebook
+
+The easiest way to get started with DBT in Jupyter notebooks is to create a new DBT notebook using Sidetrek CLI:
+
+<BashCode code="sidetrek notebook new" client:load />
+
+When you run the above command and select the DBT option, it will create a new Jupyter notebook with the DBT code template.
+
+## Usage
+
+### During development and experimentation
+
+In cell #1, you could have some DBT code:
+
+```plaintext
+%%writefile_dbt your_model.sql
+#| export_dbt your_model.sql
+
+with source as (
+  select * from {{ ref('raw_orders') }}
+)
+
+renamed as (
+  select
+    id as order_id,
+    user_id as customer_id,
+    order_date,
+  from source
+)
+
+select * from renamed
+```
+
+When you run the cell, it will write the DBT code to a file named `your_model.sql` in the same directory as your notebook. This is done by the `%%writefile_dbt` magic command.
+
+Then in cell #2, you could run the following command to execute the DBT code:
+
+```plaintext
+sidetrek run dbt run my_table.sql
+```
+
+In cell #3, you could query it:
+
+```python
+conn = trino.connect(catalog="iceberg", schema="project_staging")
+cur = conn.cursor()
+cur.execute("SELECT * FROM stg_iceberg__your_model LIMIT 10")
+rows = cur.fetchall()
+```
+
+Once you have the data, you could analyze it with something like `pandas` if you'd like:
+
+```python
+df = pd.DataFrame(rows)
+print(df.head(5))
+```
+
+Or any other tools of your choice - `duckdb`, `matplotlib`, `seaborn`, etc.
+
+### During productionization
+
+Once you're done the experimentation, you can export the notebooks as DBT models.
+
+When you run `sidetrek notebook export`, cell #1 will now be exported as a `your_model.sql` DBT file in the same directory as your notebook.

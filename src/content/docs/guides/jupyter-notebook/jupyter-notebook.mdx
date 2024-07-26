@@ -1,0 +1,71 @@
+---
+title: Jupyter Notebooks
+description: Learn how to use Jupyter notebooks with Sidetrek.
+draft: false
+---
+import BashCode from '@/components/BashCode'
+import MyAlert from '@/components/MyAlert'
+
+# Jupyter Notebooks
+
+Sidetrek ships with Jupyter Lab (IDE for Jupyter Notebooks). If you're not familiar with Jupyter Notebook, it's a great way to do "literate programming" where you can write code, add text, and visualize data all in one place.
+
+It's very popular among data scientists and analysts for enabling fast experimentation and we believe it could be very valuable for data engineers as well. It's a great platform for working with data in general because you can easily visualize data as you write code.
+
+If you're new to Jupyter Notebooks, you can learn more about them in the [official documentation](https://jupyter.org/documentation).
+
+## How to Run Jupyter Lab
+
+If you run `sidetrek start` to start the Sidetrek services, Jupyter Lab will be available at [http://localhost:8889/lab](http://localhost:8889/lab).
+
+## Create a New Notebook
+
+You can create a new Jupyter Notebook directly inside the Jupyter Lab interface, but you can also create them using the following command:
+
+<BashCode code="sidetrek notebook new" client:load />
+
+Why have a CLI command for creating a blank notebook? For a blank notebook, this is not very useful, but it's very useful for creating a DBT notebook.
+
+When you run the above command and select the DBT option, it will create a new Jupyter notebook with the DBT code template.
+
+You simply have to write the DBT code in the right Notebook cell to run and visualize the data.
+ 
+We think Jupyter Notebook provides an interesting alternative to Vscode, more iterative way to work with DBT.
+
+See more details in the [DBT Notebook](/docs/guides/jupyter-notebook/dbt) documentation.
+
+## Types of Jupyter Notebooks
+
+There are two types of Jupyter notebooks you can create with Sidetrek:
+
+1. **Python Notebook** - A blank Python notebook where you can write Python code.
+2. **DBT Notebook** - A Jupyter notebook with the DBT code template.
+
+The DBT notebook is a great way to work with DBT as you can write the DBT code in the notebook cells and run them to see the results right away.
+
+## Magics and Directives
+
+DBT notebook is made possible by two concepts that you may not be familiar with: 1) magics and 2) directives.
+
+Magics and directives imbue notebooks with special powers that allow you to do things like export the notebook as a Python module or a DBT model.
+
+See [Jupyter Notebook Magics](/docs/guides/jupyter-notebook/magics) and [Jupyter Notebook Directives](/docs/guides/jupyter-notebook/directives) for more details.
+
+## Exporting Notebooks
+
+Jupyter notebook is awesome for experimentation, but one of its main drawbacks has been that you have to duplicate the code as a Python file when it comes time to use the code in production.
+
+Sidetrek solves this problem by allowing you to export the notebooks as Python modules or DBT models via [directives](/docs/guides/jupyter-notebook/directives).
+
+First you need to add the directives to the cells you want to export:
+
+- Add `#| export` directive to cells you want to export as Python modules. 
+- Add the `#| export_dbt` directive to cells you want to export as DBT models.
+
+Once directives are added, you can export the notebooks as Python modules or DBT models with a single command at build time:
+
+<BashCode code="sidetrek notebook export" client:load />
+
+This way, you can do all your development in Jupyter notebooks and export them as Python modules or DBT models when you're ready to run them in production - as part of your CI/CD pipeline, for example.
+
+For more details, see [Jupyter Notebook Directives](/docs/guides/jupyter-notebook/directives) documentation.
