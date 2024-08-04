@@ -157,7 +157,7 @@ We've already added and configured the extractor for you in the example project,
 
 To install an extractor, you can run a command like this:
 
-<BashCode code="meltano add extractor tap-csv" client:load />
+<BashCode code="sidetrek run meltano add extractor tap-csv" client:load />
 
 Replace `tap-csv` with the name of the extractor you want to add. See the [Meltano documentation](https://meltano.com/docs/) for more information on how to work with Meltano.
 
@@ -192,7 +192,7 @@ Once the extractor is set up, it's time to add the loader. This is where you tel
 
 In the example project, we're loading the data into Iceberg tables. We've already added and configured the loader for you in the example project, but if you want to add your own later, you can do it like this:
 
-<BashCode code="meltano add --custom loader target-iceberg" client:load />
+<BashCode code="sidetrek run meltano add --custom loader target-iceberg" client:load />
 
 Note that you typically don't need the `--custom` flag if you're using one of the existing Meltano loaders.
 
