@@ -59,75 +59,82 @@ Data sources (e.g. CSV files) -> Ingestion (Meltano) -> Storage (Minio + Iceberg
 
 ### The Dataset
 
-We've included a simple dataset with four tables: `orders` (100k rows), `customers` (20k rows), `products` (2k rows), and `stores` (200 rows). This emulates the typical e-commerce data.
+We've included a simple dataset with four tables: `attendance` (205800 rows), `employees` (200 rows), `performance` (3200 rows), and `salary` (7932 rows). This emulates the typical HR records.
 
 Each table has its own csv file in the `/your_project/data` directory.
 
-<div className="grid grid-cols-1 md:grid-cols-2 md:gap-8">
+<div className="grid grid-cols-1 md:grid-cols-1 md:gap-8">
 <div className="col-span-1">
-#### Orders Table
+#### Attendance Table
 
-<div className="max-w-[320px]">
-| Field | Type |
-| --- | --- |
-| order_id | string |
-| ordered_at | timestamp |
-| product_id | string |
-| product_qty | integer |
-| customer_id | string |
-| store_id | string |
-</div>
-</div>
-
-<div className="col-span-1">
-#### Customers Table
-
-<div className="max-w-[320px]">
-| Field | Type |
-| --- | --- |
-| customer_id | string |
-| customer_name | string |
-| first_name | string |
-| last_name | string |
-| gender | string |
-| country | string |
-| address | string |
-| phone_no | string |
-| email | string |
-| payment_method | string |
-| traffic_source | string |
-| customer_age | integer |
-| device_type | string |
-</div>
-</div>
-</div>
-
-<div className="grid grid-cols-1 md:grid-cols-2 md:gap-8">
-<div className="col-span-1">
-#### Products Table
-
-<div className="max-w-[320px]">
-| Field | Type |
-| --- | --- |
-| product_id | string |
-| product_name | string |
-| product_category | string |
-| unit_price | float |
-| product_description | string |
+<div className="max-w-full">
+| Column Name     | Data Type | Description                              | Constraints              |
+|-----------------|-----------|------------------------------------------|--------------------------|
+| ID              | String    | Unique identifier for the record         | Primary Key, Unique      |
+| Employee ID     | Integer   | ID of the employee                       | Foreign Key to Employees |
+| Date            | Date      | Date of the attendance record            |                          |
+| Status          | String    | Attendance status (e.g., Present/Absent) |                          |
+| Clock In Time   | Time      | Time employee clocked in                 |                          |
+| Clock Out Time  | Time      | Time employee clocked out                |                          |
 </div>
 </div>
 
 <div className="col-span-1">
-#### Stores Table
+#### Employees Table
 
-<div className="max-w-[320px]">
-| Field | Type |
-| --- | --- |
-| store_id | string |
-| store_name | string |
-| store_city | string |
-| store_state | string |
-| tax_rate | float |
+<div className="max-w-full">
+| Column Name       | Data Type | Description                           | Constraints           |
+|-------------------|-----------|---------------------------------------|-----------------------|
+| Employee ID       | Integer   | Unique ID for each employee           | Primary Key, Unique   |
+| Name              | String    | Full name of the employee             |                       |
+| Department        | String    | Department the employee belongs to    |                       |
+| Role              | String    | Job title or role of the employee     |                       |
+| Date of Joining   | Date      | Date the employee joined the company  |                       |
+| Resignation Date  | Date      | Date the employee left the company    | Nullable              |
+| Age               | Integer   | Age of the employee                   |                       |
+| Supervisor ID     | Integer   | ID of the employee's supervisor       | Foreign Key to Employees |
+</div>
+</div>
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-1 md:gap-8">
+<div className="col-span-1">
+#### Performance Table
+
+<div className="max-w-full">
+| Column Name           | Data Type | Description                                               | Constraints              |
+|-----------------------|-----------|-----------------------------------------------------------|--------------------------|
+| ID                    | String    | Unique identifier for the performance record              | Primary Key, Unique      |
+| Employee ID           | Integer   | ID of the employee being evaluated                        | Foreign Key to Employees |
+| Evaluation Date       | Date      | Date of the performance evaluation                        |                          |
+| Review Period         | String    | Review period (e.g., "Q1 2022", "Q2 2022")               |                          |
+| Score                 | Integer   | Performance score (e.g., 1-5 scale)                       |                          |
+| KPI_1                 | Integer   | Score for KPI 1                                           |                          |
+| KPI_2                 | Integer   | Score for KPI 2                                           |                          |
+| KPI_3                 | Integer   | Score for KPI 3                                           |                          |
+| Goal Achievement      | Integer   | Goal achievement percentage                               |                          |
+| Promotion Eligible    | Boolean   | Eligibility for promotion (True if Score > 4)             |                          |
+| Training Recommended  | Boolean   | Recommendation for training (True if Score < 2)           |                          |
+</div>
+</div>
+
+<div className="col-span-1">
+#### Salary Table
+
+<div className="max-w-full">
+| Column Name         | Data Type | Description                                           | Constraints              |
+|---------------------|-----------|-------------------------------------------------------|--------------------------|
+| ID                  | String    | Unique identifier for the salary record               | Primary Key, Unique      |
+| Employee ID         | Integer   | ID of the employee                                    | Foreign Key to Employees |
+| Month               | Date      | Month of the salary record (YYYY-MM)                  |                          |
+| Base Salary         | Float     | Base salary amount                                    |                          |
+| House Rent          | Float     | House rent allowance                                  |                          |
+| Transportation      | Float     | Transportation allowance                              |                          |
+| Communication       | Float     | Communication allowance                               |                          |
+| Wellness            | Float     | Wellness allowance                                   |                          |
+| Tax Deduction       | Float     | Tax deduction amount                                  |                          |
+| Net Salary          | Float     | Final net salary after deductions                     |                          |
+
 </div>
 </div>
 </div>
@@ -198,23 +205,23 @@ Then list out the tables in that schema.
 ```plaintext
      Table     
 ---------------
- orders    
- customers 
- products
- stores  
+ attendance    
+ employees 
+ performance
+ salary  
 (4 rows)
 ```
 
 To view the data inside the table, you can run something like:
 
-<BashCode code="select count(*) from orders;" client:load />
+<BashCode code="select count(*) from attendance;" client:load />
 
 This will show you the number of rows in the `orders` table.
 
 ```plaintext
   _col0  
 --------
- 100000 
+ 205800 
 (1 row)
 ```
 
@@ -362,4 +369,4 @@ Great! You should now have a better idea as to how this project setup can be use
 
 If you're interested in digging deeper into how we built the example project step-by-step, check out the in-depth BI Stack Example Tutorial.
 
-<Button><a href="/tutorials/bi-stack-example-iceberg">Check out the BI Stack Example Tutorial</a></Button>
+{/* <Button><a href="/tutorials/bi-stack-example-iceberg">Check out the BI Stack Example Tutorial</a></Button> */}
